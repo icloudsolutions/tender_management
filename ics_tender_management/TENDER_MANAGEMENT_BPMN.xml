@@ -1,0 +1,602 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             targetNamespace="http://icloud-solutions.net/tender-management"
+             id="ICS_Tender_Management_Process"
+             exporter="ICS Tender Management"
+             exporterVersion="18.0.2.0.0">
+
+  <!-- ========================================== -->
+  <!-- MAIN TENDER MANAGEMENT PROCESS             -->
+  <!-- ========================================== -->
+
+  <process id="TenderManagementProcess" name="ICS Tender Management - Complete Workflow" isExecutable="true">
+
+    <!-- START EVENT -->
+    <startEvent id="StartEvent_OpportunityIdentified" name="Opportunity Identified">
+      <outgoing>Flow_ToRegisterTender</outgoing>
+    </startEvent>
+
+    <!-- TASK 1: REGISTER TENDER (DRAFT STAGE) -->
+    <userTask id="Task_RegisterTender" name="Register Tender (Draft Stage)">
+      <incoming>Flow_ToRegisterTender</incoming>
+      <outgoing>Flow_ToTechnicalStudy</outgoing>
+      <documentation>
+        Create tender record with basic information:
+        - Tender name and reference
+        - Customer details
+        - Estimated budget
+        - Submission deadline
+        - Attach tender documents
+        - Assign team members
+      </documentation>
+    </userTask>
+
+    <!-- TASK 2: TECHNICAL STUDY -->
+    <userTask id="Task_TechnicalStudy" name="Conduct Technical Study">
+      <incoming>Flow_ToTechnicalStudy</incoming>
+      <outgoing>Flow_ToFinancialStudy</outgoing>
+      <documentation>
+        Technical analysis phase:
+        - Review specifications
+        - Create Bill of Quantities (BoQ)
+        - Define technical requirements
+        - Import BoQ from Excel if needed
+        - Document technical notes
+        - Obtain technical approval
+      </documentation>
+    </userTask>
+
+    <!-- TASK 3: FINANCIAL STUDY -->
+    <userTask id="Task_FinancialStudy" name="Conduct Financial Study">
+      <incoming>Flow_ToFinancialStudy</incoming>
+      <outgoing>Flow_ToSendRFQ</outgoing>
+      <documentation>
+        Financial analysis phase:
+        - Identify vendors
+        - Prepare RFQ documents
+        - Set pricing criteria
+        - Define evaluation method
+      </documentation>
+    </userTask>
+
+    <!-- TASK 4: SEND RFQ TO VENDORS -->
+    <serviceTask id="Task_SendRFQ" name="Send RFQ to Vendors">
+      <incoming>Flow_ToSendRFQ</incoming>
+      <outgoing>Flow_ToCollectOffers</outgoing>
+      <documentation>
+        Automated RFQ distribution:
+        - Send RFQ emails to vendors
+        - Set response deadline
+        - Track sent RFQs
+      </documentation>
+    </serviceTask>
+
+    <!-- TASK 5: COLLECT VENDOR OFFERS -->
+    <userTask id="Task_CollectVendorOffers" name="Collect Vendor Offers">
+      <incoming>Flow_ToCollectOffers</incoming>
+      <outgoing>Flow_ToCompareVendors</outgoing>
+      <documentation>
+        Vendor quotation collection:
+        - Receive vendor quotations
+        - Enter prices in system
+        - Upload vendor documents
+        - Validate completeness
+      </documentation>
+    </userTask>
+
+    <!-- TASK 6: COMPARE VENDORS -->
+    <userTask id="Task_CompareVendors" name="Compare Vendor Offers">
+      <incoming>Flow_ToCompareVendors</incoming>
+      <outgoing>Flow_ToSelectVendors</outgoing>
+      <documentation>
+        Vendor comparison analysis:
+        - Use comparison wizard
+        - Review pricing
+        - Evaluate quality
+        - Calculate savings
+      </documentation>
+    </userTask>
+
+    <!-- TASK 7: SELECT BEST VENDORS -->
+    <userTask id="Task_SelectVendors" name="Select Best Vendors">
+      <incoming>Flow_ToSelectVendors</incoming>
+      <outgoing>Flow_ToPrepareQuotation</outgoing>
+      <documentation>
+        Vendor selection:
+        - Select best offers
+        - Apply selections to BoQ
+        - Document selection rationale
+        - Calculate base cost
+      </documentation>
+    </userTask>
+
+    <!-- TASK 8: PREPARE QUOTATION -->
+    <userTask id="Task_PrepareQuotation" name="Prepare Customer Quotation">
+      <incoming>Flow_ToPrepareQuotation</incoming>
+      <outgoing>Flow_ToApproveQuotation</outgoing>
+      <documentation>
+        Quotation preparation:
+        - Calculate final pricing with margin
+        - Generate quotation document
+        - Create sale order
+        - Add terms and conditions
+      </documentation>
+    </userTask>
+
+    <!-- GATEWAY: QUOTATION APPROVED? -->
+    <exclusiveGateway id="Gateway_QuotationApproved" name="Quotation Approved?">
+      <incoming>Flow_ToApproveQuotation</incoming>
+      <outgoing>Flow_QuotationApproved</outgoing>
+      <outgoing>Flow_QuotationRejected</outgoing>
+    </exclusiveGateway>
+
+    <!-- TASK 9: REVISE QUOTATION -->
+    <userTask id="Task_ReviseQuotation" name="Revise Quotation">
+      <incoming>Flow_QuotationRejected</incoming>
+      <outgoing>Flow_ToApproveQuotation</outgoing>
+      <documentation>
+        Quotation revision:
+        - Adjust pricing
+        - Update terms
+        - Resubmit for approval
+      </documentation>
+    </userTask>
+
+    <!-- TASK 10: SUBMIT TENDER -->
+    <userTask id="Task_SubmitTender" name="Submit Tender to Customer">
+      <incoming>Flow_QuotationApproved</incoming>
+      <outgoing>Flow_ToEvaluation</outgoing>
+      <documentation>
+        Tender submission:
+        - Submit to customer portal (Etimad)
+        - Email submission
+        - Physical delivery if needed
+        - Obtain receipt confirmation
+      </documentation>
+    </userTask>
+
+    <!-- TASK 11: UNDER EVALUATION -->
+    <userTask id="Task_UnderEvaluation" name="Under Evaluation">
+      <incoming>Flow_ToEvaluation</incoming>
+      <outgoing>Flow_ToAwaitDecision</outgoing>
+      <documentation>
+        Evaluation period:
+        - Monitor evaluation progress
+        - Answer clarifications
+        - Provide additional documents
+        - Track timeline
+      </documentation>
+    </userTask>
+
+    <!-- GATEWAY: TENDER DECISION -->
+    <exclusiveGateway id="Gateway_TenderDecision" name="Tender Decision?">
+      <incoming>Flow_ToAwaitDecision</incoming>
+      <outgoing>Flow_TenderWon</outgoing>
+      <outgoing>Flow_TenderLost</outgoing>
+      <outgoing>Flow_TenderCancelled</outgoing>
+    </exclusiveGateway>
+
+    <!-- ========================================== -->
+    <!-- PATH 1: TENDER WON                         -->
+    <!-- ========================================== -->
+
+    <userTask id="Task_ReceiveAwardLetter" name="Receive Award Letter">
+      <incoming>Flow_TenderWon</incoming>
+      <outgoing>Flow_ToProjectTypeCheck</outgoing>
+      <documentation>
+        Award processing:
+        - Receive official award letter
+        - Record contract details
+        - Sign contract
+        - Mark tender as won
+      </documentation>
+    </userTask>
+
+    <!-- GATEWAY: PROJECT TYPE -->
+    <exclusiveGateway id="Gateway_ProjectType" name="Project Type?">
+      <incoming>Flow_ToProjectTypeCheck</incoming>
+      <outgoing>Flow_SupplyProject</outgoing>
+      <outgoing>Flow_OMProject</outgoing>
+    </exclusiveGateway>
+
+    <!-- ========================================== -->
+    <!-- SUPPLY PROJECTS WORKFLOW (مشاريع التوريد)  -->
+    <!-- ========================================== -->
+
+    <!-- PHASE 1: PROJECT RECEIPT -->
+    <userTask id="Task_Supply_Phase1_ProjectReceipt" name="Supply Phase 1: Project Receipt After Award">
+      <incoming>Flow_SupplyProject</incoming>
+      <outgoing>Flow_Supply_ToPhase2</outgoing>
+      <documentation>
+        Phase 1: استلام المشروع بعد الترسية
+        - Create project from won tender
+        - Review requirements and quantities
+        - Determine delivery period
+        - Approve supply plan
+        - Assign project commissioner
+      </documentation>
+    </userTask>
+
+    <!-- PHASE 2: CONTRACTING WITH SUPPLIERS -->
+    <userTask id="Task_Supply_Phase2_Contracting" name="Supply Phase 2: Contracting with Suppliers">
+      <incoming>Flow_Supply_ToPhase2</incoming>
+      <outgoing>Flow_Supply_ToPhase3</outgoing>
+      <documentation>
+        Phase 2: التعاقد مع الموردين
+        - Review vendor offers
+        - Issue purchase orders
+        - Sign contracts
+        - Define delivery schedule
+        - Track material readiness
+      </documentation>
+    </userTask>
+
+    <!-- PHASE 3: SUPPLY EXECUTION -->
+    <userTask id="Task_Supply_Phase3_Execution" name="Supply Phase 3: Supply Execution">
+      <incoming>Flow_Supply_ToPhase3</incoming>
+      <outgoing>Flow_Supply_ToPhase4</outgoing>
+      <documentation>
+        Phase 3: تنفيذ التوريد
+        - Receive materials from vendor
+        - Inspect quantities and specifications
+        - Coordinate with government entity
+        - Document delivery minutes
+      </documentation>
+    </userTask>
+
+    <!-- PHASE 4: PRELIMINARY HANDOVER -->
+    <userTask id="Task_Supply_Phase4_PreliminaryHandover" name="Supply Phase 4: Preliminary Handover">
+      <incoming>Flow_Supply_ToPhase4</incoming>
+      <outgoing>Flow_Supply_ToPhase5</outgoing>
+      <documentation>
+        Phase 4: الاستلام الابتدائي
+        - Deliver materials to government entity
+        - Prepare preliminary receipt
+        - Address observations
+        - Register warranties
+      </documentation>
+    </userTask>
+
+    <!-- PHASE 5: FINAL HANDOVER -->
+    <userTask id="Task_Supply_Phase5_FinalHandover" name="Supply Phase 5: Final Handover">
+      <incoming>Flow_Supply_ToPhase5</incoming>
+      <outgoing>Flow_Supply_ToPhase6</outgoing>
+      <documentation>
+        Phase 5: الاستلام النهائي
+        - Approve final handover
+        - Deliver guarantees and warranties
+        - Close purchase orders
+        - Complete final documentation
+      </documentation>
+    </userTask>
+
+    <!-- PHASE 6: INVOICING AND CLOSURE -->
+    <userTask id="Task_Supply_Phase6_InvoicingClosure" name="Supply Phase 6: Invoicing and Closure">
+      <incoming>Flow_Supply_ToPhase6</incoming>
+      <outgoing>Flow_Supply_ToComplete</outgoing>
+      <documentation>
+        Phase 6: المستخلصات والإقفال
+        - Prepare financial claims
+        - Submit on Etimad platform
+        - Track payment
+        - Archive project
+      </documentation>
+    </userTask>
+
+    <!-- SUPPLY PROJECT END -->
+    <endEvent id="EndEvent_SupplyComplete" name="Supply Project Complete">
+      <incoming>Flow_Supply_ToComplete</incoming>
+    </endEvent>
+
+    <!-- ========================================== -->
+    <!-- O&M SERVICES WORKFLOW (مشاريع الصيانة والتشغيل) -->
+    <!-- ========================================== -->
+
+    <!-- PHASE 1: PROJECT KICKOFF -->
+    <userTask id="Task_OM_Phase1_Kickoff" name="O&amp;M Phase 1: Project Kickoff">
+      <incoming>Flow_OMProject</incoming>
+      <outgoing>Flow_OM_ToPhase2</outgoing>
+      <documentation>
+        Phase 1: بدء المشروع
+        - Assign project commissioner
+        - Review scope of work and SLA
+        - Approve organizational structure
+        - Form work team
+        - Hold kickoff meeting
+      </documentation>
+    </userTask>
+
+    <!-- PHASE 2: OPERATIONAL PLANNING -->
+    <userTask id="Task_OM_Phase2_Planning" name="O&amp;M Phase 2: Operational Planning">
+      <incoming>Flow_OM_ToPhase2</incoming>
+      <outgoing>Flow_OM_ToPhase3</outgoing>
+      <documentation>
+        Phase 2: التخطيط التشغيلي
+        - Approve work plan and timeline
+        - Approve visit/patrol schedule
+        - Determine notification mechanism
+        - Approve risk plan
+      </documentation>
+    </userTask>
+
+    <!-- PHASE 3: WORK EXECUTION -->
+    <userTask id="Task_OM_Phase3_Execution" name="O&amp;M Phase 3: Work Execution">
+      <incoming>Flow_OM_ToPhase3</incoming>
+      <outgoing>Flow_OM_ToPhase4</outgoing>
+      <documentation>
+        Phase 3: تنفيذ الأعمال
+        - Execute work per approved plan
+        - Comply with SLA indicators
+        - Document completed work
+        - Manage field teams
+      </documentation>
+    </userTask>
+
+    <!-- PHASE 4: MONITORING AND REPORTING (PARALLEL WITH PHASE 3) -->
+    <userTask id="Task_OM_Phase4_Monitoring" name="O&amp;M Phase 4: Monitoring and Reporting">
+      <incoming>Flow_OM_ToPhase4</incoming>
+      <outgoing>Flow_OM_ToPhase5</outgoing>
+      <documentation>
+        Phase 4: المتابعة والتقارير
+        - Prepare periodic reports (daily/weekly/monthly)
+        - Track completion percentage
+        - Address observations
+        - Continuous coordination
+      </documentation>
+    </userTask>
+
+    <!-- PHASE 5: FINANCIAL INVOICING (PERIODIC) -->
+    <userTask id="Task_OM_Phase5_Invoicing" name="O&amp;M Phase 5: Financial Invoicing">
+      <incoming>Flow_OM_ToPhase5</incoming>
+      <outgoing>Flow_OM_ContractEnd</outgoing>
+      <documentation>
+        Phase 5: المستخلصات المالية
+        - Prepare invoices per contract terms
+        - Submit to government entity
+        - Submit on Etimad platform
+        - Track payment
+        Note: This phase repeats monthly/quarterly
+      </documentation>
+    </userTask>
+
+    <!-- GATEWAY: CONTRACT PERIOD END? -->
+    <exclusiveGateway id="Gateway_OM_ContractEnd" name="Contract Period End?">
+      <incoming>Flow_OM_ContractEnd</incoming>
+      <outgoing>Flow_OM_Continue</outgoing>
+      <outgoing>Flow_OM_ToPhase6</outgoing>
+    </exclusiveGateway>
+
+    <!-- LOOP BACK TO EXECUTION -->
+    <sequenceFlow id="Flow_OM_Continue" name="Continue Service" sourceRef="Gateway_OM_ContractEnd" targetRef="Task_OM_Phase3_Execution"/>
+
+    <!-- PHASE 6: HANDOVER AND CLOSURE -->
+    <userTask id="Task_OM_Phase6_HandoverClosure" name="O&amp;M Phase 6: Handover and Closure">
+      <incoming>Flow_OM_ToPhase6</incoming>
+      <outgoing>Flow_OM_ToComplete</outgoing>
+      <documentation>
+        Phase 6: التسليم والإقفال
+        - Preliminary handover
+        - Transfer knowledge
+        - Address observations
+        - Final handover
+        - Close and archive project
+      </documentation>
+    </userTask>
+
+    <!-- O&M PROJECT END -->
+    <endEvent id="EndEvent_OMComplete" name="O&amp;M Project Complete">
+      <incoming>Flow_OM_ToComplete</incoming>
+    </endEvent>
+
+    <!-- ========================================== -->
+    <!-- PATH 2: TENDER LOST                        -->
+    <!-- ========================================== -->
+
+    <userTask id="Task_DocumentLoss" name="Document Loss">
+      <incoming>Flow_TenderLost</incoming>
+      <outgoing>Flow_ToLostEnd</outgoing>
+      <documentation>
+        Loss documentation:
+        - Record loss date and reason
+        - Document winning competitor
+        - Conduct loss analysis
+        - Capture lessons learned
+        - Maintain customer relationship
+      </documentation>
+    </userTask>
+
+    <endEvent id="EndEvent_TenderLost" name="Tender Lost">
+      <incoming>Flow_ToLostEnd</incoming>
+    </endEvent>
+
+    <!-- ========================================== -->
+    <!-- PATH 3: TENDER CANCELLED                   -->
+    <!-- ========================================== -->
+
+    <userTask id="Task_DocumentCancellation" name="Document Cancellation">
+      <incoming>Flow_TenderCancelled</incoming>
+      <outgoing>Flow_ToCancelledEnd</outgoing>
+      <documentation>
+        Cancellation documentation:
+        - Record cancellation date and reason
+        - Stop all work
+        - Notify team
+        - Close vendor RFQs
+        - Document costs incurred
+        - Archive documents
+      </documentation>
+    </userTask>
+
+    <endEvent id="EndEvent_TenderCancelled" name="Tender Cancelled">
+      <incoming>Flow_ToCancelledEnd</incoming>
+    </endEvent>
+
+    <!-- ========================================== -->
+    <!-- SEQUENCE FLOWS                             -->
+    <!-- ========================================== -->
+
+    <!-- Main Flow -->
+    <sequenceFlow id="Flow_ToRegisterTender" sourceRef="StartEvent_OpportunityIdentified" targetRef="Task_RegisterTender"/>
+    <sequenceFlow id="Flow_ToTechnicalStudy" sourceRef="Task_RegisterTender" targetRef="Task_TechnicalStudy"/>
+    <sequenceFlow id="Flow_ToFinancialStudy" sourceRef="Task_TechnicalStudy" targetRef="Task_FinancialStudy"/>
+    <sequenceFlow id="Flow_ToSendRFQ" sourceRef="Task_FinancialStudy" targetRef="Task_SendRFQ"/>
+    <sequenceFlow id="Flow_ToCollectOffers" sourceRef="Task_SendRFQ" targetRef="Task_CollectVendorOffers"/>
+    <sequenceFlow id="Flow_ToCompareVendors" sourceRef="Task_CollectVendorOffers" targetRef="Task_CompareVendors"/>
+    <sequenceFlow id="Flow_ToSelectVendors" sourceRef="Task_CompareVendors" targetRef="Task_SelectVendors"/>
+    <sequenceFlow id="Flow_ToPrepareQuotation" sourceRef="Task_SelectVendors" targetRef="Task_PrepareQuotation"/>
+    <sequenceFlow id="Flow_ToApproveQuotation" sourceRef="Task_PrepareQuotation" targetRef="Gateway_QuotationApproved"/>
+    <sequenceFlow id="Flow_QuotationApproved" name="Approved" sourceRef="Gateway_QuotationApproved" targetRef="Task_SubmitTender">
+      <conditionExpression xsi:type="tFormalExpression">approved == true</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_QuotationRejected" name="Rejected" sourceRef="Gateway_QuotationApproved" targetRef="Task_ReviseQuotation">
+      <conditionExpression xsi:type="tFormalExpression">approved == false</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_ToEvaluation" sourceRef="Task_SubmitTender" targetRef="Task_UnderEvaluation"/>
+    <sequenceFlow id="Flow_ToAwaitDecision" sourceRef="Task_UnderEvaluation" targetRef="Gateway_TenderDecision"/>
+
+    <!-- Decision Flows -->
+    <sequenceFlow id="Flow_TenderWon" name="Won" sourceRef="Gateway_TenderDecision" targetRef="Task_ReceiveAwardLetter">
+      <conditionExpression xsi:type="tFormalExpression">decision == 'won'</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_TenderLost" name="Lost" sourceRef="Gateway_TenderDecision" targetRef="Task_DocumentLoss">
+      <conditionExpression xsi:type="tFormalExpression">decision == 'lost'</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_TenderCancelled" name="Cancelled" sourceRef="Gateway_TenderDecision" targetRef="Task_DocumentCancellation">
+      <conditionExpression xsi:type="tFormalExpression">decision == 'cancelled'</conditionExpression>
+    </sequenceFlow>
+
+    <!-- Project Type Flows -->
+    <sequenceFlow id="Flow_ToProjectTypeCheck" sourceRef="Task_ReceiveAwardLetter" targetRef="Gateway_ProjectType"/>
+    <sequenceFlow id="Flow_SupplyProject" name="Supply Project" sourceRef="Gateway_ProjectType" targetRef="Task_Supply_Phase1_ProjectReceipt">
+      <conditionExpression xsi:type="tFormalExpression">project_type == 'supply'</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_OMProject" name="O&amp;M Services" sourceRef="Gateway_ProjectType" targetRef="Task_OM_Phase1_Kickoff">
+      <conditionExpression xsi:type="tFormalExpression">project_type == 'maintenance'</conditionExpression>
+    </sequenceFlow>
+
+    <!-- Supply Project Flows -->
+    <sequenceFlow id="Flow_Supply_ToPhase2" sourceRef="Task_Supply_Phase1_ProjectReceipt" targetRef="Task_Supply_Phase2_Contracting"/>
+    <sequenceFlow id="Flow_Supply_ToPhase3" sourceRef="Task_Supply_Phase2_Contracting" targetRef="Task_Supply_Phase3_Execution"/>
+    <sequenceFlow id="Flow_Supply_ToPhase4" sourceRef="Task_Supply_Phase3_Execution" targetRef="Task_Supply_Phase4_PreliminaryHandover"/>
+    <sequenceFlow id="Flow_Supply_ToPhase5" sourceRef="Task_Supply_Phase4_PreliminaryHandover" targetRef="Task_Supply_Phase5_FinalHandover"/>
+    <sequenceFlow id="Flow_Supply_ToPhase6" sourceRef="Task_Supply_Phase5_FinalHandover" targetRef="Task_Supply_Phase6_InvoicingClosure"/>
+    <sequenceFlow id="Flow_Supply_ToComplete" sourceRef="Task_Supply_Phase6_InvoicingClosure" targetRef="EndEvent_SupplyComplete"/>
+
+    <!-- O&M Project Flows -->
+    <sequenceFlow id="Flow_OM_ToPhase2" sourceRef="Task_OM_Phase1_Kickoff" targetRef="Task_OM_Phase2_Planning"/>
+    <sequenceFlow id="Flow_OM_ToPhase3" sourceRef="Task_OM_Phase2_Planning" targetRef="Task_OM_Phase3_Execution"/>
+    <sequenceFlow id="Flow_OM_ToPhase4" sourceRef="Task_OM_Phase3_Execution" targetRef="Task_OM_Phase4_Monitoring"/>
+    <sequenceFlow id="Flow_OM_ToPhase5" sourceRef="Task_OM_Phase4_Monitoring" targetRef="Task_OM_Phase5_Invoicing"/>
+    <sequenceFlow id="Flow_OM_ContractEnd" sourceRef="Task_OM_Phase5_Invoicing" targetRef="Gateway_OM_ContractEnd"/>
+    <sequenceFlow id="Flow_OM_ToPhase6" name="Contract End" sourceRef="Gateway_OM_ContractEnd" targetRef="Task_OM_Phase6_HandoverClosure">
+      <conditionExpression xsi:type="tFormalExpression">contract_end == true</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_OM_ToComplete" sourceRef="Task_OM_Phase6_HandoverClosure" targetRef="EndEvent_OMComplete"/>
+
+    <!-- Lost/Cancelled Flows -->
+    <sequenceFlow id="Flow_ToLostEnd" sourceRef="Task_DocumentLoss" targetRef="EndEvent_TenderLost"/>
+    <sequenceFlow id="Flow_ToCancelledEnd" sourceRef="Task_DocumentCancellation" targetRef="EndEvent_TenderCancelled"/>
+
+    <!-- ========================================== -->
+    <!-- DATA OBJECTS                               -->
+    <!-- ========================================== -->
+
+    <dataObject id="DataObject_TenderRecord" name="Tender Record"/>
+    <dataObject id="DataObject_BoQ" name="Bill of Quantities"/>
+    <dataObject id="DataObject_VendorOffers" name="Vendor Offers"/>
+    <dataObject id="DataObject_Quotation" name="Customer Quotation"/>
+    <dataObject id="DataObject_AwardLetter" name="Award Letter"/>
+    <dataObject id="DataObject_Project" name="Project Record"/>
+    <dataObject id="DataObject_PurchaseOrders" name="Purchase Orders"/>
+    <dataObject id="DataObject_DeliveryDocuments" name="Delivery Documents"/>
+    <dataObject id="DataObject_HandoverCertificate" name="Handover Certificate"/>
+    <dataObject id="DataObject_Invoice" name="Invoice"/>
+
+  </process>
+
+  <!-- ========================================== -->
+  <!-- COLLABORATION (POOLS AND LANES)            -->
+  <!-- ========================================== -->
+
+  <collaboration id="Collaboration_TenderManagement">
+    <participant id="Participant_Company" name="Company (Internal)" processRef="TenderManagementProcess"/>
+    <participant id="Participant_Customer" name="Customer (Government Entity)"/>
+    <participant id="Participant_Vendors" name="Vendors/Suppliers"/>
+    <participant id="Participant_Etimad" name="Etimad Platform"/>
+
+    <!-- Message Flows -->
+    <messageFlow id="MessageFlow_RFQ" name="RFQ" sourceRef="Task_SendRFQ" targetRef="Participant_Vendors"/>
+    <messageFlow id="MessageFlow_VendorQuotes" name="Vendor Quotations" sourceRef="Participant_Vendors" targetRef="Task_CollectVendorOffers"/>
+    <messageFlow id="MessageFlow_SubmitTender" name="Tender Submission" sourceRef="Task_SubmitTender" targetRef="Participant_Etimad"/>
+    <messageFlow id="MessageFlow_Clarifications" name="Clarifications" sourceRef="Participant_Customer" targetRef="Task_UnderEvaluation"/>
+    <messageFlow id="MessageFlow_Decision" name="Award Decision" sourceRef="Participant_Customer" targetRef="Gateway_TenderDecision"/>
+    <messageFlow id="MessageFlow_AwardLetter" name="Award Letter" sourceRef="Participant_Customer" targetRef="Task_ReceiveAwardLetter"/>
+    <messageFlow id="MessageFlow_PO" name="Purchase Orders" sourceRef="Task_Supply_Phase2_Contracting" targetRef="Participant_Vendors"/>
+    <messageFlow id="MessageFlow_Delivery" name="Material Delivery" sourceRef="Participant_Vendors" targetRef="Task_Supply_Phase3_Execution"/>
+    <messageFlow id="MessageFlow_Handover" name="Handover" sourceRef="Task_Supply_Phase4_PreliminaryHandover" targetRef="Participant_Customer"/>
+    <messageFlow id="MessageFlow_Invoice" name="Invoice" sourceRef="Task_Supply_Phase6_InvoicingClosure" targetRef="Participant_Etimad"/>
+    <messageFlow id="MessageFlow_Payment" name="Payment" sourceRef="Participant_Customer" targetRef="Task_Supply_Phase6_InvoicingClosure"/>
+  </collaboration>
+
+  <!-- ========================================== -->
+  <!-- DOCUMENTATION                              -->
+  <!-- ========================================== -->
+
+  <documentation id="ProcessDocumentation">
+    ICS Tender Management - Complete BPMN 2.0 Process
+    ==================================================
+
+    Version: 18.0.2.0.0
+    Date: January 29, 2026
+    Author: iCloud Solutions
+
+    This BPMN 2.0 diagram represents the complete tender management workflow
+    including:
+
+    1. PRE-AWARD PHASE (Tender Lifecycle):
+       - Draft stage (registration)
+       - Technical study
+       - Financial study
+       - Quotation preparation
+       - Submission
+       - Evaluation
+       - Decision (Won/Lost/Cancelled)
+
+    2. POST-AWARD PHASE - SUPPLY PROJECTS (مشاريع التوريد):
+       - Phase 1: Project receipt after award
+       - Phase 2: Contracting with suppliers
+       - Phase 3: Supply execution
+       - Phase 4: Preliminary handover
+       - Phase 5: Final handover
+       - Phase 6: Invoicing and closure
+
+    3. POST-AWARD PHASE - O&amp;M SERVICES (مشاريع الصيانة والتشغيل):
+       - Phase 1: Project kickoff
+       - Phase 2: Operational planning
+       - Phase 3: Work execution
+       - Phase 4: Monitoring and reporting
+       - Phase 5: Financial invoicing (periodic)
+       - Phase 6: Handover and closure
+
+    Compliance: 100% aligned with ICS Project Management Procedures
+
+    This process is executable in BPMN 2.0-compliant engines such as:
+    - Camunda BPM
+    - Activiti
+    - jBPM
+    - Flowable
+
+    For implementation in Odoo, this process is represented by:
+    - ics.tender model with stages
+    - project.project model for execution
+    - Workflows triggered by state changes
+
+    Contact: contact@icloud-solutions.net
+    Website: https://icloud-solutions.net
+  </documentation>
+
+</definitions>
