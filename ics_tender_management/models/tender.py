@@ -12,7 +12,7 @@ class Tender(models.Model):
     name = fields.Char('Tender Reference', required=True, copy=False,
         readonly=True, default=lambda self: _('New'))
 
-    etimad_tender_id = fields.Many2one('etimad.tender', string='Etimad Tender',
+    etimad_tender_id = fields.Many2one('ics.etimad.tender', string='Etimad Tender',
         help='Link to the scraped tender from Etimad portal')
 
     lead_id = fields.Many2one('crm.lead', string='CRM Lead/Opportunity',

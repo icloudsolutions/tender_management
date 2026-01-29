@@ -7,7 +7,7 @@ class CrmLead(models.Model):
     tender_ids = fields.One2many('ics.tender', 'lead_id', string='Tenders')
     tender_count = fields.Integer('Tender Count', compute='_compute_tender_count')
 
-    etimad_tender_id = fields.Many2one('etimad.tender', string='Etimad Tender')
+    etimad_tender_id = fields.Many2one('ics.etimad.tender', string='Etimad Tender')
 
     @api.depends('tender_ids')
     def _compute_tender_count(self):
