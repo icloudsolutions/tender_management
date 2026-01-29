@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <!-- Company to Responsible Person-->
+    <record id="sh_vendor_signup_email_notification" model="mail.template">
+        <field name="name">Notification for responsible person</field>
+        <field name="model_id" ref="sh_all_in_one_tender_bundle.model_res_partner" />
+        <field name="lang">{{object.env.context.get("lang")}}</field>
+        <field name="subject">New Vendor Sign up</field>
+        <field name="body_html" type="html">
+            <div style="line-height: 28px;">
+                Hello There,<br />
+                New Vendor <b t-out="object.name"></b> is just sign-up,<br />
+                You may take follow-up with them.<br />
+                <a style='background: #7a569f;color: #fff;border-radius: 5px;padding: 2px 14px;text-decoration: none;display: inline-block;' role="button" t-attf-href="/web?#id={{object.id}}&amp;model=res.partner">View Details</a><br />
+                Thank You...<br />
+            </div>
+        </field>
+    </record>
+</odoo>

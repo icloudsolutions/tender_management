@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+		<!-- Inherit Purchase Config Setting view -->
+		<record id="sh_purchase_config_seetings" model="ir.ui.view">
+			<field name="name">res.config.settings</field>
+			<field name="model">res.config.settings</field>
+			<field name="inherit_id" ref="purchase.res_config_settings_view_form_purchase"/>
+        	<field name="arch" type="xml">
+				<xpath expr="//app[@name='purchase']" position="inside">
+					<block title="Purchase Tender Configuration">
+						<setting>
+							<field name="sh_auto_add_followers"/>
+						</setting>
+						<setting>
+							<field name="sh_portal_user_create"/>
+						</setting>
+						<setting id="tender_document">
+							<field name="sh_tender_document_manage"/>
+						</setting>
+						<setting>
+							<field name="sh_tender_auto_close"/>
+						</setting>
+					</block>
+				</xpath>
+        	</field>
+		</record>
+	</data>
+</odoo>
