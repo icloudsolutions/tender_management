@@ -13,16 +13,15 @@ class IcsTenderDashboard(models.Model):
     @api.model
     def get_tender_statistics(self):
         """Get comprehensive tender statistics for dashboard"""
-        tender_obj = self.env['ics.tender.management']
+        tender_obj = self.env['ics.tender']
 
         total_tenders = tender_obj.search_count([])
 
-        draft_tenders = tender_obj.search_count([('stage_id.sequence', '=', 1)])
-        active_tenders = tender_obj.search_count([
-            ('stage_id.name', 'in', ['Technical Study', 'Financial Study', 'Quotation Prepared', 'Submitted', 'Under Evaluation'])
-        ])
-        won_tenders = tender_obj.search_count([('stage_id.is_won', '=', True)])
-        lost_tenders = tender_obj.search_count([('stage_id.is_lost', '=', True)])
+        # Prefer the explicit workflow field on the tender
+        draft_tenders = tender_obj.search_count([('state', '=', 'draft')])
+        active_tenders = tender_obj.search_count([('state', 'in', ['technical', 'financial', 'quotation', 'submitted', 'evaluation'])])
+        won_tenders = tender_obj.search_count([('state', '=', 'won')])
+        lost_tenders = tender_obj.search_count([('state', '=', 'lost')])
 
         supply_projects = tender_obj.search_count([('tender_category', '=', 'supply')])
         maintenance_projects = tender_obj.search_count([('tender_category', '=', 'maintenance')])
@@ -34,9 +33,6 @@ class IcsTenderDashboard(models.Model):
         etimad_stats = self._get_etimad_statistics()
         stage_distribution = self._get_stage_distribution()
         financial_summary = self._get_financial_summary()
-        project_execution = self._get_project_execution_stats()
-        procedure_compliance = self._get_procedure_compliance()
-        win_loss_ratio = self._get_win_loss_ratio()
 
         return {
             'total_tenders': total_tenders,
@@ -53,30 +49,24 @@ class IcsTenderDashboard(models.Model):
             'etimad_stats': etimad_stats,
             'stage_distribution': stage_distribution,
             'financial_summary': financial_summary,
-            'project_execution': project_execution,
-            'procedure_compliance': procedure_compliance,
-            'win_loss_ratio': win_loss_ratio,
         }
 
     def _get_vendor_offer_stats(self):
         """Get vendor offer statistics"""
-        tender_obj = self.env['ics.tender.management']
+        tender_obj = self.env['ics.tender']
 
         total_offers = 0
-        pending_offers = 0
         accepted_offers = 0
 
         all_tenders = tender_obj.search([])
         for tender in all_tenders:
-            if tender.tender_type == 'single_vendor':
-                total_offers += len(tender.vendor_offer_ids)
-                pending_offers += len(tender.vendor_offer_ids.filtered(lambda o: o.status == 'pending'))
-                accepted_offers += len(tender.vendor_offer_ids.filtered(lambda o: o.status == 'accepted'))
-            else:
-                for line in tender.boq_line_ids:
-                    total_offers += len(line.vendor_offer_ids)
-                    pending_offers += len(line.vendor_offer_ids.filtered(lambda o: o.status == 'pending'))
-                    accepted_offers += len(line.vendor_offer_ids.filtered(lambda o: o.status == 'accepted'))
+            for line in tender.boq_line_ids:
+                offers = line.vendor_offer_ids
+                total_offers += len(offers)
+                # In this module, "accepted" means "selected" vendor offer
+                accepted_offers += len(offers.filtered(lambda o: o.is_selected))
+
+        pending_offers = max(total_offers - accepted_offers, 0)
 
         return {
             'total': total_offers,
@@ -86,7 +76,7 @@ class IcsTenderDashboard(models.Model):
 
     def _get_tender_by_category(self):
         """Get tender distribution by category"""
-        tender_obj = self.env['ics.tender.management']
+        tender_obj = self.env['ics.tender']
 
         categories = [
             ('supply', 'Supply Projects'),
@@ -112,19 +102,19 @@ class IcsTenderDashboard(models.Model):
 
     def _get_tender_by_type(self):
         """Get tender distribution by tender type"""
-        tender_obj = self.env['ics.tender.management']
+        tender_obj = self.env['ics.tender']
 
         single_vendor = tender_obj.search_count([('tender_type', '=', 'single_vendor')])
-        multiple_vendor = tender_obj.search_count([('tender_type', '=', 'multiple_vendor')])
+        product_wise = tender_obj.search_count([('tender_type', '=', 'product_wise')])
 
         return {
             'labels': ['Single Vendor', 'Product-wise Vendor'],
-            'values': [single_vendor, multiple_vendor]
+            'values': [single_vendor, product_wise]
         }
 
     def _get_monthly_trend(self):
         """Get tender creation trend for last 6 months"""
-        tender_obj = self.env['ics.tender.management']
+        tender_obj = self.env['ics.tender']
 
         months = []
         values = []
@@ -171,7 +161,7 @@ class IcsTenderDashboard(models.Model):
 
     def _get_stage_distribution(self):
         """Get tender distribution by stage"""
-        tender_obj = self.env['ics.tender.management']
+        tender_obj = self.env['ics.tender']
         stage_obj = self.env['ics.tender.stage']
 
         stages = stage_obj.search([('name', 'not in', ['Draft', 'Won', 'Lost'])], order='sequence')
@@ -192,20 +182,20 @@ class IcsTenderDashboard(models.Model):
 
     def _get_financial_summary(self):
         """Get financial summary of tenders"""
-        tender_obj = self.env['ics.tender.management']
+        tender_obj = self.env['ics.tender']
 
         all_tenders = tender_obj.search([])
 
-        total_budget = sum(tender.estimated_cost or 0 for tender in all_tenders)
+        total_budget = sum(t.total_estimated_cost or 0 for t in all_tenders)
         active_budget = sum(
-            tender.estimated_cost or 0
-            for tender in all_tenders
-            if tender.stage_id.name in ['Vendor Selection', 'Quotation Preparation', 'Quotation Review']
+            (t.total_estimated_cost or 0)
+            for t in all_tenders
+            if t.state in ['technical', 'financial', 'quotation', 'submitted', 'evaluation']
         )
         won_budget = sum(
-            tender.final_total or 0
-            for tender in all_tenders
-            if tender.stage_id.name == 'Won'
+            (t.actual_revenue or t.total_quotation_amount or 0)
+            for t in all_tenders
+            if t.state == 'won'
         )
 
         return {
@@ -214,6 +204,7 @@ class IcsTenderDashboard(models.Model):
             'won_budget': won_budget,
             'currency_symbol': self.env.company.currency_id.symbol or 'SAR',
         }
+
 
     def _get_project_execution_stats(self):
         """Get project execution statistics for won tenders"""
