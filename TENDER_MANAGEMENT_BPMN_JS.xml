@@ -1,0 +1,767 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_ICS_Tender" targetNamespace="http://bpmn.io/schema/bpmn" exporter="bpmn-js (ICS Tender Management)" exporterVersion="18.0.2">
+
+  <bpmn:collaboration id="Collaboration_TenderManagement">
+    <bpmn:participant id="Participant_Company" name="Company (Internal Process)" processRef="Process_TenderManagement" />
+    <bpmn:participant id="Participant_Customer" name="Customer / Government Entity" />
+    <bpmn:participant id="Participant_Vendors" name="Vendors / Suppliers" />
+    <bpmn:messageFlow id="MessageFlow_RFQ" name="RFQ" sourceRef="Task_SendRFQ" targetRef="Participant_Vendors" />
+    <bpmn:messageFlow id="MessageFlow_Quotes" name="Quotations" sourceRef="Participant_Vendors" targetRef="Task_CollectVendorOffers" />
+    <bpmn:messageFlow id="MessageFlow_Submit" name="Tender Submission" sourceRef="Task_SubmitTender" targetRef="Participant_Customer" />
+    <bpmn:messageFlow id="MessageFlow_Decision" name="Decision" sourceRef="Participant_Customer" targetRef="Gateway_TenderDecision" />
+  </bpmn:collaboration>
+
+  <bpmn:process id="Process_TenderManagement" name="ICS Tender Management Process" isExecutable="true">
+
+    <!-- START EVENT -->
+    <bpmn:startEvent id="StartEvent_OpportunityIdentified" name="Opportunity&#10;Identified">
+      <bpmn:outgoing>Flow_ToRegisterTender</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <!-- PRE-AWARD PHASE -->
+    <bpmn:userTask id="Task_RegisterTender" name="Register&#10;Tender">
+      <bpmn:incoming>Flow_ToRegisterTender</bpmn:incoming>
+      <bpmn:outgoing>Flow_ToTechnicalStudy</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_TechnicalStudy" name="Technical&#10;Study">
+      <bpmn:incoming>Flow_ToTechnicalStudy</bpmn:incoming>
+      <bpmn:outgoing>Flow_ToFinancialStudy</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_FinancialStudy" name="Financial&#10;Study">
+      <bpmn:incoming>Flow_ToFinancialStudy</bpmn:incoming>
+      <bpmn:outgoing>Flow_ToSendRFQ</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:serviceTask id="Task_SendRFQ" name="Send RFQ&#10;to Vendors">
+      <bpmn:incoming>Flow_ToSendRFQ</bpmn:incoming>
+      <bpmn:outgoing>Flow_ToCollectOffers</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:userTask id="Task_CollectVendorOffers" name="Collect&#10;Vendor Offers">
+      <bpmn:incoming>Flow_ToCollectOffers</bpmn:incoming>
+      <bpmn:outgoing>Flow_ToCompareVendors</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_CompareVendors" name="Compare&#10;Vendors">
+      <bpmn:incoming>Flow_ToCompareVendors</bpmn:incoming>
+      <bpmn:outgoing>Flow_ToSelectVendors</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_SelectVendors" name="Select Best&#10;Vendors">
+      <bpmn:incoming>Flow_ToSelectVendors</bpmn:incoming>
+      <bpmn:outgoing>Flow_ToPrepareQuotation</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_PrepareQuotation" name="Prepare&#10;Quotation">
+      <bpmn:incoming>Flow_ToPrepareQuotation</bpmn:incoming>
+      <bpmn:outgoing>Flow_ToApproveQuotation</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <!-- QUOTATION APPROVAL GATEWAY -->
+    <bpmn:exclusiveGateway id="Gateway_QuotationApproved" name="Approved?">
+      <bpmn:incoming>Flow_ToApproveQuotation</bpmn:incoming>
+      <bpmn:incoming>Flow_QuotationRevised</bpmn:incoming>
+      <bpmn:outgoing>Flow_QuotationApproved</bpmn:outgoing>
+      <bpmn:outgoing>Flow_QuotationRejected</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:userTask id="Task_ReviseQuotation" name="Revise&#10;Quotation">
+      <bpmn:incoming>Flow_QuotationRejected</bpmn:incoming>
+      <bpmn:outgoing>Flow_QuotationRevised</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_SubmitTender" name="Submit&#10;Tender">
+      <bpmn:incoming>Flow_QuotationApproved</bpmn:incoming>
+      <bpmn:outgoing>Flow_ToEvaluation</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_UnderEvaluation" name="Under&#10;Evaluation">
+      <bpmn:incoming>Flow_ToEvaluation</bpmn:incoming>
+      <bpmn:outgoing>Flow_ToAwaitDecision</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <!-- TENDER DECISION GATEWAY -->
+    <bpmn:exclusiveGateway id="Gateway_TenderDecision" name="Decision?">
+      <bpmn:incoming>Flow_ToAwaitDecision</bpmn:incoming>
+      <bpmn:outgoing>Flow_TenderWon</bpmn:outgoing>
+      <bpmn:outgoing>Flow_TenderLost</bpmn:outgoing>
+      <bpmn:outgoing>Flow_TenderCancelled</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- WON PATH -->
+    <bpmn:userTask id="Task_ReceiveAwardLetter" name="Receive&#10;Award Letter">
+      <bpmn:incoming>Flow_TenderWon</bpmn:incoming>
+      <bpmn:outgoing>Flow_ToProjectTypeCheck</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <!-- PROJECT TYPE GATEWAY -->
+    <bpmn:exclusiveGateway id="Gateway_ProjectType" name="Project&#10;Type?">
+      <bpmn:incoming>Flow_ToProjectTypeCheck</bpmn:incoming>
+      <bpmn:outgoing>Flow_SupplyProject</bpmn:outgoing>
+      <bpmn:outgoing>Flow_OMProject</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- SUPPLY PROJECT SUBPROCESS -->
+    <bpmn:subProcess id="SubProcess_SupplyProject" name="Supply Project (6 Phases)">
+      <bpmn:incoming>Flow_SupplyProject</bpmn:incoming>
+      <bpmn:outgoing>Flow_Supply_ToComplete</bpmn:outgoing>
+
+      <bpmn:startEvent id="StartEvent_Supply" name="Start">
+        <bpmn:outgoing>Flow_Supply_ToPhase1</bpmn:outgoing>
+      </bpmn:startEvent>
+
+      <bpmn:userTask id="Task_Supply_Phase1" name="Phase 1:&#10;Project Receipt">
+        <bpmn:incoming>Flow_Supply_ToPhase1</bpmn:incoming>
+        <bpmn:outgoing>Flow_Supply_ToPhase2</bpmn:outgoing>
+      </bpmn:userTask>
+
+      <bpmn:userTask id="Task_Supply_Phase2" name="Phase 2:&#10;Contracting">
+        <bpmn:incoming>Flow_Supply_ToPhase2</bpmn:incoming>
+        <bpmn:outgoing>Flow_Supply_ToPhase3</bpmn:outgoing>
+      </bpmn:userTask>
+
+      <bpmn:userTask id="Task_Supply_Phase3" name="Phase 3:&#10;Execution">
+        <bpmn:incoming>Flow_Supply_ToPhase3</bpmn:incoming>
+        <bpmn:outgoing>Flow_Supply_ToPhase4</bpmn:outgoing>
+      </bpmn:userTask>
+
+      <bpmn:userTask id="Task_Supply_Phase4" name="Phase 4:&#10;Prelim Handover">
+        <bpmn:incoming>Flow_Supply_ToPhase4</bpmn:incoming>
+        <bpmn:outgoing>Flow_Supply_ToPhase5</bpmn:outgoing>
+      </bpmn:userTask>
+
+      <bpmn:userTask id="Task_Supply_Phase5" name="Phase 5:&#10;Final Handover">
+        <bpmn:incoming>Flow_Supply_ToPhase5</bpmn:incoming>
+        <bpmn:outgoing>Flow_Supply_ToPhase6</bpmn:outgoing>
+      </bpmn:userTask>
+
+      <bpmn:userTask id="Task_Supply_Phase6" name="Phase 6:&#10;Invoicing">
+        <bpmn:incoming>Flow_Supply_ToPhase6</bpmn:incoming>
+        <bpmn:outgoing>Flow_Supply_ToEnd</bpmn:outgoing>
+      </bpmn:userTask>
+
+      <bpmn:endEvent id="EndEvent_Supply" name="Complete">
+        <bpmn:incoming>Flow_Supply_ToEnd</bpmn:incoming>
+      </bpmn:endEvent>
+
+      <bpmn:sequenceFlow id="Flow_Supply_ToPhase1" sourceRef="StartEvent_Supply" targetRef="Task_Supply_Phase1" />
+      <bpmn:sequenceFlow id="Flow_Supply_ToPhase2" sourceRef="Task_Supply_Phase1" targetRef="Task_Supply_Phase2" />
+      <bpmn:sequenceFlow id="Flow_Supply_ToPhase3" sourceRef="Task_Supply_Phase2" targetRef="Task_Supply_Phase3" />
+      <bpmn:sequenceFlow id="Flow_Supply_ToPhase4" sourceRef="Task_Supply_Phase3" targetRef="Task_Supply_Phase4" />
+      <bpmn:sequenceFlow id="Flow_Supply_ToPhase5" sourceRef="Task_Supply_Phase4" targetRef="Task_Supply_Phase5" />
+      <bpmn:sequenceFlow id="Flow_Supply_ToPhase6" sourceRef="Task_Supply_Phase5" targetRef="Task_Supply_Phase6" />
+      <bpmn:sequenceFlow id="Flow_Supply_ToEnd" sourceRef="Task_Supply_Phase6" targetRef="EndEvent_Supply" />
+    </bpmn:subProcess>
+
+    <!-- O&M SERVICE SUBPROCESS -->
+    <bpmn:subProcess id="SubProcess_OMService" name="O&amp;M Service (6 Phases + Loop)">
+      <bpmn:incoming>Flow_OMProject</bpmn:incoming>
+      <bpmn:outgoing>Flow_OM_ToComplete</bpmn:outgoing>
+
+      <bpmn:startEvent id="StartEvent_OM" name="Start">
+        <bpmn:outgoing>Flow_OM_ToPhase1</bpmn:outgoing>
+      </bpmn:startEvent>
+
+      <bpmn:userTask id="Task_OM_Phase1" name="Phase 1:&#10;Kickoff">
+        <bpmn:incoming>Flow_OM_ToPhase1</bpmn:incoming>
+        <bpmn:outgoing>Flow_OM_ToPhase2</bpmn:outgoing>
+      </bpmn:userTask>
+
+      <bpmn:userTask id="Task_OM_Phase2" name="Phase 2:&#10;Planning">
+        <bpmn:incoming>Flow_OM_ToPhase2</bpmn:incoming>
+        <bpmn:outgoing>Flow_OM_ToPhase3</bpmn:outgoing>
+      </bpmn:userTask>
+
+      <bpmn:userTask id="Task_OM_Phase3" name="Phase 3:&#10;Execution">
+        <bpmn:incoming>Flow_OM_ToPhase3</bpmn:incoming>
+        <bpmn:incoming>Flow_OM_Continue</bpmn:incoming>
+        <bpmn:outgoing>Flow_OM_ToPhase4</bpmn:outgoing>
+      </bpmn:userTask>
+
+      <bpmn:userTask id="Task_OM_Phase4" name="Phase 4:&#10;Monitoring">
+        <bpmn:incoming>Flow_OM_ToPhase4</bpmn:incoming>
+        <bpmn:outgoing>Flow_OM_ToPhase5</bpmn:outgoing>
+      </bpmn:userTask>
+
+      <bpmn:userTask id="Task_OM_Phase5" name="Phase 5:&#10;Invoicing">
+        <bpmn:incoming>Flow_OM_ToPhase5</bpmn:incoming>
+        <bpmn:outgoing>Flow_OM_ContractEnd</bpmn:outgoing>
+      </bpmn:userTask>
+
+      <bpmn:exclusiveGateway id="Gateway_OM_ContractEnd" name="Contract&#10;End?">
+        <bpmn:incoming>Flow_OM_ContractEnd</bpmn:incoming>
+        <bpmn:outgoing>Flow_OM_Continue</bpmn:outgoing>
+        <bpmn:outgoing>Flow_OM_ToPhase6</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+
+      <bpmn:userTask id="Task_OM_Phase6" name="Phase 6:&#10;Closure">
+        <bpmn:incoming>Flow_OM_ToPhase6</bpmn:incoming>
+        <bpmn:outgoing>Flow_OM_ToEnd</bpmn:outgoing>
+      </bpmn:userTask>
+
+      <bpmn:endEvent id="EndEvent_OM" name="Complete">
+        <bpmn:incoming>Flow_OM_ToEnd</bpmn:incoming>
+      </bpmn:endEvent>
+
+      <bpmn:sequenceFlow id="Flow_OM_ToPhase1" sourceRef="StartEvent_OM" targetRef="Task_OM_Phase1" />
+      <bpmn:sequenceFlow id="Flow_OM_ToPhase2" sourceRef="Task_OM_Phase1" targetRef="Task_OM_Phase2" />
+      <bpmn:sequenceFlow id="Flow_OM_ToPhase3" sourceRef="Task_OM_Phase2" targetRef="Task_OM_Phase3" />
+      <bpmn:sequenceFlow id="Flow_OM_ToPhase4" sourceRef="Task_OM_Phase3" targetRef="Task_OM_Phase4" />
+      <bpmn:sequenceFlow id="Flow_OM_ToPhase5" sourceRef="Task_OM_Phase4" targetRef="Task_OM_Phase5" />
+      <bpmn:sequenceFlow id="Flow_OM_ContractEnd" sourceRef="Task_OM_Phase5" targetRef="Gateway_OM_ContractEnd" />
+      <bpmn:sequenceFlow id="Flow_OM_Continue" name="Continue" sourceRef="Gateway_OM_ContractEnd" targetRef="Task_OM_Phase3" />
+      <bpmn:sequenceFlow id="Flow_OM_ToPhase6" name="End" sourceRef="Gateway_OM_ContractEnd" targetRef="Task_OM_Phase6" />
+      <bpmn:sequenceFlow id="Flow_OM_ToEnd" sourceRef="Task_OM_Phase6" targetRef="EndEvent_OM" />
+    </bpmn:subProcess>
+
+    <!-- END EVENTS -->
+    <bpmn:endEvent id="EndEvent_SupplyComplete" name="Supply&#10;Complete">
+      <bpmn:incoming>Flow_Supply_ToComplete</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:endEvent id="EndEvent_OMComplete" name="O&amp;M&#10;Complete">
+      <bpmn:incoming>Flow_OM_ToComplete</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- LOST PATH -->
+    <bpmn:userTask id="Task_DocumentLoss" name="Document&#10;Loss">
+      <bpmn:incoming>Flow_TenderLost</bpmn:incoming>
+      <bpmn:outgoing>Flow_ToLostEnd</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:endEvent id="EndEvent_TenderLost" name="Tender&#10;Lost">
+      <bpmn:incoming>Flow_ToLostEnd</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- CANCELLED PATH -->
+    <bpmn:userTask id="Task_DocumentCancellation" name="Document&#10;Cancellation">
+      <bpmn:incoming>Flow_TenderCancelled</bpmn:incoming>
+      <bpmn:outgoing>Flow_ToCancelledEnd</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:endEvent id="EndEvent_TenderCancelled" name="Tender&#10;Cancelled">
+      <bpmn:incoming>Flow_ToCancelledEnd</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- SEQUENCE FLOWS -->
+    <bpmn:sequenceFlow id="Flow_ToRegisterTender" sourceRef="StartEvent_OpportunityIdentified" targetRef="Task_RegisterTender" />
+    <bpmn:sequenceFlow id="Flow_ToTechnicalStudy" sourceRef="Task_RegisterTender" targetRef="Task_TechnicalStudy" />
+    <bpmn:sequenceFlow id="Flow_ToFinancialStudy" sourceRef="Task_TechnicalStudy" targetRef="Task_FinancialStudy" />
+    <bpmn:sequenceFlow id="Flow_ToSendRFQ" sourceRef="Task_FinancialStudy" targetRef="Task_SendRFQ" />
+    <bpmn:sequenceFlow id="Flow_ToCollectOffers" sourceRef="Task_SendRFQ" targetRef="Task_CollectVendorOffers" />
+    <bpmn:sequenceFlow id="Flow_ToCompareVendors" sourceRef="Task_CollectVendorOffers" targetRef="Task_CompareVendors" />
+    <bpmn:sequenceFlow id="Flow_ToSelectVendors" sourceRef="Task_CompareVendors" targetRef="Task_SelectVendors" />
+    <bpmn:sequenceFlow id="Flow_ToPrepareQuotation" sourceRef="Task_SelectVendors" targetRef="Task_PrepareQuotation" />
+    <bpmn:sequenceFlow id="Flow_ToApproveQuotation" sourceRef="Task_PrepareQuotation" targetRef="Gateway_QuotationApproved" />
+    <bpmn:sequenceFlow id="Flow_QuotationApproved" name="Yes" sourceRef="Gateway_QuotationApproved" targetRef="Task_SubmitTender" />
+    <bpmn:sequenceFlow id="Flow_QuotationRejected" name="No" sourceRef="Gateway_QuotationApproved" targetRef="Task_ReviseQuotation" />
+    <bpmn:sequenceFlow id="Flow_QuotationRevised" sourceRef="Task_ReviseQuotation" targetRef="Gateway_QuotationApproved" />
+    <bpmn:sequenceFlow id="Flow_ToEvaluation" sourceRef="Task_SubmitTender" targetRef="Task_UnderEvaluation" />
+    <bpmn:sequenceFlow id="Flow_ToAwaitDecision" sourceRef="Task_UnderEvaluation" targetRef="Gateway_TenderDecision" />
+    <bpmn:sequenceFlow id="Flow_TenderWon" name="Won" sourceRef="Gateway_TenderDecision" targetRef="Task_ReceiveAwardLetter" />
+    <bpmn:sequenceFlow id="Flow_TenderLost" name="Lost" sourceRef="Gateway_TenderDecision" targetRef="Task_DocumentLoss" />
+    <bpmn:sequenceFlow id="Flow_TenderCancelled" name="Cancelled" sourceRef="Gateway_TenderDecision" targetRef="Task_DocumentCancellation" />
+    <bpmn:sequenceFlow id="Flow_ToProjectTypeCheck" sourceRef="Task_ReceiveAwardLetter" targetRef="Gateway_ProjectType" />
+    <bpmn:sequenceFlow id="Flow_SupplyProject" name="Supply" sourceRef="Gateway_ProjectType" targetRef="SubProcess_SupplyProject" />
+    <bpmn:sequenceFlow id="Flow_OMProject" name="O&amp;M" sourceRef="Gateway_ProjectType" targetRef="SubProcess_OMService" />
+    <bpmn:sequenceFlow id="Flow_Supply_ToComplete" sourceRef="SubProcess_SupplyProject" targetRef="EndEvent_SupplyComplete" />
+    <bpmn:sequenceFlow id="Flow_OM_ToComplete" sourceRef="SubProcess_OMService" targetRef="EndEvent_OMComplete" />
+    <bpmn:sequenceFlow id="Flow_ToLostEnd" sourceRef="Task_DocumentLoss" targetRef="EndEvent_TenderLost" />
+    <bpmn:sequenceFlow id="Flow_ToCancelledEnd" sourceRef="Task_DocumentCancellation" targetRef="EndEvent_TenderCancelled" />
+
+  </bpmn:process>
+
+  <!-- BPMN DIAGRAM (Visual Layout) -->
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_TenderManagement">
+
+      <!-- COMPANY PARTICIPANT (Main Swimlane) -->
+      <bpmndi:BPMNShape id="Participant_Company_di" bpmnElement="Participant_Company" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="3400" height="700" />
+      </bpmndi:BPMNShape>
+
+      <!-- CUSTOMER PARTICIPANT -->
+      <bpmndi:BPMNShape id="Participant_Customer_di" bpmnElement="Participant_Customer" isHorizontal="true">
+        <dc:Bounds x="160" y="820" width="3400" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- VENDORS PARTICIPANT -->
+      <bpmndi:BPMNShape id="Participant_Vendors_di" bpmnElement="Participant_Vendors" isHorizontal="true">
+        <dc:Bounds x="160" y="940" width="3400" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- START EVENT -->
+      <bpmndi:BPMNShape id="StartEvent_OpportunityIdentified_di" bpmnElement="StartEvent_OpportunityIdentified">
+        <dc:Bounds x="232" y="232" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="222" y="275" width="56" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- PRE-AWARD TASKS -->
+      <bpmndi:BPMNShape id="Task_RegisterTender_di" bpmnElement="Task_RegisterTender">
+        <dc:Bounds x="320" y="210" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_TechnicalStudy_di" bpmnElement="Task_TechnicalStudy">
+        <dc:Bounds x="470" y="210" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_FinancialStudy_di" bpmnElement="Task_FinancialStudy">
+        <dc:Bounds x="620" y="210" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_SendRFQ_di" bpmnElement="Task_SendRFQ">
+        <dc:Bounds x="770" y="210" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_CollectVendorOffers_di" bpmnElement="Task_CollectVendorOffers">
+        <dc:Bounds x="920" y="210" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_CompareVendors_di" bpmnElement="Task_CompareVendors">
+        <dc:Bounds x="1070" y="210" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_SelectVendors_di" bpmnElement="Task_SelectVendors">
+        <dc:Bounds x="1220" y="210" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_PrepareQuotation_di" bpmnElement="Task_PrepareQuotation">
+        <dc:Bounds x="1370" y="210" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- QUOTATION APPROVAL GATEWAY -->
+      <bpmndi:BPMNShape id="Gateway_QuotationApproved_di" bpmnElement="Gateway_QuotationApproved" isMarkerVisible="true">
+        <dc:Bounds x="1525" y="225" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1521" y="201" width="58" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_ReviseQuotation_di" bpmnElement="Task_ReviseQuotation">
+        <dc:Bounds x="1500" y="350" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmn:BPMNShape id="Task_SubmitTender_di" bpmnElement="Task_SubmitTender">
+        <dc:Bounds x="1630" y="210" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_UnderEvaluation_di" bpmnElement="Task_UnderEvaluation">
+        <dc:Bounds x="1780" y="210" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- TENDER DECISION GATEWAY -->
+      <bpmndi:BPMNShape id="Gateway_TenderDecision_di" bpmnElement="Gateway_TenderDecision" isMarkerVisible="true">
+        <dc:Bounds x="1935" y="225" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1934" y="201" width="51" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- WON PATH -->
+      <bpmndi:BPMNShape id="Task_ReceiveAwardLetter_di" bpmnElement="Task_ReceiveAwardLetter">
+        <dc:Bounds x="2040" y="210" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- PROJECT TYPE GATEWAY -->
+      <bpmndi:BPMNShape id="Gateway_ProjectType_di" bpmnElement="Gateway_ProjectType" isMarkerVisible="true">
+        <dc:Bounds x="2195" y="225" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2191" y="201" width="58" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- SUPPLY SUBPROCESS -->
+      <bpmndi:BPMNShape id="SubProcess_SupplyProject_di" bpmnElement="SubProcess_SupplyProject" isExpanded="true">
+        <dc:Bounds x="2300" y="120" width="1100" height="240" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="StartEvent_Supply_di" bpmnElement="StartEvent_Supply">
+        <dc:Bounds x="2332" y="222" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2337" y="265" width="26" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_Supply_Phase1_di" bpmnElement="Task_Supply_Phase1">
+        <dc:Bounds x="2410" y="200" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_Supply_Phase2_di" bpmnElement="Task_Supply_Phase2">
+        <dc:Bounds x="2550" y="200" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_Supply_Phase3_di" bpmnElement="Task_Supply_Phase3">
+        <dc:Bounds x="2690" y="200" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_Supply_Phase4_di" bpmnElement="Task_Supply_Phase4">
+        <dc:Bounds x="2830" y="200" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_Supply_Phase5_di" bpmnElement="Task_Supply_Phase5">
+        <dc:Bounds x="2970" y="200" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_Supply_Phase6_di" bpmnElement="Task_Supply_Phase6">
+        <dc:Bounds x="3110" y="200" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="EndEvent_Supply_di" bpmnElement="EndEvent_Supply">
+        <dc:Bounds x="3252" y="222" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3244" y="265" width="52" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Supply Flow Edges -->
+      <bpmndi:BPMNEdge id="Flow_Supply_ToPhase1_di" bpmnElement="Flow_Supply_ToPhase1">
+        <di:waypoint x="2368" y="240" />
+        <di:waypoint x="2410" y="240" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Supply_ToPhase2_di" bpmnElement="Flow_Supply_ToPhase2">
+        <di:waypoint x="2510" y="240" />
+        <di:waypoint x="2550" y="240" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Supply_ToPhase3_di" bpmnElement="Flow_Supply_ToPhase3">
+        <di:waypoint x="2650" y="240" />
+        <di:waypoint x="2690" y="240" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Supply_ToPhase4_di" bpmnElement="Flow_Supply_ToPhase4">
+        <di:waypoint x="2790" y="240" />
+        <di:waypoint x="2830" y="240" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Supply_ToPhase5_di" bpmnElement="Flow_Supply_ToPhase5">
+        <di:waypoint x="2930" y="240" />
+        <di:waypoint x="2970" y="240" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Supply_ToPhase6_di" bpmnElement="Flow_Supply_ToPhase6">
+        <di:waypoint x="3070" y="240" />
+        <di:waypoint x="3110" y="240" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Supply_ToEnd_di" bpmnElement="Flow_Supply_ToEnd">
+        <di:waypoint x="3210" y="240" />
+        <di:waypoint x="3252" y="240" />
+      </bpmndi:BPMNEdge>
+
+      <!-- O&M SUBPROCESS -->
+      <bpmndi:BPMNShape id="SubProcess_OMService_di" bpmnElement="SubProcess_OMService" isExpanded="true">
+        <dc:Bounds x="2300" y="420" width="1100" height="320" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="StartEvent_OM_di" bpmnElement="StartEvent_OM">
+        <dc:Bounds x="2332" y="522" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2337" y="565" width="26" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_OM_Phase1_di" bpmnElement="Task_OM_Phase1">
+        <dc:Bounds x="2410" y="500" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_OM_Phase2_di" bpmnElement="Task_OM_Phase2">
+        <dc:Bounds x="2550" y="500" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_OM_Phase3_di" bpmnElement="Task_OM_Phase3">
+        <dc:Bounds x="2690" y="500" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_OM_Phase4_di" bpmnElement="Task_OM_Phase4">
+        <dc:Bounds x="2830" y="500" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_OM_Phase5_di" bpmnElement="Task_OM_Phase5">
+        <dc:Bounds x="2970" y="500" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Gateway_OM_ContractEnd_di" bpmnElement="Gateway_OM_ContractEnd" isMarkerVisible="true">
+        <dc:Bounds x="3115" y="515" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3111" y="491" width="58" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_OM_Phase6_di" bpmnElement="Task_OM_Phase6">
+        <dc:Bounds x="3090" y="640" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="EndEvent_OM_di" bpmnElement="EndEvent_OM">
+        <dc:Bounds x="3252" y="662" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3244" y="705" width="52" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- O&M Flow Edges -->
+      <bpmndi:BPMNEdge id="Flow_OM_ToPhase1_di" bpmnElement="Flow_OM_ToPhase1">
+        <di:waypoint x="2368" y="540" />
+        <di:waypoint x="2410" y="540" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_OM_ToPhase2_di" bpmnElement="Flow_OM_ToPhase2">
+        <di:waypoint x="2510" y="540" />
+        <di:waypoint x="2550" y="540" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_OM_ToPhase3_di" bpmnElement="Flow_OM_ToPhase3">
+        <di:waypoint x="2650" y="540" />
+        <di:waypoint x="2690" y="540" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_OM_ToPhase4_di" bpmnElement="Flow_OM_ToPhase4">
+        <di:waypoint x="2790" y="540" />
+        <di:waypoint x="2830" y="540" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_OM_ToPhase5_di" bpmnElement="Flow_OM_ToPhase5">
+        <di:waypoint x="2930" y="540" />
+        <di:waypoint x="2970" y="540" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_OM_ContractEnd_di" bpmnElement="Flow_OM_ContractEnd">
+        <di:waypoint x="3070" y="540" />
+        <di:waypoint x="3115" y="540" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_OM_Continue_di" bpmnElement="Flow_OM_Continue">
+        <di:waypoint x="3140" y="515" />
+        <di:waypoint x="3140" y="460" />
+        <di:waypoint x="2740" y="460" />
+        <di:waypoint x="2740" y="500" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2920" y="442" width="46" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_OM_ToPhase6_di" bpmnElement="Flow_OM_ToPhase6">
+        <di:waypoint x="3140" y="565" />
+        <di:waypoint x="3140" y="640" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3148" y="593" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_OM_ToEnd_di" bpmnElement="Flow_OM_ToEnd">
+        <di:waypoint x="3190" y="680" />
+        <di:waypoint x="3252" y="680" />
+      </bpmndi:BPMNEdge>
+
+      <!-- END EVENTS -->
+      <bpmndi:BPMNShape id="EndEvent_SupplyComplete_di" bpmnElement="EndEvent_SupplyComplete">
+        <dc:Bounds x="3442" y="232" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3434" y="275" width="52" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="EndEvent_OMComplete_di" bpmnElement="EndEvent_OMComplete">
+        <dc:Bounds x="3442" y="562" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3434" y="605" width="52" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- LOST PATH -->
+      <bpmndi:BPMNShape id="Task_DocumentLoss_di" bpmnElement="Task_DocumentLoss">
+        <dc:Bounds x="1910" y="390" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="EndEvent_TenderLost_di" bpmnElement="EndEvent_TenderLost">
+        <dc:Bounds x="2062" y="412" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2053" y="455" width="54" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- CANCELLED PATH -->
+      <bpmndi:BPMNShape id="Task_DocumentCancellation_di" bpmnElement="Task_DocumentCancellation">
+        <dc:Bounds x="1910" y="540" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="EndEvent_TenderCancelled_di" bpmnElement="EndEvent_TenderCancelled">
+        <dc:Bounds x="2062" y="562" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2053" y="605" width="54" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- MAIN SEQUENCE FLOW EDGES -->
+      <bpmndi:BPMNEdge id="Flow_ToRegisterTender_di" bpmnElement="Flow_ToRegisterTender">
+        <di:waypoint x="268" y="250" />
+        <di:waypoint x="320" y="250" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_ToTechnicalStudy_di" bpmnElement="Flow_ToTechnicalStudy">
+        <di:waypoint x="420" y="250" />
+        <di:waypoint x="470" y="250" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_ToFinancialStudy_di" bpmnElement="Flow_ToFinancialStudy">
+        <di:waypoint x="570" y="250" />
+        <di:waypoint x="620" y="250" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_ToSendRFQ_di" bpmnElement="Flow_ToSendRFQ">
+        <di:waypoint x="720" y="250" />
+        <di:waypoint x="770" y="250" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_ToCollectOffers_di" bpmnElement="Flow_ToCollectOffers">
+        <di:waypoint x="870" y="250" />
+        <di:waypoint x="920" y="250" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_ToCompareVendors_di" bpmnElement="Flow_ToCompareVendors">
+        <di:waypoint x="1020" y="250" />
+        <di:waypoint x="1070" y="250" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_ToSelectVendors_di" bpmnElement="Flow_ToSelectVendors">
+        <di:waypoint x="1170" y="250" />
+        <di:waypoint x="1220" y="250" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_ToPrepareQuotation_di" bpmnElement="Flow_ToPrepareQuotation">
+        <di:waypoint x="1320" y="250" />
+        <di:waypoint x="1370" y="250" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_ToApproveQuotation_di" bpmnElement="Flow_ToApproveQuotation">
+        <di:waypoint x="1470" y="250" />
+        <di:waypoint x="1525" y="250" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_QuotationApproved_di" bpmnElement="Flow_QuotationApproved">
+        <di:waypoint x="1575" y="250" />
+        <di:waypoint x="1630" y="250" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1589" y="232" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_QuotationRejected_di" bpmnElement="Flow_QuotationRejected">
+        <di:waypoint x="1550" y="275" />
+        <di:waypoint x="1550" y="350" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1558" y="303" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_QuotationRevised_di" bpmnElement="Flow_QuotationRevised">
+        <di:waypoint x="1500" y="390" />
+        <di:waypoint x="1550" y="390" />
+        <di:waypoint x="1550" y="275" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_ToEvaluation_di" bpmnElement="Flow_ToEvaluation">
+        <di:waypoint x="1730" y="250" />
+        <di:waypoint x="1780" y="250" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_ToAwaitDecision_di" bpmnElement="Flow_ToAwaitDecision">
+        <di:waypoint x="1880" y="250" />
+        <di:waypoint x="1935" y="250" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_TenderWon_di" bpmnElement="Flow_TenderWon">
+        <di:waypoint x="1985" y="250" />
+        <di:waypoint x="2040" y="250" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2002" y="232" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_TenderLost_di" bpmnElement="Flow_TenderLost">
+        <di:waypoint x="1960" y="275" />
+        <di:waypoint x="1960" y="390" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1967" y="323" width="21" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_TenderCancelled_di" bpmnElement="Flow_TenderCancelled">
+        <di:waypoint x="1960" y="275" />
+        <di:waypoint x="1960" y="540" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1932" y="393" width="47" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_ToProjectTypeCheck_di" bpmnElement="Flow_ToProjectTypeCheck">
+        <di:waypoint x="2140" y="250" />
+        <di:waypoint x="2195" y="250" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_SupplyProject_di" bpmnElement="Flow_SupplyProject">
+        <di:waypoint x="2245" y="250" />
+        <di:waypoint x="2300" y="250" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2254" y="232" width="34" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_OMProject_di" bpmnElement="Flow_OMProject">
+        <di:waypoint x="2220" y="275" />
+        <di:waypoint x="2220" y="580" />
+        <di:waypoint x="2300" y="580" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2228" y="413" width="28" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Supply_ToComplete_di" bpmnElement="Flow_Supply_ToComplete">
+        <di:waypoint x="3400" y="250" />
+        <di:waypoint x="3442" y="250" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_OM_ToComplete_di" bpmnElement="Flow_OM_ToComplete">
+        <di:waypoint x="3400" y="580" />
+        <di:waypoint x="3442" y="580" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_ToLostEnd_di" bpmnElement="Flow_ToLostEnd">
+        <di:waypoint x="2010" y="430" />
+        <di:waypoint x="2062" y="430" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_ToCancelledEnd_di" bpmnElement="Flow_ToCancelledEnd">
+        <di:waypoint x="2010" y="580" />
+        <di:waypoint x="2062" y="580" />
+      </bpmndi:BPMNEdge>
+
+      <!-- MESSAGE FLOW EDGES -->
+      <bpmndi:BPMNEdge id="MessageFlow_RFQ_di" bpmnElement="MessageFlow_RFQ">
+        <di:waypoint x="820" y="290" />
+        <di:waypoint x="820" y="940" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="MessageFlow_Quotes_di" bpmnElement="MessageFlow_Quotes">
+        <di:waypoint x="970" y="940" />
+        <di:waypoint x="970" y="290" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="MessageFlow_Submit_di" bpmnElement="MessageFlow_Submit">
+        <di:waypoint x="1680" y="290" />
+        <di:waypoint x="1680" y="820" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="MessageFlow_Decision_di" bpmnElement="MessageFlow_Decision">
+        <di:waypoint x="1960" y="820" />
+        <di:waypoint x="1960" y="275" />
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+
+</bpmn:definitions>
