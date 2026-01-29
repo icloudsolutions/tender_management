@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_vendor_comparison_wizard_form" model="ir.ui.view">
+            <field name="name">ics.tender.vendor.comparison.wizard.form</field>
+            <field name="model">ics.tender.vendor.comparison.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Compare Vendor Offers">
+                    <sheet>
+                        <group>
+                            <field name="tender_id" readonly="1"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group>
+                            <group>
+                                <label for="total_best_price" string="Total Best Price"/>
+                                <div class="o_row">
+                                    <field name="total_best_price" widget="monetary" readonly="1"/>
+                                </div>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Vendor Comparison" name="comparison">
+                                <field name="line_ids">
+                                    <tree decoration-success="savings > 0" decoration-danger="savings &lt; 0">
+                                        <field name="product_id"/>
+                                        <field name="quantity"/>
+                                        <field name="uom_id"/>
+                                        <field name="estimated_cost" sum="Total Estimated"/>
+                                        <field name="best_vendor_id"/>
+                                        <field name="best_offer_unit_price"/>
+                                        <field name="best_offer_total" sum="Total Best Offers"/>
+                                        <field name="offer_count"/>
+                                        <field name="savings" sum="Total Savings"/>
+                                        <field name="savings_percentage" string="Savings %"/>
+                                        <field name="currency_id" invisible="1"/>
+                                        <button name="action_view_offers" type="object"
+                                            string="View All Offers" class="btn-link"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <footer>
+                        <button name="action_apply_selection" string="Apply Best Vendors" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+    </data>
+</odoo>

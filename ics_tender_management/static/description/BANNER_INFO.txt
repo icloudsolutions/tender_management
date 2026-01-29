@@ -1,0 +1,86 @@
+Banner Image Specifications for ICS Tender Management
+======================================================
+
+For professional presentation on Odoo Apps Store, create the following images:
+
+1. BANNER.PNG (Main Banner)
+   - Dimensions: 1200x600 pixels
+   - Background: Gradient from #667eea to #764ba2
+   - Content:
+     * Module name "ICS Tender Management" in large white text
+     * Subtitle "Complete Saudi Tender Management System"
+     * Icon of a gavel or document with checklist
+     * "Etimad Integration" badge
+     * "€2,500" price tag
+     * iCloud Solutions logo
+
+2. ICON.PNG (Module Icon)
+   - Dimensions: 256x256 pixels
+   - Background: Same gradient as banner
+   - Content:
+     * Simple document/checklist icon in white
+     * Rounded corners (15px radius)
+   - Note: icon.svg is already provided and can be converted to PNG
+
+3. SCREENSHOT_1.PNG - Main Kanban View
+   - Show tender kanban with multiple stages
+   - Various tenders in different states
+   - Highlight urgent tender with red badge
+
+4. SCREENSHOT_2.PNG - Tender Form View
+   - Complete tender form with all fields filled
+   - Show BoQ lines section
+   - Display smart buttons with counts
+   - Show status bar with stages
+
+5. SCREENSHOT_3.PNG - Vendor Comparison Wizard
+   - Show comparison wizard with multiple vendors
+   - Highlight savings calculations
+   - Display best vendor selections
+
+6. SCREENSHOT_4.PNG - Quotation Generation
+   - Show quotation wizard
+   - Display preview lines with costs and margins
+   - Show total calculations
+
+7. SCREENSHOT_5.PNG - CRM Integration
+   - Show CRM opportunity with tender smart button
+   - Highlight "Create Tender" button
+   - Show etimad tender field
+
+8. SCREENSHOT_6.PNG - Project Creation
+   - Show won tender with "Create Project" button
+   - Display project wizard
+   - Show created project with tasks
+
+Design Guidelines:
+------------------
+- Use professional, clean design
+- Consistent color scheme (purple gradient)
+- High contrast for readability
+- Include iCloud Solutions branding
+- Show real-world example data
+- Highlight key features visually
+- Use arrows or callouts to emphasize important elements
+
+Color Palette:
+--------------
+Primary: #667eea (Purple Blue)
+Secondary: #764ba2 (Deep Purple)
+Success: #28a745 (Green)
+Danger: #dc3545 (Red)
+Warning: #ffc107 (Yellow)
+Info: #17a2b8 (Cyan)
+White: #ffffff
+Dark: #333333
+
+Tools Recommended:
+------------------
+- Adobe Photoshop / Illustrator
+- Figma
+- Canva Pro
+- GIMP (free alternative)
+- Inkscape (for SVG)
+
+For professional banner design services, contact:
+iCloud Solutions - contact@icloud-solutions.net

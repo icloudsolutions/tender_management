@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <template id="report_tender_document">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <div class="oe_structure"/>
+
+                            <h2>
+                                <span>Tender: </span>
+                                <span t-field="o.name"/>
+                            </h2>
+
+                            <div class="row mt32 mb32">
+                                <div class="col-6">
+                                    <strong>Tender Number:</strong>
+                                    <p t-field="o.tender_number"/>
+                                </div>
+                                <div class="col-6">
+                                    <strong>Customer:</strong>
+                                    <p t-field="o.partner_id"/>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-6">
+                                    <strong>Tender Title:</strong>
+                                    <p t-field="o.tender_title"/>
+                                </div>
+                                <div class="col-6">
+                                    <strong>Category:</strong>
+                                    <p t-field="o.tender_category"/>
+                                </div>
+                            </div>
+
+                            <div class="row mt16">
+                                <div class="col-6">
+                                    <strong>Submission Deadline:</strong>
+                                    <p t-field="o.submission_deadline"/>
+                                </div>
+                                <div class="col-6">
+                                    <strong>Status:</strong>
+                                    <p t-field="o.state"/>
+                                </div>
+                            </div>
+
+                            <div class="row mt32" t-if="o.description">
+                                <div class="col-12">
+                                    <strong>Description:</strong>
+                                    <div t-field="o.description"/>
+                                </div>
+                            </div>
+
+                            <div class="row mt32">
+                                <div class="col-12">
+                                    <h4>Financial Summary</h4>
+                                    <table class="table table-sm">
+                                        <tr>
+                                            <td><strong>Total Estimated Cost:</strong></td>
+                                            <td class="text-end">
+                                                <span t-field="o.total_estimated_cost"
+                                                    t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Total Vendor Cost:</strong></td>
+                                            <td class="text-end">
+                                                <span t-field="o.total_vendor_cost"
+                                                    t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Margin (<span t-field="o.margin_percentage"/>%):</strong></td>
+                                            <td class="text-end">
+                                                <span t-field="o.margin_amount"
+                                                    t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                            </td>
+                                        </tr>
+                                        <tr class="border-top">
+                                            <td><strong>Total Quotation Amount:</strong></td>
+                                            <td class="text-end">
+                                                <strong>
+                                                    <span t-field="o.total_quotation_amount"
+                                                        t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="oe_structure"/>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+
+        <template id="report_tender_boq_document">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <div class="oe_structure"/>
+
+                            <h2>
+                                <span>Bill of Quantities</span>
+                            </h2>
+                            <h4>
+                                <span>Tender: </span>
+                                <span t-field="o.name"/>
+                                <span> - </span>
+                                <span t-field="o.tender_title"/>
+                            </h4>
+
+                            <div class="row mt32 mb32">
+                                <div class="col-6">
+                                    <strong>Customer:</strong>
+                                    <p t-field="o.partner_id"/>
+                                </div>
+                                <div class="col-6">
+                                    <strong>Date:</strong>
+                                    <p t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d')"/>
+                                </div>
+                            </div>
+
+                            <table class="table table-sm table-bordered mt32">
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Description</th>
+                                        <th class="text-center">Qty</th>
+                                        <th class="text-center">UoM</th>
+                                        <th class="text-end">Unit Price</th>
+                                        <th class="text-end">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-set="line_number" t-value="0"/>
+                                    <tr t-foreach="o.boq_line_ids" t-as="line">
+                                        <t t-set="line_number" t-value="line_number + 1"/>
+                                        <td><span t-esc="line_number"/></td>
+                                        <td>
+                                            <span t-field="line.name"/>
+                                            <span t-if="line.product_id"> [<span t-field="line.product_id.default_code"/>]</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <span t-field="line.quantity"/>
+                                        </td>
+                                        <td class="text-center">
+                                            <span t-field="line.uom_id"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <span t-esc="line.unit_price"
+                                                t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                        </td>
+                                        <td class="text-end">
+                                            <span t-field="line.estimated_cost"
+                                                t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr class="border-top">
+                                        <td colspan="5" class="text-end"><strong>Total:</strong></td>
+                                        <td class="text-end">
+                                            <strong>
+                                                <span t-field="o.total_estimated_cost"
+                                                    t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                            </strong>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+
+                            <div class="oe_structure"/>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+
+    </data>
+</odoo>

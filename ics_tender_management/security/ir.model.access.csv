@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ics_tender_user,ics.tender.user,model_ics_tender,group_tender_user,1,1,1,0
+access_ics_tender_manager,ics.tender.manager,model_ics_tender,group_tender_manager,1,1,1,1
+access_ics_tender_stage_user,ics.tender.stage.user,model_ics_tender_stage,group_tender_user,1,0,0,0
+access_ics_tender_stage_manager,ics.tender.stage.manager,model_ics_tender_stage,group_tender_manager,1,1,1,1
+access_ics_tender_boq_line_user,ics.tender.boq.line.user,model_ics_tender_boq_line,group_tender_user,1,1,1,0
+access_ics_tender_boq_line_manager,ics.tender.boq.line.manager,model_ics_tender_boq_line,group_tender_manager,1,1,1,1
+access_ics_tender_vendor_offer_user,ics.tender.vendor.offer.user,model_ics_tender_vendor_offer,group_tender_user,1,1,1,0
+access_ics_tender_vendor_offer_manager,ics.tender.vendor.offer.manager,model_ics_tender_vendor_offer,group_tender_manager,1,1,1,1

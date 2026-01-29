@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_create_project_wizard_form" model="ir.ui.view">
+            <field name="name">ics.tender.project.wizard.form</field>
+            <field name="model">ics.tender.project.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Create Project">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="tender_id" readonly="1"/>
+                                <field name="partner_id" readonly="1"/>
+                                <field name="name"/>
+                                <field name="user_id" widget="many2one_avatar_user"/>
+                            </group>
+                            <group>
+                                <field name="date_start"/>
+                                <field name="sale_order_id"/>
+                                <field name="create_from_sale_order"/>
+                                <field name="create_from_boq"/>
+                            </group>
+                        </group>
+                        <group string="Project Configuration">
+                            <p class="text-muted">
+                                This will create a new project linked to this tender.
+                                <br/>
+                                If "Create Tasks from BoQ" is checked, each BoQ line will be converted into a project task.
+                                <br/>
+                                If "Link to Sales Order" is checked and a confirmed sales order is selected, the project will be linked to it.
+                            </p>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="action_create_project" string="Create Project" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+    </data>
+</odoo>

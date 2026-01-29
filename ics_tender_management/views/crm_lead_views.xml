@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_crm_lead_form_inherit_tender" model="ir.ui.view">
+            <field name="name">crm.lead.form.inherit.tender</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button name="action_view_tenders" type="object"
+                        class="oe_stat_button" icon="fa-gavel"
+                        invisible="tender_count == 0">
+                        <field name="tender_count" widget="statinfo" string="Tenders"/>
+                    </button>
+                </xpath>
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="etimad_tender_id" invisible="type == 'lead'"/>
+                </xpath>
+                <xpath expr="//header" position="inside">
+                    <button name="action_create_tender" string="Create Tender"
+                        type="object" class="btn-primary"
+                        invisible="type == 'lead'"/>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>

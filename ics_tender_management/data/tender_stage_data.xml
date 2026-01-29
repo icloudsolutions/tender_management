@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="stage_draft" model="ics.tender.stage">
+            <field name="name">Draft</field>
+            <field name="sequence">1</field>
+            <field name="fold" eval="False"/>
+            <field name="requirements">&lt;p&gt;Initial tender registration and information gathering&lt;/p&gt;</field>
+        </record>
+
+        <record id="stage_technical" model="ics.tender.stage">
+            <field name="name">Technical Study</field>
+            <field name="sequence">2</field>
+            <field name="fold" eval="False"/>
+            <field name="requirements">&lt;p&gt;Complete technical analysis, review specifications, and identify requirements&lt;/p&gt;</field>
+        </record>
+
+        <record id="stage_financial" model="ics.tender.stage">
+            <field name="name">Financial Study</field>
+            <field name="sequence">3</field>
+            <field name="fold" eval="False"/>
+            <field name="requirements">&lt;p&gt;Upload BoQ, send RFQs to vendors, and analyze pricing&lt;/p&gt;</field>
+        </record>
+
+        <record id="stage_quotation" model="ics.tender.stage">
+            <field name="name">Quotation Prepared</field>
+            <field name="sequence">4</field>
+            <field name="fold" eval="False"/>
+            <field name="requirements">&lt;p&gt;Generate final quotation with margin calculation&lt;/p&gt;</field>
+        </record>
+
+        <record id="stage_submitted" model="ics.tender.stage">
+            <field name="name">Submitted</field>
+            <field name="sequence">5</field>
+            <field name="fold" eval="False"/>
+            <field name="requirements">&lt;p&gt;Tender has been submitted to customer&lt;/p&gt;</field>
+        </record>
+
+        <record id="stage_evaluation" model="ics.tender.stage">
+            <field name="name">Under Evaluation</field>
+            <field name="sequence">6</field>
+            <field name="fold" eval="False"/>
+            <field name="requirements">&lt;p&gt;Customer is evaluating the tender&lt;/p&gt;</field>
+        </record>
+
+        <record id="stage_won" model="ics.tender.stage">
+            <field name="name">Won</field>
+            <field name="sequence">7</field>
+            <field name="fold" eval="False"/>
+            <field name="is_won" eval="True"/>
+            <field name="requirements">&lt;p&gt;Congratulations! Create project and start execution&lt;/p&gt;</field>
+        </record>
+
+        <record id="stage_lost" model="ics.tender.stage">
+            <field name="name">Lost</field>
+            <field name="sequence">8</field>
+            <field name="fold" eval="True"/>
+            <field name="is_lost" eval="True"/>
+            <field name="requirements">&lt;p&gt;Document reasons for losing the tender for future improvement&lt;/p&gt;</field>
+        </record>
+
+        <record id="stage_cancelled" model="ics.tender.stage">
+            <field name="name">Cancelled</field>
+            <field name="sequence">9</field>
+            <field name="fold" eval="True"/>
+            <field name="requirements">&lt;p&gt;Tender has been cancelled&lt;/p&gt;</field>
+        </record>
+
+    </data>
+</odoo>

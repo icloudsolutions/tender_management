@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <menuitem id="menu_tender_root"
+            name="Tender Management"
+            sequence="60"
+            web_icon="ics_tender_management,static/description/icon.png"
+            groups="group_tender_user"/>
+
+        <menuitem id="menu_tender_tenders"
+            name="Tenders"
+            parent="menu_tender_root"
+            sequence="10"/>
+
+        <menuitem id="menu_tender_all"
+            name="All Tenders"
+            parent="menu_tender_tenders"
+            action="action_tender"
+            sequence="10"/>
+
+        <record id="action_tender_my" model="ir.actions.act_window">
+            <field name="name">My Tenders</field>
+            <field name="res_model">ics.tender</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="search_view_id" ref="view_tender_search"/>
+            <field name="context">{'search_default_my_tenders': 1, 'search_default_active': 1}</field>
+            <field name="domain">[]</field>
+        </record>
+
+        <menuitem id="menu_tender_my"
+            name="My Tenders"
+            parent="menu_tender_tenders"
+            action="action_tender_my"
+            sequence="5"/>
+
+        <record id="action_tender_urgent" model="ir.actions.act_window">
+            <field name="name">Urgent Tenders</field>
+            <field name="res_model">ics.tender</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="search_view_id" ref="view_tender_search"/>
+            <field name="context">{'search_default_urgent': 1, 'search_default_active': 1}</field>
+            <field name="domain">[]</field>
+        </record>
+
+        <menuitem id="menu_tender_urgent"
+            name="Urgent Tenders"
+            parent="menu_tender_tenders"
+            action="action_tender_urgent"
+            sequence="15"/>
+
+        <menuitem id="menu_tender_config"
+            name="Configuration"
+            parent="menu_tender_root"
+            sequence="90"
+            groups="group_tender_manager"/>
+
+        <record id="action_tender_stage" model="ir.actions.act_window">
+            <field name="name">Tender Stages</field>
+            <field name="res_model">ics.tender.stage</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="menu_tender_stage"
+            name="Tender Stages"
+            parent="menu_tender_config"
+            action="action_tender_stage"
+            sequence="10"/>
+
+    </data>
+</odoo>
