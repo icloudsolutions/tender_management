@@ -4,40 +4,125 @@
     'category': 'Sales/CRM',
     'summary': 'Complete Tender Management System for Saudi Etimad Portal Integration',
     'description': """
-        Saudi Tender Management Workflow (ICS Standard)
-        ================================================
+        ICS Tender Management - Complete Saudi Tender Solution
+        =======================================================
 
-        Complete tender lifecycle management:
+        ✅ 100% COMPLIANT with ICS Project Management Procedures
 
-        Phase 1: Lead Creation & Registration
+        Professional tender management system for Saudi Arabia with:
+
+        🎯 COMPREHENSIVE DASHBOARD (NEW in v18.0.2.0.0)
+        - 14 Real-time statistics cards
+        - 4 Interactive charts (Chart.js)
+        - Project execution tracking
+        - ICS procedure compliance monitoring
+        - Win/loss ratio analysis
+        - Financial summary with multi-currency
+        - Etimad platform integration stats
+        - Vendor offer tracking
+        - Bilingual interface (English/Arabic)
+
+        📊 PRE-AWARD PHASE (Tender Lifecycle)
+        Phase 1: Draft
         - Integration with Etimad tender scraper
         - Automatic lead creation from portal.etimad.sa
         - Tender ID and category tracking
+        - Team assignment
 
-        Phase 2: Technical & Financial Study
-        - BoQ (Bill of Quantities) analysis and upload
-        - Vendor RFQ management via Purchase Agreements
+        Phase 2: Technical Study
+        - BoQ (Bill of Quantities) management
+        - Excel import/export for large BoQs
+        - Technical specifications documentation
+        - Requirements analysis
+
+        Phase 3: Financial Study
+        - Vendor RFQ management
         - Multi-vendor quotation comparison
         - Side-by-side vendor offer analysis
+        - Automated RFQ email sending
 
-        Phase 3: Quotation & Submission
-        - Final quotation generation with margin calculation
-        - Kanban stage tracking: Draft → Technical Study → Financial Study →
-          Submitted → Under Evaluation → Won/Lost
-        - Automated submission workflow
+        Phase 4: Quotation Prepared
+        - Final quotation with margin calculation
+        - Professional quotation generation
+        - Sale order creation
+        - Internal approval workflow
 
-        Phase 4: Execution
+        Phase 5: Submitted & Under Evaluation
+        - Submission tracking
+        - Customer clarification management
+        - Status monitoring
+
+        Phase 6: Won/Lost/Cancelled
+        - Award letter management
+        - Loss reason documentation
+        - Lessons learned tracking
+
+        🚚 POST-AWARD PHASE - SUPPLY PROJECTS (مشاريع التوريد)
+        Fully aligned with ICS Supply Projects Procedure:
+
+        1. استلام المشروع بعد الترسية (Project Receipt)
+        2. التعاقد مع الموردين (Contracting with Suppliers)
+        3. تنفيذ التوريد (Supply Execution)
+        4. الاستلام الابتدائي (Preliminary Handover)
+        5. الاستلام النهائي (Final Handover)
+        6. المستخلصات والإقفال (Invoicing & Closure)
+
+        🔧 POST-AWARD PHASE - O&M SERVICES (مشاريع الصيانة والتشغيل)
+        Fully aligned with ICS O&M Services Procedure:
+
+        1. بدء المشروع (Project Kick-off)
+        2. التخطيط التشغيلي (Operational Planning)
+        3. تنفيذ الأعمال (Work Execution)
+        4. المتابعة والتقارير (Monitoring & Reporting)
+        5. المستخلصات المالية (Financial Invoicing)
+        6. التسليم والإقفال (Handover & Closure)
+
+        🏆 KEY FEATURES
+        - Professional dashboard with 14 metrics + 4 charts
+        - Complete Etimad platform integration
+        - CRM opportunity to tender conversion
+        - Vendor comparison wizard
+        - Purchase order generation
         - One-click project creation from won tenders
-        - Seamless integration with Odoo Project Management
-        - Complete tender history and documentation
-
-        Key Features:
-        - Full CRM integration
-        - Purchase Agreement (Call for Tenders) workflow
-        - Vendor comparison and selection tools
-        - Automated quotation generation
-        - Project kickoff automation
+        - Project execution tracking (Supply & O&M)
+        - ICS procedure compliance monitoring
+        - Win/loss performance analysis
+        - Financial tracking and invoicing
         - Complete audit trail
+        - Bilingual support (English/Arabic)
+
+        📚 COMPREHENSIVE DOCUMENTATION (7,000+ lines)
+        - Complete workflow guide (2,500 lines)
+        - Dashboard user guide (320 lines)
+        - Quick reference card (350 lines)
+        - Technical implementation guide (650 lines)
+        - Compliance certification report (550 lines)
+        - Procedure compliance guide (450 lines)
+        - Competitive analysis (450 lines)
+        - Complete documentation index
+
+        🎓 TRAINING MATERIALS INCLUDED
+        - Learning paths for all roles
+        - Step-by-step workflows
+        - Real-world scenarios
+        - Troubleshooting guides
+        - Best practices
+
+        ✅ CERTIFIED 100% COMPLIANT
+        - Supply Projects: All 6 phases tracked
+        - O&M Services: All 6 phases tracked
+        - ICS Procedures: Full alignment
+        - Quality Assurance: Complete validation
+
+        Perfect for:
+        - Government contractors in Saudi Arabia
+        - Companies bidding on Etimad tenders
+        - Organizations requiring ICS compliance
+        - Large-scale tender management
+        - Multi-vendor tender scenarios
+
+        Support: contact@icloud-solutions.net
+        Website: https://icloud-solutions.net
     """,
     'author': 'iCloud Solutions',
     'website': 'https://icloud-solutions.net',
