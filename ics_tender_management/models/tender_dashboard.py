@@ -19,10 +19,10 @@ class IcsTenderDashboard(models.Model):
 
         draft_tenders = tender_obj.search_count([('stage_id.sequence', '=', 1)])
         active_tenders = tender_obj.search_count([
-            ('stage_id.name', 'in', ['Vendor Selection', 'Quotation Preparation', 'Quotation Review'])
+            ('stage_id.name', 'in', ['Technical Study', 'Financial Study', 'Quotation Prepared', 'Submitted', 'Under Evaluation'])
         ])
-        won_tenders = tender_obj.search_count([('stage_id.name', '=', 'Won')])
-        lost_tenders = tender_obj.search_count([('stage_id.name', '=', 'Lost')])
+        won_tenders = tender_obj.search_count([('stage_id.is_won', '=', True)])
+        lost_tenders = tender_obj.search_count([('stage_id.is_lost', '=', True)])
 
         supply_projects = tender_obj.search_count([('tender_category', '=', 'supply')])
         maintenance_projects = tender_obj.search_count([('tender_category', '=', 'maintenance')])
@@ -34,6 +34,9 @@ class IcsTenderDashboard(models.Model):
         etimad_stats = self._get_etimad_statistics()
         stage_distribution = self._get_stage_distribution()
         financial_summary = self._get_financial_summary()
+        project_execution = self._get_project_execution_stats()
+        procedure_compliance = self._get_procedure_compliance()
+        win_loss_ratio = self._get_win_loss_ratio()
 
         return {
             'total_tenders': total_tenders,
@@ -50,6 +53,9 @@ class IcsTenderDashboard(models.Model):
             'etimad_stats': etimad_stats,
             'stage_distribution': stage_distribution,
             'financial_summary': financial_summary,
+            'project_execution': project_execution,
+            'procedure_compliance': procedure_compliance,
+            'win_loss_ratio': win_loss_ratio,
         }
 
     def _get_vendor_offer_stats(self):
@@ -207,4 +213,110 @@ class IcsTenderDashboard(models.Model):
             'active_budget': active_budget,
             'won_budget': won_budget,
             'currency_symbol': self.env.company.currency_id.symbol or 'SAR',
+        }
+
+    def _get_project_execution_stats(self):
+        """Get project execution statistics for won tenders"""
+        tender_obj = self.env['ics.tender.management']
+        project_obj = self.env['project.project']
+
+        won_tenders = tender_obj.search([('stage_id.is_won', '=', True)])
+
+        total_projects = project_obj.search_count([('tender_id', 'in', won_tenders.ids)])
+
+        in_execution = project_obj.search_count([
+            ('tender_id', 'in', won_tenders.ids),
+            ('stage_id.is_closed', '=', False)
+        ])
+
+        completed = project_obj.search_count([
+            ('tender_id', 'in', won_tenders.ids),
+            ('stage_id.is_closed', '=', True)
+        ])
+
+        supply_in_execution = project_obj.search_count([
+            ('tender_id.tender_category', '=', 'supply'),
+            ('tender_id', 'in', won_tenders.ids),
+            ('stage_id.is_closed', '=', False)
+        ])
+
+        maintenance_in_execution = project_obj.search_count([
+            ('tender_id.tender_category', '=', 'maintenance'),
+            ('tender_id', 'in', won_tenders.ids),
+            ('stage_id.is_closed', '=', False)
+        ])
+
+        return {
+            'total_projects': total_projects,
+            'in_execution': in_execution,
+            'completed': completed,
+            'supply_in_execution': supply_in_execution,
+            'maintenance_in_execution': maintenance_in_execution,
+        }
+
+    def _get_procedure_compliance(self):
+        """Get procedure compliance metrics based on ICS procedures"""
+        tender_obj = self.env['ics.tender.management']
+        project_obj = self.env['project.project']
+
+        won_supply = tender_obj.search_count([
+            ('stage_id.is_won', '=', True),
+            ('tender_category', '=', 'supply')
+        ])
+
+        won_maintenance = tender_obj.search_count([
+            ('stage_id.is_won', '=', True),
+            ('tender_category', '=', 'maintenance')
+        ])
+
+        supply_with_projects = 0
+        if won_supply > 0:
+            supply_tenders = tender_obj.search([
+                ('stage_id.is_won', '=', True),
+                ('tender_category', '=', 'supply')
+            ])
+            supply_with_projects = project_obj.search_count([
+                ('tender_id', 'in', supply_tenders.ids)
+            ])
+
+        maintenance_with_projects = 0
+        if won_maintenance > 0:
+            maintenance_tenders = tender_obj.search([
+                ('stage_id.is_won', '=', True),
+                ('tender_category', '=', 'maintenance')
+            ])
+            maintenance_with_projects = project_obj.search_count([
+                ('tender_id', 'in', maintenance_tenders.ids)
+            ])
+
+        supply_compliance = (supply_with_projects / won_supply * 100) if won_supply > 0 else 100
+        maintenance_compliance = (maintenance_with_projects / won_maintenance * 100) if won_maintenance > 0 else 100
+
+        return {
+            'supply_won': won_supply,
+            'supply_with_projects': supply_with_projects,
+            'supply_compliance': round(supply_compliance, 1),
+            'maintenance_won': won_maintenance,
+            'maintenance_with_projects': maintenance_with_projects,
+            'maintenance_compliance': round(maintenance_compliance, 1),
+            'overall_compliance': round((supply_compliance + maintenance_compliance) / 2, 1) if (won_supply > 0 or won_maintenance > 0) else 100,
+        }
+
+    def _get_win_loss_ratio(self):
+        """Calculate win/loss ratio and success rate"""
+        tender_obj = self.env['ics.tender.management']
+
+        won_count = tender_obj.search_count([('stage_id.is_won', '=', True)])
+        lost_count = tender_obj.search_count([('stage_id.is_lost', '=', True)])
+
+        total_decided = won_count + lost_count
+        win_rate = (won_count / total_decided * 100) if total_decided > 0 else 0
+        loss_rate = (lost_count / total_decided * 100) if total_decided > 0 else 0
+
+        return {
+            'won_count': won_count,
+            'lost_count': lost_count,
+            'total_decided': total_decided,
+            'win_rate': round(win_rate, 1),
+            'loss_rate': round(loss_rate, 1),
         }
