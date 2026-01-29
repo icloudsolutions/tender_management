@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Import BoQ Wizard -->
+        <record id="view_import_boq_wizard_form" model="ir.ui.view">
+            <field name="name">ics.tender.import.boq.wizard.form</field>
+            <field name="model">ics.tender.import.boq.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Import BoQ from Excel">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="tender_id" readonly="1"/>
+                                <field name="file" filename="filename"/>
+                                <field name="filename" invisible="1"/>
+                            </group>
+                            <group>
+                                <field name="import_option"/>
+                            </group>
+                        </group>
+                        <group string="Excel File Format">
+                            <p>
+                                The Excel file should contain the following columns in order:
+                                <ul>
+                                    <li><strong>Product Code</strong> - Product internal reference or barcode (optional)</li>
+                                    <li><strong>Description</strong> - Product description (required)</li>
+                                    <li><strong>Quantity</strong> - Quantity (required, numeric)</li>
+                                    <li><strong>UoM</strong> - Unit of Measure (e.g., Unit, KG, Meter)</li>
+                                    <li><strong>Estimated Cost</strong> - Total estimated cost (numeric)</li>
+                                    <li><strong>Technical Specifications</strong> - Detailed specifications (optional)</li>
+                                </ul>
+                            </p>
+                            <p class="text-muted">
+                                <strong>Note:</strong> The first row should contain column headers.
+                                If a product code is provided and exists in the system, it will be linked automatically.
+                            </p>
+                        </group>
+                        <group>
+                            <button name="%(ics_tender_management.action_download_boq_template)d"
+                                string="Download Template"
+                                type="action"
+                                class="btn-link"
+                                icon="fa-download"/>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="action_import_boq" string="Import" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- Export BoQ Wizard -->
+        <record id="view_export_boq_wizard_form" model="ir.ui.view">
+            <field name="name">ics.tender.export.boq.wizard.form</field>
+            <field name="model">ics.tender.export.boq.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Export BoQ to Excel">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="tender_id" readonly="1"/>
+                            </group>
+                        </group>
+                        <group string="Export Options">
+                            <field name="include_specifications"/>
+                            <field name="include_vendor_offers"/>
+                        </group>
+                        <group>
+                            <p class="text-muted">
+                                This will export all BoQ lines to an Excel file.
+                                The file will be downloaded automatically and also attached to the tender.
+                            </p>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="action_export_boq" string="Export to Excel" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- BoQ Template Download Action -->
+        <record id="action_download_boq_template" model="ir.actions.act_url">
+            <field name="name">Download BoQ Template</field>
+            <field name="url">/ics_tender_management/static/templates/BoQ_Import_Template.xls</field>
+            <field name="target">self</field>
+        </record>
+
+    </data>
+</odoo>
