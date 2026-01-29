@@ -35,6 +35,13 @@ class Tender(models.Model):
         ('other', 'Other'),
     ], string='Tender Category', required=True, tracking=True)
 
+    tender_type = fields.Selection([
+        ('single_vendor', 'Single Vendor for All Products'),
+        ('product_wise', 'Product-wise Vendor Selection'),
+    ], string='Tender Type', default='single_vendor', required=True, tracking=True,
+        help='Single Vendor: Select one vendor for all products (all prices mandatory). '
+             'Product-wise: Select different vendors per product (prices optional, multiple POs).')
+
     description = fields.Html('Description')
 
     stage_id = fields.Many2one('ics.tender.stage', string='Stage',
@@ -347,6 +354,130 @@ class Tender(models.Model):
                 'default_res_id': self.id,
             },
         }
+
+    def action_create_purchase_orders(self):
+        self.ensure_one()
+
+        if self.tender_type == 'single_vendor':
+            return self._create_single_purchase_order()
+        else:
+            return self._create_multiple_purchase_orders()
+
+    def _create_single_purchase_order(self):
+        missing_selections = self.boq_line_ids.filtered(lambda l: not l.selected_vendor_id)
+        if missing_selections:
+            raise UserError(_(
+                'Single Vendor Mode requires all products to be assigned to vendors.\n'
+                'Missing vendor selection for: %s'
+            ) % ', '.join(missing_selections.mapped('name')))
+
+        vendors = self.boq_line_ids.mapped('selected_vendor_id')
+        if len(vendors) > 1:
+            raise UserError(_(
+                'Single Vendor Mode requires all products to use the same vendor.\n'
+                'Currently selected vendors: %s'
+            ) % ', '.join(vendors.mapped('name')))
+
+        if not vendors:
+            raise UserError(_('Please select a vendor for the products.'))
+
+        vendor = vendors[0]
+
+        purchase_order = self.env['purchase.order'].create({
+            'partner_id': vendor.id,
+            'tender_id': self.id,
+            'origin': self.name,
+            'date_order': fields.Datetime.now(),
+        })
+
+        for boq_line in self.boq_line_ids:
+            self.env['purchase.order.line'].create({
+                'order_id': purchase_order.id,
+                'product_id': boq_line.product_id.id,
+                'name': boq_line.name,
+                'product_qty': boq_line.quantity,
+                'product_uom': boq_line.uom_id.id,
+                'price_unit': boq_line.selected_vendor_price / boq_line.quantity if boq_line.quantity else 0,
+                'date_planned': fields.Datetime.now(),
+            })
+
+        return {
+            'name': _('Purchase Order'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'purchase.order',
+            'view_mode': 'form',
+            'res_id': purchase_order.id,
+            'target': 'current',
+        }
+
+    def _create_multiple_purchase_orders(self):
+        lines_with_vendor = self.boq_line_ids.filtered(lambda l: l.selected_vendor_id)
+
+        if not lines_with_vendor:
+            raise UserError(_('Please select vendors for at least one product.'))
+
+        vendors = lines_with_vendor.mapped('selected_vendor_id')
+        created_orders = self.env['purchase.order']
+
+        for vendor in vendors:
+            vendor_lines = lines_with_vendor.filtered(lambda l: l.selected_vendor_id == vendor)
+
+            purchase_order = self.env['purchase.order'].create({
+                'partner_id': vendor.id,
+                'tender_id': self.id,
+                'origin': self.name,
+                'date_order': fields.Datetime.now(),
+            })
+
+            for boq_line in vendor_lines:
+                self.env['purchase.order.line'].create({
+                    'order_id': purchase_order.id,
+                    'product_id': boq_line.product_id.id,
+                    'name': boq_line.name,
+                    'product_qty': boq_line.quantity,
+                    'product_uom': boq_line.uom_id.id,
+                    'price_unit': boq_line.selected_vendor_price / boq_line.quantity if boq_line.quantity else 0,
+                    'date_planned': fields.Datetime.now(),
+                })
+
+            created_orders |= purchase_order
+
+        if len(created_orders) == 1:
+            return {
+                'name': _('Purchase Order'),
+                'type': 'ir.actions.act_window',
+                'res_model': 'purchase.order',
+                'view_mode': 'form',
+                'res_id': created_orders.id,
+                'target': 'current',
+            }
+        else:
+            return {
+                'name': _('Purchase Orders'),
+                'type': 'ir.actions.act_window',
+                'res_model': 'purchase.order',
+                'view_mode': 'tree,form',
+                'domain': [('id', 'in', created_orders.ids)],
+                'target': 'current',
+            }
+
+    def _validate_vendor_selection(self):
+        self.ensure_one()
+
+        if self.tender_type == 'single_vendor':
+            missing_selections = self.boq_line_ids.filtered(lambda l: not l.selected_vendor_id)
+            if missing_selections:
+                raise ValidationError(_(
+                    'Single Vendor Mode: All products must have a vendor selected.\n'
+                    'Missing selections for: %s'
+                ) % ', '.join(missing_selections.mapped('name')))
+
+            vendors = self.boq_line_ids.mapped('selected_vendor_id')
+            if len(vendors) > 1:
+                raise ValidationError(_(
+                    'Single Vendor Mode: All products must use the same vendor.\n'
+                    'Please select only one vendor for all products.'
+                ))
 
     @api.onchange('lead_id')
     def _onchange_lead_id(self):

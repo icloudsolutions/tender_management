@@ -8,6 +8,8 @@ class VendorComparisonWizard(models.TransientModel):
 
     tender_id = fields.Many2one('ics.tender', string='Tender', required=True)
 
+    tender_type = fields.Selection(related='tender_id.tender_type', string='Tender Type', readonly=True)
+
     line_ids = fields.One2many('ics.tender.vendor.comparison.line', 'wizard_id',
         string='Comparison Lines')
 
@@ -15,6 +17,10 @@ class VendorComparisonWizard(models.TransientModel):
         compute='_compute_totals', currency_field='currency_id')
 
     currency_id = fields.Many2one('res.currency', related='tender_id.currency_id')
+
+    single_vendor_id = fields.Many2one('res.partner', string='Selected Vendor',
+        help='For Single Vendor mode: This vendor will be applied to all products',
+        domain=[('is_company', '=', True)])
 
     @api.depends('line_ids.best_offer_total')
     def _compute_totals(self):
@@ -50,13 +56,97 @@ class VendorComparisonWizard(models.TransientModel):
 
     def action_apply_selection(self):
         self.ensure_one()
+
+        if self.tender_type == 'single_vendor':
+            return self._apply_single_vendor_selection()
+        else:
+            return self._apply_product_wise_selection()
+
+    def _apply_single_vendor_selection(self):
+        if not self.single_vendor_id:
+            raise UserError(_('Please select a vendor for Single Vendor mode.'))
+
+        for line in self.line_ids:
+            vendor_offer = self.env['ics.tender.vendor.offer'].search([
+                ('boq_line_id', '=', line.boq_line_id.id),
+                ('vendor_id', '=', self.single_vendor_id.id)
+            ], limit=1)
+
+            if not vendor_offer:
+                raise UserError(_(
+                    'Vendor %s has no offer for product: %s\n'
+                    'Please ensure the selected vendor has submitted offers for all products.'
+                ) % (self.single_vendor_id.name, line.product_id.name or line.boq_line_id.name))
+
+            line.boq_line_id.write({
+                'selected_vendor_id': self.single_vendor_id.id,
+                'selected_vendor_price': vendor_offer.total_price,
+            })
+
+        return {'type': 'ir.actions.act_window_close'}
+
+    def _apply_product_wise_selection(self):
         for line in self.line_ids:
             if line.best_vendor_id:
                 line.boq_line_id.write({
                     'selected_vendor_id': line.best_vendor_id.id,
                     'selected_vendor_price': line.best_offer_total,
                 })
+
         return {'type': 'ir.actions.act_window_close'}
+
+    def action_select_best_common_vendor(self):
+        self.ensure_one()
+
+        if self.tender_type != 'single_vendor':
+            raise UserError(_('This action is only for Single Vendor mode.'))
+
+        boq_lines = self.tender_id.boq_line_ids
+        if not boq_lines:
+            raise UserError(_('No BoQ lines found.'))
+
+        all_vendors = self.env['res.partner']
+        for boq_line in boq_lines:
+            line_vendors = boq_line.vendor_offer_ids.mapped('vendor_id')
+            if not all_vendors:
+                all_vendors = line_vendors
+            else:
+                all_vendors &= line_vendors
+
+        if not all_vendors:
+            raise UserError(_(
+                'No common vendor found with offers for all products.\n'
+                'Please ensure at least one vendor has submitted offers for all items.'
+            ))
+
+        vendor_totals = {}
+        for vendor in all_vendors:
+            total = 0
+            for boq_line in boq_lines:
+                offer = self.env['ics.tender.vendor.offer'].search([
+                    ('boq_line_id', '=', boq_line.id),
+                    ('vendor_id', '=', vendor.id)
+                ], limit=1)
+                if offer:
+                    total += offer.total_price
+            vendor_totals[vendor.id] = total
+
+        best_vendor_id = min(vendor_totals, key=vendor_totals.get)
+        self.single_vendor_id = best_vendor_id
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Best Vendor Selected'),
+                'message': _('Selected: %s (Total: %s)') % (
+                    self.single_vendor_id.name,
+                    '{:,.2f}'.format(vendor_totals[best_vendor_id])
+                ),
+                'type': 'success',
+                'sticky': False,
+            }
+        }
 
 
 class VendorComparisonLine(models.TransientModel):

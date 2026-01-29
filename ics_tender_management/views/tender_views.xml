@@ -122,6 +122,10 @@
                         <button name="action_compare_vendors" string="Compare Vendors"
                             type="object"
                             invisible="state not in ['financial', 'quotation']"/>
+                        <button name="action_create_purchase_orders" string="Create Purchase Order(s)"
+                            type="object" class="btn-primary"
+                            invisible="state not in ['financial', 'quotation']"
+                            help="Single Vendor: Creates 1 PO. Product-wise: Creates multiple POs per vendor"/>
                         <button name="action_prepare_quotation" string="Prepare Quotation"
                             type="object" class="oe_highlight"
                             invisible="state != 'financial'"/>
@@ -183,6 +187,9 @@
                                 <field name="tender_number"/>
                                 <field name="tender_title"/>
                                 <field name="tender_category"/>
+                                <field name="tender_type" widget="radio"
+                                    options="{'horizontal': true}"
+                                    attrs="{'readonly': [('state', 'not in', ['draft', 'technical'])]}"/>
                                 <field name="etimad_tender_id" options="{'no_create': True}"/>
                                 <field name="lead_id" options="{'no_create': True}"/>
                                 <field name="partner_id" options="{'no_create_edit': True}"/>

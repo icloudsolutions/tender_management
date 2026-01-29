@@ -8,9 +8,35 @@
             <field name="arch" type="xml">
                 <form string="Compare Vendor Offers">
                     <sheet>
+                        <div class="alert alert-info" role="alert" attrs="{'invisible': [('tender_type', '!=', 'single_vendor')]}">
+                            <strong>Single Vendor Mode:</strong> You must select ONE vendor for ALL products.
+                            The system will use this vendor's offers for all items.
+                        </div>
+                        <div class="alert alert-success" role="alert" attrs="{'invisible': [('tender_type', '!=', 'product_wise')]}">
+                            <strong>Product-wise Mode:</strong> You can select different vendors for each product.
+                            The system will automatically select the best offer per product.
+                        </div>
                         <group>
                             <field name="tender_id" readonly="1"/>
+                            <field name="tender_type" invisible="1"/>
                             <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group attrs="{'invisible': [('tender_type', '!=', 'single_vendor')]}">
+                            <group>
+                                <label for="single_vendor_id" string="Select Vendor"/>
+                                <div class="o_row">
+                                    <field name="single_vendor_id"
+                                        domain="[('id', 'in', [])]"
+                                        options="{'no_create': True, 'no_create_edit': True}"
+                                        placeholder="Choose a vendor..."/>
+                                    <button name="action_select_best_common_vendor"
+                                        type="object"
+                                        string="Auto-Select Best"
+                                        class="btn-link"
+                                        icon="fa-magic"
+                                        help="Automatically select the vendor with the lowest total price"/>
+                                </div>
+                            </group>
                         </group>
                         <group>
                             <group>
@@ -43,7 +69,16 @@
                         </notebook>
                     </sheet>
                     <footer>
-                        <button name="action_apply_selection" string="Apply Best Vendors" type="object" class="btn-primary"/>
+                        <button name="action_apply_selection"
+                            string="Apply Selected Vendor"
+                            type="object"
+                            class="btn-primary"
+                            attrs="{'invisible': [('tender_type', '!=', 'single_vendor')]}"/>
+                        <button name="action_apply_selection"
+                            string="Apply Best Vendors per Product"
+                            type="object"
+                            class="btn-primary"
+                            attrs="{'invisible': [('tender_type', '!=', 'product_wise')]}"/>
                         <button string="Cancel" class="btn-secondary" special="cancel"/>
                     </footer>
                 </form>

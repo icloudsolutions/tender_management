@@ -6,7 +6,10 @@
             <field name="name">ics.tender.boq.line.tree</field>
             <field name="model">ics.tender.boq.line</field>
             <field name="arch" type="xml">
-                <tree string="Bill of Quantities" editable="bottom">
+                <tree string="Bill of Quantities" editable="bottom"
+                    decoration-success="selected_vendor_id"
+                    decoration-warning="not selected_vendor_id and tender_type == 'single_vendor'"
+                    decoration-info="not selected_vendor_id and tender_type == 'product_wise'">
                     <field name="sequence" widget="handle"/>
                     <field name="product_id"/>
                     <field name="name"/>
@@ -15,8 +18,10 @@
                     <field name="estimated_cost" sum="Total Estimated"/>
                     <field name="selected_vendor_id"/>
                     <field name="selected_vendor_price" sum="Total Vendor Cost"/>
+                    <field name="offer_count" string="Offers"/>
                     <field name="currency_id" invisible="1"/>
                     <field name="tender_id" invisible="1"/>
+                    <field name="tender_type" invisible="1"/>
                 </tree>
             </field>
         </record>

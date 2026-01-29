@@ -10,6 +10,8 @@ class TenderBoQLine(models.Model):
     tender_id = fields.Many2one('ics.tender', string='Tender',
         required=True, ondelete='cascade')
 
+    tender_type = fields.Selection(related='tender_id.tender_type', string='Tender Type', store=True, readonly=True)
+
     sequence = fields.Integer('Sequence', default=10)
 
     name = fields.Char('Description', required=True)
@@ -44,6 +46,13 @@ class TenderBoQLine(models.Model):
     notes = fields.Text('Notes')
 
     specifications = fields.Html('Technical Specifications')
+
+    offer_count = fields.Integer('Number of Offers', compute='_compute_offer_count')
+
+    @api.depends('vendor_offer_ids')
+    def _compute_offer_count(self):
+        for line in self:
+            line.offer_count = len(line.vendor_offer_ids)
 
     @api.depends('estimated_cost', 'quantity')
     def _compute_unit_price(self):
