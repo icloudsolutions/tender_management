@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="ics_tender_management.Dashboard">
+        <div class="ics_tender_dashboard">
+            <t t-if="state.isLoading">
+                <div class="d-flex justify-content-center align-items-center" style="min-height: 400px;">
+                    <div class="text-center">
+                        <i class="fa fa-spinner fa-spin fa-3x text-primary mb-3"/>
+                        <h4>Loading Dashboard...</h4>
+                    </div>
+                </div>
+            </t>
+
+            <t t-else="">
+                <div class="dashboard-header mb-4">
+                    <h2 class="mb-1">Tender Management Dashboard</h2>
+                    <p class="text-muted mb-0">Real-time overview of your tender operations | لوحة متابعة إدارة المشاريع</p>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-primary shadow h-100 py-2 cursor-pointer" t-on-click="() => this.openTenders('all')">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            Total Tenders
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                            <t t-esc="state.stats.total_tenders"/>
+                                        </div>
+                                        <div class="text-xs text-muted">إجمالي المشاريع</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fa fa-file-text fa-2x text-gray-300"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-success shadow h-100 py-2 cursor-pointer" t-on-click="() => this.openTenders('active')">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                            Active Tenders
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                            <t t-esc="state.stats.active_tenders"/>
+                                        </div>
+                                        <div class="text-xs text-muted">المشاريع النشطة</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fa fa-hourglass-half fa-2x text-gray-300"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-info shadow h-100 py-2 cursor-pointer" t-on-click="() => this.openTenders('won')">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                            Won Tenders
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                            <t t-esc="state.stats.won_tenders"/>
+                                        </div>
+                                        <div class="text-xs text-muted">المشاريع المكتسبة</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fa fa-trophy fa-2x text-gray-300"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-warning shadow h-100 py-2 cursor-pointer" t-on-click="() => this.openEtimadTenders()">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            Etimad Tenders
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                            <t t-esc="state.stats.etimad_stats.total_etimad || 0"/>
+                                        </div>
+                                        <div class="text-xs text-muted">
+                                            <t t-esc="state.stats.etimad_stats.new_tenders || 0"/> New | جديد
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fa fa-cloud-download fa-2x text-gray-300"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-xl-4 col-lg-6 mb-4">
+                        <div class="card border-left-supply shadow h-100 py-2 cursor-pointer" t-on-click="() => this.openTenders('supply')">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-supply text-uppercase mb-1">
+                                            Supply Projects
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                            <t t-esc="state.stats.supply_projects"/>
+                                        </div>
+                                        <div class="text-xs text-muted">مشاريع التوريد</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fa fa-truck fa-2x text-gray-300"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-6 mb-4">
+                        <div class="card border-left-maintenance shadow h-100 py-2 cursor-pointer" t-on-click="() => this.openTenders('maintenance')">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-maintenance text-uppercase mb-1">
+                                            Maintenance Projects
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                            <t t-esc="state.stats.maintenance_projects"/>
+                                        </div>
+                                        <div class="text-xs text-muted">مشاريع الصيانة والتشغيل</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fa fa-wrench fa-2x text-gray-300"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-12 mb-4">
+                        <div class="card border-left-draft shadow h-100 py-2 cursor-pointer" t-on-click="() => this.openTenders('draft')">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-draft text-uppercase mb-1">
+                                            Draft Tenders
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                            <t t-esc="state.stats.draft_tenders"/>
+                                        </div>
+                                        <div class="text-xs text-muted">المشاريع قيد الإعداد</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fa fa-edit fa-2x text-gray-300"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-xl-4 col-md-4 mb-4">
+                        <div class="card shadow h-100">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    <i class="fa fa-pie-chart"/> Tender Type Distribution
+                                </h6>
+                                <small class="text-muted">توزيع المشاريع حسب النوع</small>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container" style="height: 250px;">
+                                    <canvas t-ref="tenderTypeChart"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4 col-md-4 mb-4">
+                        <div class="card shadow h-100">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    <i class="fa fa-bar-chart"/> Tenders by Category
+                                </h6>
+                                <small class="text-muted">المشاريع حسب الفئة</small>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container" style="height: 250px;">
+                                    <canvas t-ref="tenderCategoryChart"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4 col-md-4 mb-4">
+                        <div class="card shadow h-100">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    <i class="fa fa-line-chart"/> 6-Month Trend
+                                </h6>
+                                <small class="text-muted">اتجاه المشاريع (6 أشهر)</small>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container" style="height: 250px;">
+                                    <canvas t-ref="monthlyTrendChart"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-xl-6 col-lg-6 mb-4">
+                        <div class="card shadow h-100">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    <i class="fa fa-tasks"/> Tenders by Stage
+                                </h6>
+                                <small class="text-muted">المشاريع حسب المرحلة</small>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container" style="height: 300px;">
+                                    <canvas t-ref="stageDistributionChart"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-6 col-lg-6 mb-4">
+                        <div class="card shadow h-100">
+                            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="m-0 font-weight-bold text-primary">
+                                        <i class="fa fa-money"/> Financial Summary
+                                    </h6>
+                                    <small class="text-muted">الملخص المالي</small>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-4 pb-3 border-bottom">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="text-muted">Total Budget</span>
+                                        <span class="font-weight-bold text-gray-800">
+                                            <t t-esc="formatCurrency(state.stats.financial_summary.total_budget)"/>
+                                            <t t-esc="state.stats.financial_summary.currency_symbol"/>
+                                        </span>
+                                    </div>
+                                    <small class="text-muted">إجمالي الميزانية</small>
+                                </div>
+
+                                <div class="mb-4 pb-3 border-bottom">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="text-muted">Active Budget</span>
+                                        <span class="font-weight-bold text-success">
+                                            <t t-esc="formatCurrency(state.stats.financial_summary.active_budget)"/>
+                                            <t t-esc="state.stats.financial_summary.currency_symbol"/>
+                                        </span>
+                                    </div>
+                                    <small class="text-muted">ميزانية المشاريع النشطة</small>
+                                </div>
+
+                                <div class="mb-2">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="text-muted">Won Budget</span>
+                                        <span class="font-weight-bold text-info">
+                                            <t t-esc="formatCurrency(state.stats.financial_summary.won_budget)"/>
+                                            <t t-esc="state.stats.financial_summary.currency_symbol"/>
+                                        </span>
+                                    </div>
+                                    <small class="text-muted">ميزانية المشاريع المكتسبة</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-xl-4 col-md-4 mb-4">
+                        <div class="card border-left-info shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                    Total Offers
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                    <t t-esc="state.stats.vendor_offers.total"/>
+                                </div>
+                                <div class="text-xs text-muted">إجمالي العروض</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4 col-md-4 mb-4">
+                        <div class="card border-left-warning shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                    Pending Offers
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                    <t t-esc="state.stats.vendor_offers.pending"/>
+                                </div>
+                                <div class="text-xs text-muted">العروض قيد المراجعة</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4 col-md-4 mb-4">
+                        <div class="card border-left-success shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                    Accepted Offers
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                    <t t-esc="state.stats.vendor_offers.accepted"/>
+                                </div>
+                                <div class="text-xs text-muted">العروض المقبولة</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

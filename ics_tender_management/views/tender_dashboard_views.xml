@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_ics_tender_dashboard" model="ir.actions.client">
+        <field name="name">Tender Dashboard</field>
+        <field name="tag">ics_tender_dashboard</field>
+    </record>
+
+    <menuitem
+        id="menu_tender_dashboard"
+        name="Dashboard"
+        parent="menu_tender_root"
+        action="action_ics_tender_dashboard"
+        sequence="0"/>
+</odoo>

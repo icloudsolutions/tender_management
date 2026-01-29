@@ -7,3 +7,5 @@ access_ics_tender_boq_line_user,ics.tender.boq.line.user,model_ics_tender_boq_li
 access_ics_tender_boq_line_manager,ics.tender.boq.line.manager,model_ics_tender_boq_line,group_tender_manager,1,1,1,1
 access_ics_tender_vendor_offer_user,ics.tender.vendor.offer.user,model_ics_tender_vendor_offer,group_tender_user,1,1,1,0
 access_ics_tender_vendor_offer_manager,ics.tender.vendor.offer.manager,model_ics_tender_vendor_offer,group_tender_manager,1,1,1,1
+access_ics_tender_dashboard_user,ics.tender.dashboard.user,model_ics_tender_dashboard,group_tender_user,1,0,0,0
+access_ics_tender_dashboard_manager,ics.tender.dashboard.manager,model_ics_tender_dashboard,group_tender_manager,1,0,0,0

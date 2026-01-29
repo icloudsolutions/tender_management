@@ -1,6 +1,6 @@
 {
     'name': 'ICS Tender Management',
-    'version': '18.0.1.0.0',
+    'version': '18.0.2.0.0',
     'category': 'Sales/CRM',
     'summary': 'Complete Tender Management System for Saudi Etimad Portal Integration',
     'description': """
@@ -61,6 +61,7 @@
         'data/tender_sequence.xml',
         'data/tender_stage_data.xml',
         'data/mail_template_data.xml',
+        'views/tender_dashboard_views.xml',
         'views/tender_views.xml',
         'views/tender_boq_views.xml',
         'views/crm_lead_views.xml',
@@ -77,6 +78,9 @@
     'assets': {
         'web.assets_backend': [
             'ics_tender_management/static/src/css/tender_kanban.css',
+            'ics_tender_management/static/src/scss/tender_dashboard.scss',
+            'ics_tender_management/static/src/js/tender_dashboard.js',
+            'ics_tender_management/static/src/xml/tender_dashboard.xml',
         ],
     },
     'images': ['static/description/banner.png'],
