@@ -26,7 +26,7 @@ class GenerateQuotationWizard(models.TransientModel):
     notes = fields.Html('Terms and Conditions')
 
     line_preview_ids = fields.One2many('ics.tender.quotation.line.preview', 'wizard_id',
-        string='Preview Lines', compute='_compute_preview_lines')
+        string='Preview Lines', compute='_compute_preview_lines', store=False, readonly=True)
 
     total_cost = fields.Monetary('Total Cost', compute='_compute_totals',
         currency_field='currency_id')
@@ -42,7 +42,9 @@ class GenerateQuotationWizard(models.TransientModel):
     @api.depends('tender_id.boq_line_ids', 'margin_percentage', 'use_vendor_costs')
     def _compute_preview_lines(self):
         for wizard in self:
-            lines = []
+            # Delete existing lines
+            wizard.line_preview_ids.unlink()
+            # Create new lines
             for boq_line in wizard.tender_id.boq_line_ids:
                 if wizard.use_vendor_costs and boq_line.selected_vendor_price:
                     cost = boq_line.selected_vendor_price
@@ -52,7 +54,8 @@ class GenerateQuotationWizard(models.TransientModel):
                 margin = cost * (wizard.margin_percentage / 100)
                 total = cost + margin
 
-                lines.append((0, 0, {
+                self.env['ics.tender.quotation.line.preview'].create({
+                    'wizard_id': wizard.id,
                     'product_id': boq_line.product_id.id,
                     'name': boq_line.name,
                     'quantity': boq_line.quantity,
@@ -61,8 +64,7 @@ class GenerateQuotationWizard(models.TransientModel):
                     'margin': margin,
                     'unit_price': total / boq_line.quantity if boq_line.quantity else 0,
                     'total': total,
-                }))
-            wizard.line_preview_ids = lines
+                })
 
     @api.depends('line_preview_ids.cost', 'line_preview_ids.margin', 'line_preview_ids.total')
     def _compute_totals(self):

@@ -2,11 +2,12 @@
 <odoo>
     <data>
 
-        <record id="view_tender_tree" model="ir.ui.view">
-            <field name="name">ics.tender.tree</field>
+        <record id="view_tender_list" model="ir.ui.view">
+            <field name="name">ics.tender.list</field>
             <field name="model">ics.tender</field>
+            <field name="type">list</field>
             <field name="arch" type="xml">
-                <tree string="Tenders" decoration-danger="is_urgent" decoration-success="state=='won'" decoration-muted="state in ['lost','cancelled']">
+                <list string="Tenders" decoration-danger="is_urgent" decoration-success="state=='won'" decoration-muted="state in ['lost','cancelled']">
                     <field name="name"/>
                     <field name="tender_number"/>
                     <field name="tender_title"/>
@@ -25,7 +26,7 @@
                         decoration-danger="state=='lost'"/>
                     <field name="priority" widget="priority" optional="show"/>
                     <field name="activity_ids" widget="list_activity"/>
-                </tree>
+                </list>
             </field>
         </record>
 
@@ -189,7 +190,7 @@
                                 <field name="tender_category"/>
                                 <field name="tender_type" widget="radio"
                                     options="{'horizontal': true}"
-                                    attrs="{'readonly': [('state', 'not in', ['draft', 'technical'])]}"/>
+                                    readonly="state not in ['draft', 'technical']"/>
                                 <field name="etimad_tender_id" options="{'no_create': True}"/>
                                 <field name="lead_id" options="{'no_create': True}"/>
                                 <field name="partner_id" options="{'no_create_edit': True}"/>
@@ -227,7 +228,7 @@
                             </page>
                             <page string="Bill of Quantities" name="boq">
                                 <field name="boq_line_ids">
-                                    <tree editable="bottom">
+                                    <list editable="bottom">
                                         <field name="sequence" widget="handle"/>
                                         <field name="product_id"/>
                                         <field name="name"/>
@@ -237,7 +238,7 @@
                                         <field name="selected_vendor_id"/>
                                         <field name="selected_vendor_price" sum="Total Vendor Cost"/>
                                         <field name="currency_id" invisible="1"/>
-                                    </tree>
+                                    </list>
                                 </field>
                             </page>
                             <page string="Internal Notes" name="notes">
@@ -257,11 +258,7 @@
                             </page>
                         </notebook>
                     </sheet>
-                    <div class="oe_chatter">
-                        <field name="message_follower_ids"/>
-                        <field name="activity_ids"/>
-                        <field name="message_ids"/>
-                    </div>
+                    <chatter/> 
                 </form>
             </field>
         </record>
@@ -302,24 +299,6 @@
                         <filter string="Submission Month" name="group_submission_month" context="{'group_by':'submission_deadline:month'}"/>
                     </group>
                 </search>
-            </field>
-        </record>
-
-        <record id="action_tender" model="ir.actions.act_window">
-            <field name="name">Tenders</field>
-            <field name="res_model">ics.tender</field>
-            <field name="view_mode">kanban,tree,form</field>
-            <field name="search_view_id" ref="view_tender_search"/>
-            <field name="context">{'search_default_my_tenders': 1}</field>
-            <field name="help" type="html">
-                <p class="o_view_nocontent_smiling_face">
-                    Create your first Tender
-                </p>
-                <p>
-                    Start managing tenders from Etimad portal or create them manually.
-                    Track technical and financial studies, compare vendor offers,
-                    and generate quotations with built-in margin calculation.
-                </p>
             </field>
         </record>
 

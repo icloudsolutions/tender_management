@@ -20,7 +20,7 @@ class CrmLead(models.Model):
             'name': 'Tenders',
             'type': 'ir.actions.act_window',
             'res_model': 'ics.tender',
-            'view_mode': 'tree,form,kanban',
+            'view_mode': 'list,form,kanban',
             'domain': [('lead_id', '=', self.id)],
             'context': {
                 'default_lead_id': self.id,

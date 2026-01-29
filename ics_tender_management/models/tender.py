@@ -237,7 +237,7 @@ class Tender(models.Model):
             'name': _('Bill of Quantities'),
             'type': 'ir.actions.act_window',
             'res_model': 'ics.tender.boq.line',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('tender_id', '=', self.id)],
             'context': {'default_tender_id': self.id},
         }
@@ -279,7 +279,7 @@ class Tender(models.Model):
             'name': _('Purchase Agreements'),
             'type': 'ir.actions.act_window',
             'res_model': 'purchase.requisition',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('tender_id', '=', self.id)],
             'context': {'default_tender_id': self.id},
         }
@@ -301,7 +301,7 @@ class Tender(models.Model):
             'name': _('Quotations'),
             'type': 'ir.actions.act_window',
             'res_model': 'sale.order',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('tender_id', '=', self.id)],
             'context': {'default_tender_id': self.id, 'default_partner_id': self.partner_id.id},
         }
@@ -337,7 +337,7 @@ class Tender(models.Model):
             'name': _('Projects'),
             'type': 'ir.actions.act_window',
             'res_model': 'project.project',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('tender_id', '=', self.id)],
         }
 
@@ -347,7 +347,7 @@ class Tender(models.Model):
             'name': _('Attachments'),
             'type': 'ir.actions.act_window',
             'res_model': 'ir.attachment',
-            'view_mode': 'kanban,tree,form',
+            'view_mode': 'kanban,list,form',
             'domain': [('res_model', '=', 'ics.tender'), ('res_id', '=', self.id)],
             'context': {
                 'default_res_model': 'ics.tender',
@@ -456,7 +456,7 @@ class Tender(models.Model):
                 'name': _('Purchase Orders'),
                 'type': 'ir.actions.act_window',
                 'res_model': 'purchase.order',
-                'view_mode': 'tree,form',
+                'view_mode': 'list,form',
                 'domain': [('id', 'in', created_orders.ids)],
                 'target': 'current',
             }

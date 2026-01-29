@@ -202,7 +202,7 @@ class VendorComparisonLine(models.TransientModel):
             'name': _('Vendor Offers'),
             'type': 'ir.actions.act_window',
             'res_model': 'ics.tender.vendor.offer',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('boq_line_id', '=', self.boq_line_id.id)],
             'target': 'new',
         }

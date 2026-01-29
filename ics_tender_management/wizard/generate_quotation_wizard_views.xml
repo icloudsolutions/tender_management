@@ -41,7 +41,7 @@
                         <notebook>
                             <page string="Quotation Preview" name="preview">
                                 <field name="line_preview_ids">
-                                    <tree>
+                                    <list>
                                         <field name="product_id"/>
                                         <field name="name"/>
                                         <field name="quantity"/>
@@ -51,7 +51,7 @@
                                         <field name="unit_price"/>
                                         <field name="total" sum="Total Amount"/>
                                         <field name="currency_id" invisible="1"/>
-                                    </tree>
+                                    </list>
                                 </field>
                             </page>
                             <page string="Terms and Conditions" name="notes">

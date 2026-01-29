@@ -2,11 +2,12 @@
 <odoo>
     <data>
 
-        <record id="view_tender_boq_line_tree" model="ir.ui.view">
-            <field name="name">ics.tender.boq.line.tree</field>
+        <record id="view_tender_boq_line_list" model="ir.ui.view">
+            <field name="name">ics.tender.boq.line.list</field>
             <field name="model">ics.tender.boq.line</field>
+            <field name="type">list</field>
             <field name="arch" type="xml">
-                <tree string="Bill of Quantities" editable="bottom"
+                <list string="Bill of Quantities" editable="bottom"
                     decoration-success="selected_vendor_id"
                     decoration-warning="not selected_vendor_id and tender_type == 'single_vendor'"
                     decoration-info="not selected_vendor_id and tender_type == 'product_wise'">
@@ -22,7 +23,7 @@
                     <field name="currency_id" invisible="1"/>
                     <field name="tender_id" invisible="1"/>
                     <field name="tender_type" invisible="1"/>
-                </tree>
+                </list>
             </field>
         </record>
 
@@ -59,7 +60,7 @@
                             </page>
                             <page string="Vendor Offers" name="vendor_offers">
                                 <field name="vendor_offer_ids">
-                                    <tree editable="bottom" decoration-success="is_selected">
+                                    <list editable="bottom" decoration-success="is_selected">
                                         <field name="vendor_id"/>
                                         <field name="unit_price"/>
                                         <field name="quantity" readonly="1"/>
@@ -71,7 +72,7 @@
                                             string="Select" class="btn-primary"
                                             invisible="is_selected"/>
                                         <field name="currency_id" invisible="1"/>
-                                    </tree>
+                                    </list>
                                 </field>
                             </page>
                             <page string="Notes" name="notes">
