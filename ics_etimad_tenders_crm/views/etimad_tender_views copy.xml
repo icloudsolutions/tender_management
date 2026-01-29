@@ -1,0 +1,455 @@
+<odoo>
+    <!-- list/List View -->
+    <record id="view_etimad_tender_list" model="ir.ui.view">
+        <field name="name">etimad.tender.list</field>
+        <field name="model">ics.etimad.tender</field>
+        <field name="arch" type="xml">
+            <list string="Etimad Tenders" decoration-muted="state in ('cancelled', 'lost')" decoration-success="state == 'won'" decoration-warning="remaining_days &lt; 7 and remaining_days &gt; 0" decoration-danger="remaining_days &lt;= 3 and remaining_days &gt; 0">
+                
+                <field name="reference_number"/>
+                <field name="name"/>
+                <field name="opportunity_id"/>
+                <field name="agency_name"/>
+                <field name="tender_type"/>
+                <field name="activity_name"/>
+                <field name="created_on"/>
+                <field name="published_at"/>
+                <field name="last_enquiry_date"/>
+                <field name="offers_deadline"/>
+                <field name="remaining_days" decoration-danger="remaining_days &lt;= 3" decoration-warning="remaining_days &lt; 7 and remaining_days &gt; 3"/>
+                <field name="total_fees" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="state" widget="badge" decoration-success="state == 'won'" decoration-danger="state in ('lost', 'cancelled')" decoration-warning="state == 'qualification'" decoration-info="state in ('new', 'in_progress')"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="is_favorite" invisible="1"/>
+                
+                <button name="action_create_opportunity" string="CREATE OPPORTUNITY" type="object" class="btn-primary" icon="fa-plus-circle" invisible="opportunity_id"/>
+                
+                <button name="action_open_url" string="VISIT" type="object" class="btn-info" icon="fa-external-link"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_etimad_tender_form" model="ir.ui.view">
+        <field name="name">etimad.tender.form</field>
+        <field name="model">ics.etimad.tender</field>
+        <field name="arch" type="xml">
+            <form string="Etimad Tender" class="o_etimad_tender_form">
+                <header>
+                    <button name="action_set_state" 
+                            string="Start Progress" 
+                            type="object" 
+                            class="oe_highlight"
+                            context="{'state': 'in_progress'}" 
+                            invisible="state != 'new'"/>
+                    <button name="action_set_state" 
+                            string="Move to Qualification" 
+                            type="object" 
+                            context="{'state': 'qualification'}" 
+                            invisible="state not in ['new', 'in_progress']"/>
+                    <button name="action_set_state" 
+                            string="Mark as Won" 
+                            type="object"
+                            class="oe_highlight"
+                            context="{'state': 'won'}" 
+                            invisible="state in ['won', 'lost', 'cancelled']"/>
+                    <button name="action_set_state" 
+                            string="Mark as Lost" 
+                            type="object" 
+                            context="{'state': 'lost'}" 
+                            invisible="state in ['won', 'lost', 'cancelled']"/>
+                    <button name="action_set_state" 
+                            string="Cancel Tender" 
+                            type="object" 
+                            context="{'state': 'cancelled'}" 
+                            invisible="state in ['won', 'lost', 'cancelled']"/>
+                    <field name="state" 
+                           widget="statusbar" 
+                           statusbar_visible="new,in_progress,qualification,won"
+                           options="{'clickable': '1'}"/>
+                </header>
+                
+                <sheet>
+                    <!-- Button Box - Sticky Actions -->
+                    <div class="oe_button_box" name="button_box">
+                        <!-- Favorite Toggle -->
+                        <button name="action_toggle_favorite" 
+                                type="object" 
+                                class="oe_stat_button" 
+                                icon="fa-star-o" 
+                                invisible="is_favorite"
+                                title="Add to Favorites">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">Add to</span>
+                                <span class="o_stat_text">Favorites</span>
+                            </div>
+                        </button>
+                        <button name="action_toggle_favorite" 
+                                type="object" 
+                                class="oe_stat_button" 
+                                icon="fa-star" 
+                                style="color: #ffc107;" 
+                                invisible="not is_favorite"
+                                title="Remove from Favorites">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text" style="color: #ffc107;">Favorited</span>
+                            </div>
+                        </button>
+                        
+                        <!-- Opportunity Management -->
+                        <button name="action_create_opportunity" 
+                                type="object" 
+                                class="oe_stat_button" 
+                                icon="fa-handshake-o" 
+                                invisible="opportunity_id"
+                                title="Create CRM Opportunity">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">Create</span>
+                                <span class="o_stat_text">Opportunity</span>
+                            </div>
+                        </button>
+                        
+                        <button name="action_view_opportunities" 
+                                type="object" 
+                                class="oe_stat_button" 
+                                icon="fa-handshake-o" 
+                                invisible="not opportunity_id"
+                                title="View Opportunity">
+                            <field name="opportunity_count" widget="statinfo" string="Opportunity"/>
+                        </button>
+                        
+                        <!-- Deadline Indicator -->
+                        <button class="oe_stat_button" icon="fa-clock-o" title="Days until deadline">
+                            <field name="remaining_days" widget="statinfo" string="Days Left"/>
+                        </button>
+                        
+                        <!-- External Link -->
+                        <button name="action_open_url" 
+                                type="object" 
+                                class="oe_stat_button" 
+                                icon="fa-external-link" 
+                                invisible="not tender_url"
+                                title="Open on Etimad Portal">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">View on</span>
+                                <span class="o_stat_text">Etimad</span>
+                            </div>
+                        </button>
+                    </div>
+                    
+                    <!-- Status Ribbons -->
+                    <widget name="web_ribbon" 
+                            title="⭐ Favorite" 
+                            bg_color="bg-warning" 
+                            invisible="not is_favorite"/>
+                    
+                    <widget name="web_ribbon" 
+                            title="✓ Won" 
+                            bg_color="bg-success" 
+                            invisible="state != 'won'"/>
+                    
+                    <widget name="web_ribbon" 
+                            title="⚠ Urgent" 
+                            bg_color="bg-danger" 
+                            invisible="remaining_days &gt; 3 or remaining_days &lt;= 0"/>
+                    
+                    <!-- Title Section -->
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only" string="Tender Name"/>
+                        <h1 class="d-flex align-items-center">
+                            <field name="name" 
+                                   placeholder="Enter tender name..." 
+                                   class="flex-grow-1"
+                                   required="1"/>
+                        </h1>
+                        <div class="o_row">
+                            <label for="reference_number" class="oe_edit_only" string="Reference"/>
+                            <h3 class="text-muted">
+                                <field name="reference_number" 
+                                       placeholder="Reference will be set automatically" 
+                                       readonly="1"/>
+                            </h3>
+                        </div>
+                    </div>
+                    
+                    <!-- Main Information Groups -->
+                    <group>
+                        <group string="📋 Tender Information" name="tender_info">
+                            <field name="tender_number" 
+                                   string="Tender Number"
+                                   placeholder="Auto-filled from Etimad"/>
+                            <field name="tender_type" 
+                                   string="Type"
+                                   placeholder="Tender type"/>
+                            <field name="activity_name" 
+                                   string="Activity"
+                                   placeholder="Tender activity"/>
+                            <field name="agency_name" 
+                                   string="Agency"
+                                   placeholder="Government agency"/>
+                            <field name="branch_name" 
+                                   string="Branch"
+                                   placeholder="Agency branch"/>
+                            <field name="external_source" 
+                                   string="Source" 
+                                   readonly="1"/>
+                        </group>
+                        
+                        <group string="📅 Important Dates" name="dates_info">
+                            <field name="created_on" 
+                                   string="Created" 
+                                   readonly="1"
+                                   widget="date"/>
+                            <field name="published_at" 
+                                   string="Published"
+                                   widget="datetime"/>
+                            <field name="last_enquiry_date" 
+                                   string="Enquiries Deadline"
+                                   widget="datetime"/>
+                            <field name="last_enquiry_date_hijri" 
+                                   string="Enquiries (Hijri)"
+                                   placeholder="Hijri date"/>
+                            <field name="offers_deadline" 
+                                   string="Offers Deadline"
+                                   widget="datetime"
+                                   class="o_field_highlight"/>
+                            <field name="last_offer_date_hijri" 
+                                   string="Offers (Hijri)"
+                                   placeholder="Hijri date"/>
+                            <field name="submission_date" 
+                                   string="Submission Date"
+                                   widget="datetime"/>
+                        </group>
+                    </group>
+                    
+                    <!-- Financial and CRM Information -->
+                    <group>
+                        <group string="💰 Financial Information" name="financial_info">
+                            <field name="currency_id" invisible="1"/>
+                            <field name="invitation_cost" 
+                                   string="Invitation Cost"
+                                   widget="monetary" 
+                                   options="{'currency_field': 'currency_id'}"/>
+                            <field name="financial_fees" 
+                                   string="Financial Fees"
+                                   widget="monetary" 
+                                   options="{'currency_field': 'currency_id'}"/>
+                            <label for="total_fees" string="Total Fees" class="fw-bold"/>
+                            <field name="total_fees" 
+                                   widget="monetary" 
+                                   options="{'currency_field': 'currency_id'}" 
+                                   class="oe_subtotal_footer_separator fw-bold"/>
+                        </group>
+                        
+                        <group string="🤝 CRM Integration" name="crm_info">
+                            <field name="opportunity_id" 
+                                   string="Linked Opportunity"
+                                   options="{'no_create': True}"/>
+                            <div invisible="not opportunity_id" class="alert alert-info mt-2">
+                                <i class="fa fa-info-circle"/> This tender is linked to a CRM opportunity
+                            </div>
+                            <div invisible="opportunity_id" class="alert alert-warning mt-2">
+                                <i class="fa fa-exclamation-triangle"/> No opportunity created yet
+                            </div>
+                        </group>
+                    </group>
+                    
+                    <!-- Quick Actions Bar -->
+                    <group invisible="not tender_url">
+                        <div class="d-flex gap-2 mt-3">
+                            <button name="action_open_url" 
+                                    string="🔗 Open on Etimad Portal" 
+                                    type="object" 
+                                    class="btn btn-primary flex-grow-1" 
+                                    icon="fa-external-link"
+                                    title="Visit this tender on the Etimad website"/>
+                            <button name="action_create_opportunity" 
+                                    string="➕ Create Opportunity" 
+                                    type="object" 
+                                    class="btn btn-success flex-grow-1" 
+                                    icon="fa-plus-circle"
+                                    invisible="opportunity_id"
+                                    title="Create a CRM opportunity from this tender"/>
+                        </div>
+                    </group>
+                    
+                    <!-- Detailed Information in Notebook -->
+                    <notebook>
+                        <page string="📝 Description" name="description">
+                            <field name="description" 
+                                   placeholder="Enter detailed tender description, requirements, and specifications..."
+                                   widget="text"
+                                   nolabel="1"/>
+                        </page>
+                        
+                        <page string="📓 Internal Notes" name="notes">
+                            <field name="notes" 
+                                   placeholder="Add internal notes, team comments, or action items here..."
+                                   widget="text"
+                                   nolabel="1"/>
+                        </page>
+                        
+                        <page string="📊 Technical Details" name="technical">
+                            <group>
+                                <group string="System Information">
+                                    <field name="tender_id" readonly="1"/>
+                                    <field name="tender_id_string" readonly="1"/>
+                                    <field name="activity_id" readonly="1"/>
+                                    <field name="tender_status_id" readonly="1"/>
+                                    <field name="tender_url" readonly="1" widget="url"/>
+                                </group>
+                                <group string="Status Information">
+                                    <field name="state" readonly="1"/>
+                                    <field name="is_favorite" readonly="1"/>
+                                    <field name="remaining_days" readonly="1"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                
+                <!-- Chatter for Communication -->
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" 
+                           widget="mail_followers"
+                           groups="base.group_user"/>
+                    <field name="activity_ids" 
+                           widget="mail_activity"/>
+                    <field name="message_ids" 
+                           widget="mail_thread"
+                           options="{'post_refresh': 'recipients'}"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="view_etimad_tender_kanban" model="ir.ui.view">
+        <field name="name">etimad.tender.kanban</field>
+        <field name="model">ics.etimad.tender</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" default_group_by="state">
+                <field name="name"/>
+                <field name="reference_number"/>
+                <field name="agency_name"/>
+                <field name="total_fees"/>
+                <field name="remaining_days"/>
+                <field name="state"/>
+                <field name="is_favorite"/>
+                <field name="currency_id"/>
+                
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_record_top">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_kanban_record_title">
+                                        <field name="name"/>
+                                    </strong>
+                                </div>
+                                <div class="o_kanban_record_top_right">
+                                    <field name="is_favorite" widget="boolean_favorite"/>
+                                </div>
+                            </div>
+                            <div class="o_kanban_record_body">
+                                <field name="reference_number"/>
+                                <br/>
+                                <field name="agency_name"/>
+                            </div>
+                            <div class="o_kanban_record_bottom">
+                                <div class="oe_kanban_bottom_left">
+                                    <field name="total_fees" widget="monetary"/>
+                                </div>
+                                <div class="oe_kanban_bottom_right">
+                                    <span t-if="record.remaining_days.raw_value &gt; 0" class="badge badge-pill" t-attf-class="badge-{{record.remaining_days.raw_value &lt; 3 ? 'danger' : (record.remaining_days.raw_value &lt; 7 ? 'warning' : 'info')}}">
+                                        <i class="fa fa-clock-o"/> <field name="remaining_days"/> days
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_etimad_tender_search" model="ir.ui.view">
+        <field name="name">etimad.tender.search</field>
+        <field name="model">ics.etimad.tender</field>
+        <field name="arch" type="xml">
+            <search string="Search Tenders">
+                <field name="name" string="Tender Name"/>
+                <field name="reference_number"/>
+                <field name="agency_name"/>
+                <field name="tender_type"/>
+                <field name="activity_name"/>
+                <field name="tender_number"/>
+                
+                <filter string="Favorites" name="favorites" domain="[('is_favorite', '=', True)]"/>
+                <filter string="With Opportunity" name="with_opportunity" domain="[('opportunity_id', '!=', False)]"/>
+                <filter string="Without Opportunity" name="without_opportunity" domain="[('opportunity_id', '=', False)]"/>
+                
+                <separator/>
+                <filter string="New" name="state_new" domain="[('state', '=', 'new')]"/>
+                <filter string="In Progress" name="state_in_progress" domain="[('state', '=', 'in_progress')]"/>
+                <filter string="Qualification" name="state_qualification" domain="[('state', '=', 'qualification')]"/>
+                <filter string="Won" name="state_won" domain="[('state', '=', 'won')]"/>
+                <filter string="Lost" name="state_lost" domain="[('state', '=', 'lost')]"/>
+                
+                <separator/>
+                <filter string="Urgent (≤3 days)" name="urgent" domain="[('remaining_days', '&lt;=', 3), ('remaining_days', '&gt;', 0)]"/>
+                <filter string="Due This Week" name="due_week" domain="[('remaining_days', '&lt;=', 7), ('remaining_days', '&gt;', 0)]"/>
+                <filter string="Published Today" name="published_today" domain="[('published_at', '&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0))),                                 ('published_at', '&lt;=', datetime.datetime.combine(context_today(), datetime.time(23,59,59)))]"/>
+                
+                <separator/>
+                <filter string="High Value (&gt;10K SAR)" name="high_value" domain="[('total_fees', '&gt;', 10000)]"/>
+                
+                <group expand="0" string="Group By">
+                    <filter string="Agency" name="group_agency" context="{'group_by': 'agency_name'}"/>
+                    <filter string="Tender Type" name="group_type" context="{'group_by': 'tender_type'}"/>
+                    <filter string="Activity" name="group_activity" context="{'group_by': 'activity_name'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Published Date" name="group_published" context="{'group_by': 'published_at:month'}"/>
+                    <filter string="Deadline" name="group_deadline" context="{'group_by': 'offers_deadline:week'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_etimad_tenders" model="ir.actions.act_window">
+        <field name="name">Etimad Tenders</field>
+        <field name="res_model">ics.etimad.tender</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="search_view_id" ref="view_etimad_tender_search"/>
+        <field name="context">{
+            'search_default_state_new': 1,
+            'search_default_without_opportunity': 1,
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No tenders found. Let's fetch some from Etimad!
+            </p>
+            <p>
+                Click the <b>Fetch Etimad Tenders</b> button in the action menu to sync tenders from the Etimad platform.
+            </p>
+        </field>
+    </record>
+
+    <!-- Server Action for Fetching Tenders -->
+    <record id="action_server_fetch_etimad_tenders" model="ir.actions.server">
+        <field name="name">Fetch Etimad Tenders</field>
+        <field name="model_id" ref="model_ics_etimad_tender"/>
+        <field name="binding_model_id" ref="model_ics_etimad_tender"/>
+        <field name="binding_view_types">list,form</field>
+        <field name="state">code</field>
+        <field name="code">
+if records:
+    action = records[0].fetch_etimad_tenders()
+else:
+    action = model.fetch_etimad_tenders()
+        </field>
+    </record>
+
+</odoo>

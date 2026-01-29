@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ========================================================= -->
+    <!-- 🌐 ROOT MENU -->
+    <!-- ========================================================= -->
+    <menuitem id="menu_etimad_root"
+              name="Etimad Tenders"
+              web_icon="ics_etimad_tenders_crm,static/description/icon.png"
+              sequence="5"/>
+
+    <!-- ========================================================= -->
+    <!-- 📋 ACTION: ALL TENDERS -->
+    <!-- ========================================================= -->
+    <record id="action_etimad_tenders" model="ir.actions.act_window">
+        <field name="name">All Tenders</field>
+        <field name="res_model">ics.etimad.tender</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Etimad Tender record
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_etimad_tenders"
+              name="All Tenders"
+              parent="menu_etimad_root"
+              action="action_etimad_tenders"
+              sequence="10"/>
+
+    <!-- ========================================================= -->
+    <!-- 📊 DASHBOARD -->
+    <!-- ========================================================= -->
+    <menuitem id="menu_etimad_dashboard"
+              name="Dashboard"
+              parent="menu_etimad_root"
+              sequence="5"/>
+    <!-- (You can later attach a custom action here if you have a dashboard view) -->
+
+    <!-- ========================================================= -->
+    <!-- ⭐ FAVORITE TENDERS -->
+    <!-- ========================================================= -->
+    <record id="action_etimad_tenders_favorites" model="ir.actions.act_window">
+        <field name="name">Favorite Tenders</field>
+        <field name="res_model">ics.etimad.tender</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="domain">[('is_favorite', '=', True)]</field>
+        <field name="context">{'search_default_state_new': 1}</field>
+    </record>
+
+    <menuitem id="menu_etimad_favorites"
+              name="Favorites"
+              parent="menu_etimad_root"
+              action="action_etimad_tenders_favorites"
+              sequence="20"/>
+
+    <!-- ========================================================= -->
+    <!-- 💼 MY OPPORTUNITIES -->
+    <!-- ========================================================= -->
+    <record id="action_etimad_my_opportunities" model="ir.actions.act_window">
+        <field name="name">My Tender Opportunities</field>
+        <field name="res_model">ics.etimad.tender</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="domain">[('opportunity_id', '!=', False)]</field>
+        <field name="context">{'create': False}</field>
+    </record>
+
+    <menuitem id="menu_etimad_opportunities"
+              name="With Opportunities"
+              parent="menu_etimad_root"
+              action="action_etimad_my_opportunities"
+              sequence="30"/>
+
+    <!-- ========================================================= -->
+    <!-- ⏰ URGENT TENDERS -->
+    <!-- ========================================================= -->
+    <record id="action_etimad_urgent_tenders" model="ir.actions.act_window">
+        <field name="name">Urgent Tenders (≤7 days)</field>
+        <field name="res_model">ics.etimad.tender</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="domain">[('remaining_days', '&lt;=', 7), ('remaining_days', '&gt;', 0), ('state', 'in', ['new', 'in_progress'])]</field>
+        <field name="context">{'create': False}</field>
+    </record>
+
+    <menuitem id="menu_etimad_urgent"
+              name="Urgent (≤7 days)"
+              parent="menu_etimad_root"
+              action="action_etimad_urgent_tenders"
+              sequence="40"/>
+
+    <!-- ========================================================= -->
+    <!-- ⚙️ CONFIGURATION -->
+    <!-- ========================================================= -->
+    <!-- ⚙️ CONFIGURATION -->
+    <menuitem id="menu_etimad_config"
+            name="Configuration"
+            parent="menu_etimad_root"
+            sequence="100"
+            groups="base.group_system"/>
+
+    <menuitem id="menu_etimad_settings"
+            name="Settings"
+            parent="menu_etimad_config"
+            sequence="10"
+            groups="base.group_system"/>
+
+</odoo>

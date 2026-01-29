@@ -1,0 +1,521 @@
+/* ============================================= */
+/* ETIMAD TENDERS - RESPONSIVE & ZOOM FIX CSS */
+/* ============================================= */
+
+/* Fix form view at 100% zoom and all screen sizes */
+.o_form_view .ics_etimad_tender {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* Ensure proper spacing for form groups */
+.o_form_view .o_group {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Fix title section spacing */
+.o_form_view .oe_title {
+    margin-bottom: 1.5rem;
+    width: 100%;
+}
+
+.o_form_view .oe_title h1 {
+    font-size: 1.75rem;
+    line-height: 1.3;
+    margin-bottom: 0.5rem;
+    word-wrap: break-word;
+}
+
+.o_form_view .oe_title h3 {
+    font-size: 1.125rem;
+    line-height: 1.4;
+    color: #6c757d;
+    font-weight: 400;
+}
+
+/* Button box improvements */
+.o_form_view .oe_button_box {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.o_form_view .oe_button_box .oe_stat_button {
+    min-width: 120px;
+    flex: 0 0 auto;
+}
+
+/* Group layout fixes for better readability */
+.o_form_view .o_group > tbody > tr > td.o_td_label {
+    width: 180px;
+    min-width: 180px;
+    padding: 0.5rem 0.75rem;
+    vertical-align: top;
+    font-weight: 500;
+}
+
+.o_form_view .o_group > tbody > tr > td:not(.o_td_label) {
+    padding: 0.5rem 0.75rem;
+}
+
+/* Notebook tabs */
+.o_form_view .o_notebook {
+    margin-top: 1rem;
+}
+
+.o_form_view .o_notebook .nav-tabs {
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.o_form_view .o_notebook .nav-tabs .nav-link {
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    color: #6c757d;
+    border: none;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+}
+
+.o_form_view .o_notebook .nav-tabs .nav-link:hover {
+    color: #0d6efd;
+    border-bottom-color: #0d6efd;
+    background-color: #f8f9fa;
+}
+
+.o_form_view .o_notebook .nav-tabs .nav-link.active {
+    color: #0d6efd;
+    border-bottom-color: #0d6efd;
+    background-color: transparent;
+    font-weight: 600;
+}
+
+.o_form_view .o_notebook .tab-content {
+    padding: 1.5rem 0;
+}
+
+/* Related Documents Table Styling */
+.o_form_view .o_notebook .o_list_table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.o_form_view .o_notebook .o_list_table thead th {
+    background-color: #f8f9fa;
+    padding: 0.75rem 1rem;
+    font-weight: 600;
+    text-align: left;
+    border-bottom: 2px solid #dee2e6;
+    color: #495057;
+}
+
+.o_form_view .o_notebook .o_list_table tbody td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e9ecef;
+    vertical-align: middle;
+}
+
+.o_form_view .o_notebook .o_list_table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Activities list styling */
+.o_form_view .o_notebook .o_activity {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.o_form_view .o_notebook .o_activity:hover {
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* Messages/Chatter styling inside tabs */
+.o_form_view .o_notebook .o_mail_thread {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 0.375rem;
+}
+
+.o_form_view .o_notebook .o_thread_message {
+    background-color: #fff;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border-radius: 0.375rem;
+    border: 1px solid #dee2e6;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+/* Followers widget styling */
+.o_form_view .o_notebook .o_followers {
+    padding: 1rem;
+}
+
+.o_form_view .o_notebook .o_followers .o_follower {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    margin: 0.25rem;
+    background-color: #e9ecef;
+    border-radius: 1.5rem;
+    font-size: 0.875rem;
+}
+
+/* Empty state for tabs */
+.o_form_view .o_notebook .o_view_nocontent {
+    padding: 3rem 1rem;
+    text-align: center;
+    color: #6c757d;
+}
+
+.o_form_view .o_notebook .o_view_nocontent i {
+    font-size: 3rem;
+    opacity: 0.5;
+    margin-bottom: 1rem;
+}
+
+/* Tab content animations */
+.o_form_view .o_notebook .tab-pane {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Field improvements */
+.o_form_view .o_field_widget {
+    width: 100%;
+    max-width: 100%;
+}
+
+.o_form_view .o_field_monetary,
+.o_form_view .o_field_datetime,
+.o_form_view .o_field_char {
+    min-width: 0;
+}
+
+/* Statusbar fixes */
+.o_form_view .o_form_statusbar {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.o_form_view .o_statusbar_buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+}
+
+/* Ribbon widget */
+.o_form_view .o_ribbon {
+    position: absolute;
+    right: -5px;
+    top: 10px;
+    z-index: 1;
+}
+
+/* Sheet adjustments for better zoom handling */
+.o_form_view .o_form_sheet {
+    padding: 1.5rem;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* List view enhancements */
+.o_list_view .o_data_row {
+    min-height: 40px;
+}
+
+.o_list_view th,
+.o_list_view td {
+    padding: 0.5rem 0.75rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Badge styling in list view */
+.o_list_view .badge {
+    padding: 0.375rem 0.625rem;
+    font-size: 0.875rem;
+    display: inline-block;
+}
+
+/* Kanban improvements */
+.o_kanban_view.o_kanban_mobile .o_kanban_record {
+    margin: 0.5rem;
+    padding: 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border-radius: 0.375rem;
+}
+
+.o_kanban_record_top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+}
+
+.o_kanban_record_title {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.4;
+    margin-bottom: 0.25rem;
+}
+
+.o_kanban_record_body {
+    margin-bottom: 0.75rem;
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.o_kanban_record_bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0.75rem;
+    border-top: 1px solid #e9ecef;
+}
+
+/* Financial field emphasis */
+.o_form_view .oe_subtotal_footer_separator {
+    border-top: 2px solid #dee2e6;
+    padding-top: 0.75rem !important;
+    margin-top: 0.5rem;
+    font-weight: 600;
+}
+
+/* Chatter section */
+.o_form_view .oe_chatter {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #dee2e6;
+}
+
+/* Action buttons */
+.o_form_view button.btn-primary,
+.o_list_view button.btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+}
+
+.o_form_view button.btn-info,
+.o_list_view button.btn-info {
+    background-color: #0dcaf0;
+    border-color: #0dcaf0;
+    color: #000;
+    padding: 0.5rem 1rem;
+}
+
+/* Urgent tender highlighting */
+.o_data_row.text-danger {
+    background-color: #fff5f5 !important;
+}
+
+.o_data_row.text-warning {
+    background-color: #fff9e6 !important;
+}
+
+/* Favorite star styling */
+.o_stat_button .fa-star {
+    color: #ffc107;
+    font-size: 1.25rem;
+}
+
+.o_stat_button .fa-star-o {
+    color: #adb5bd;
+    font-size: 1.25rem;
+}
+
+/* Responsive breakpoints */
+@media (max-width: 1400px) {
+    .o_form_view .o_group > tbody > tr > td.o_td_label {
+        width: 150px;
+        min-width: 150px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .o_form_view .oe_title h1 {
+        font-size: 1.5rem;
+    }
+    
+    .o_form_view .o_group > tbody > tr > td.o_td_label {
+        width: 130px;
+        min-width: 130px;
+        font-size: 0.875rem;
+    }
+}
+
+@media (max-width: 992px) {
+    .o_form_view .o_form_sheet {
+        padding: 1rem;
+    }
+    
+    .o_form_view .oe_button_box {
+        justify-content: flex-start;
+    }
+    
+    .o_form_view .oe_button_box .oe_stat_button {
+        min-width: 100px;
+        font-size: 0.875rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .o_form_view .oe_title h1 {
+        font-size: 1.25rem;
+    }
+    
+    .o_form_view .o_group {
+        display: block;
+    }
+    
+    .o_form_view .o_group > tbody > tr {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 0.5rem;
+    }
+    
+    .o_form_view .o_group > tbody > tr > td.o_td_label {
+        width: 100%;
+        padding-bottom: 0.25rem;
+    }
+    
+    .o_form_view .o_group > tbody > tr > td:not(.o_td_label) {
+        width: 100%;
+        padding-top: 0.25rem;
+    }
+}
+
+/* Fix for browser zoom levels */
+@media (min-resolution: 144dpi) {
+    .o_form_view .o_form_sheet {
+        font-size: 1rem;
+    }
+}
+
+/* Ensure proper text wrapping */
+.o_form_view .o_field_text,
+.o_form_view .o_field_html {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+/* Improve readonly field visibility */
+.o_form_view .o_field_widget[readonly] {
+    background-color: #f8f9fa;
+    padding: 0.375rem 0.5rem;
+    border-radius: 0.25rem;
+}
+
+/* External link button styling */
+.o_form_view button[name="action_open_url"] {
+    margin-top: 1rem;
+}
+
+/* Search view filters */
+.o_searchview .o_searchview_facet {
+    margin: 0.25rem;
+}
+
+/* Group by headers in list view */
+.o_group_header {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    padding: 0.75rem 1rem;
+}
+
+/* Activity indicators */
+.o_activity_summary {
+    padding: 0.25rem;
+    border-radius: 0.25rem;
+}
+
+/* Form validation feedback */
+.o_form_view .o_field_invalid {
+    border-color: #dc3545 !important;
+    background-color: #fff5f5;
+}
+
+/* Loading indicator */
+.o_loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+}
+
+/* Empty state styling */
+.o_view_nocontent {
+    padding: 3rem 1rem;
+    text-align: center;
+}
+
+.o_view_nocontent_smiling_face {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.6;
+}
+
+/* Ensure proper spacing in groups */
+.o_form_view .o_inner_group {
+    margin-bottom: 1rem;
+}
+
+/* Fix for monetary fields alignment */
+.o_form_view .o_field_monetary input {
+    text-align: right;
+}
+
+/* Status badge improvements */
+.badge-success {
+    background-color: #198754;
+}
+
+.badge-danger {
+    background-color: #dc3545;
+}
+
+.badge-warning {
+    background-color: #ffc107;
+    color: #000;
+}
+
+.badge-info {
+    background-color: #0dcaf0;
+    color: #000;
+}
+
+/* Print-friendly styles */
+@media print {
+    .o_form_view .oe_button_box,
+    .o_form_view .o_form_statusbar,
+    .o_form_view .oe_chatter {
+        display: none;
+    }
+    
+    .o_form_view .o_form_sheet {
+        padding: 0;
+    }
+}

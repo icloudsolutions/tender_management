@@ -1,0 +1,65 @@
+<odoo>
+    <record id="res_config_settings_view_form_etimad" model="ir.ui.view">
+        <field name="name">res.config.settings.etimad.form</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority">90</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app string="Etimad Tenders" name="ics_etimad_tenders_crm" groups="base.group_system">
+                    <block title="Etimad Platform Integration" name="etimad_integration_settings">
+                        <setting id="etimad_api_settings" help="Configure connection to Etimad government tenders platform">
+                            <field name="etimad_auto_sync"/>
+                            <div class="content-group" invisible="not etimad_auto_sync">
+                                <div class="mt16">
+                                    <label for="etimad_sync_interval" string="Sync Interval (hours)"/>
+                                    <field name="etimad_sync_interval" class="oe_inline"/>
+                                </div>
+                            </div>
+                        </setting>
+                        
+                        <setting id="etimad_fetch_settings" help="Configure how many tenders to fetch per sync">
+                            <label for="etimad_fetch_page_size" string="Tenders per Sync"/>
+                            <div class="text-muted">
+                                Number of tenders to fetch in each synchronization (recommended: 20-50)
+                            </div>
+                            <field name="etimad_fetch_page_size" class="oe_inline"/>
+                        </setting>
+                        
+                        <setting id="etimad_opportunity_settings" title="Automatically create CRM opportunities for new tenders" help="Enable to automatically create opportunities when tenders match criteria">
+                            <field name="etimad_auto_create_opportunity"/>
+                            <div class="content-group" invisible="not etimad_auto_create_opportunity">
+                                <div class="mt16">
+                                    <label for="etimad_min_tender_value" string="Minimum Tender Value (SAR)"/>
+                                    <field name="etimad_min_tender_value" class="oe_inline"/>
+                                    <div class="text-muted">
+                                        Only create opportunities for tenders above this value
+                                    </div>
+                                </div>
+                            </div>
+                        </setting>
+                    </block>
+                    
+                    <block title="Notification Settings" name="etimad_notification_settings">
+                        <setting id="etimad_notification_settings" help="Get notified about new tenders and urgent deadlines">
+                            <field name="etimad_notify_new_tenders"/>
+                            <field name="etimad_notify_urgent_deadlines" invisible="not etimad_notify_new_tenders"/>
+                        </setting>
+                    </block>
+                    
+                    <block title="Advanced Settings" name="etimad_advanced_settings">
+                        <setting id="etimad_archive_settings" help="Automatically archive old closed tenders">
+                            <field name="etimad_auto_archive"/>
+                            <div class="content-group" invisible="not etimad_auto_archive">
+                                <div class="mt16">
+                                    <label for="etimad_archive_days" string="Archive after (days)"/>
+                                    <field name="etimad_archive_days" class="oe_inline"/>
+                                </div>
+                            </div>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>
