@@ -221,16 +221,16 @@ export class IcsTenderDashboard extends Component {
             domain = [];
             name = "All Tenders";
         } else if (type === 'draft') {
-            domain = [['stage_id.sequence', '=', 1]];
+            domain = [['state', '=', 'draft']];
             name = "Draft Tenders";
         } else if (type === 'active') {
-            domain = [['stage_id.name', 'in', ['Vendor Selection', 'Quotation Preparation', 'Quotation Review']]];
+            domain = [['state', 'in', ['technical', 'financial', 'quotation', 'submitted', 'evaluation']]];
             name = "Active Tenders";
         } else if (type === 'won') {
-            domain = [['stage_id.name', '=', 'Won']];
+            domain = [['state', '=', 'won']];
             name = "Won Tenders";
         } else if (type === 'lost') {
-            domain = [['stage_id.name', '=', 'Lost']];
+            domain = [['state', '=', 'lost']];
             name = "Lost Tenders";
         } else if (type === 'supply') {
             domain = [['tender_category', '=', 'supply']];
@@ -243,7 +243,7 @@ export class IcsTenderDashboard extends Component {
         this.action.doAction({
             name: name,
             type: 'ir.actions.act_window',
-            res_model: 'ics.tender.management',
+            res_model: 'ics.tender',
             views: [[false, 'list'], [false, 'form']],
             domain: domain,
             context: {create: false},
