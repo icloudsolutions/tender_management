@@ -3101,3 +3101,53 @@ msgstr "التوصية:"
 #: model:ir.ui.view,arch_db:ics_tender_management.view_create_project_wizard_form
 msgid "Use the existing project instead. Click \"View Projects\" on the tender form to access it."
 msgstr "استخدم المشروع الموجود بدلاً من ذلك. انقر على \"عرض المشاريع\" في نموذج المنافسة للوصول إليه."
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_crm_lead__is_from_etimad
+msgid "Created from Etimad"
+msgstr "تم إنشاؤها من إعتماد"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,help:ics_tender_management.field_crm_lead__is_from_etimad
+msgid "This opportunity was created from Etimad tender and is controlled by Tender Management"
+msgstr "تم إنشاء هذه الفرصة من منافسة إعتماد ويتم التحكم فيها من خلال إدارة المنافسات"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_crm_lead__active_tender_id
+msgid "Active Tender"
+msgstr "المنافسة النشطة"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,help:ics_tender_management.field_crm_lead__active_tender_id
+msgid "The primary active tender linked to this opportunity"
+msgstr "المنافسة النشطة الأساسية المرتبطة بهذه الفرصة"
+
+#. module: ics_tender_management
+#: code:addons/ics_tender_management/models/crm_lead.py
+msgid "This opportunity is controlled by Tender Management.\\n\\nLinked Tender: %s\\nCurrent State: %s\\n\\nTo modify this opportunity, please update the tender instead.\\nChanges to the tender will automatically sync to this opportunity."
+msgstr "هذه الفرصة يتم التحكم فيها من خلال إدارة المنافسات.\\n\\nالمنافسة المرتبطة: %s\\nالحالة الحالية: %s\\n\\nلتعديل هذه الفرصة، يرجى تحديث المنافسة بدلاً من ذلك.\\nسيتم مزامنة التغييرات على المنافسة تلقائيًا مع هذه الفرصة."
+
+#. module: ics_tender_management
+#: code:addons/ics_tender_management/models/tender.py
+msgid "Stage synchronized from Tender: <a href=\"/web#id=%s&model=ics.tender\">%s</a><br/>Tender State: %s"
+msgstr "تم مزامنة المرحلة من المنافسة: <a href=\"/web#id=%s&model=ics.tender\">%s</a><br/>حالة المنافسة: %s"
+
+#. module: ics_tender_management
+#: code:addons/ics_tender_management/models/tender.py
+msgid "Tender Stage Update"
+msgstr "تحديث مرحلة المنافسة"
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_crm_lead_form_inherit_tender
+msgid "🎯 This opportunity is controlled by Tender Management"
+msgstr "🎯 هذه الفرصة يتم التحكم فيها من خلال إدارة المنافسات"
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_crm_lead_form_inherit_tender
+msgid "This opportunity is linked to an active tender and cannot be edited directly. All changes must be made through the tender form to maintain data consistency."
+msgstr "هذه الفرصة مرتبطة بمنافسة نشطة ولا يمكن تعديلها مباشرة. يجب إجراء جميع التغييرات من خلال نموذج المنافسة للحفاظ على اتساق البيانات."
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_crm_lead_form_inherit_tender
+msgid "Linked Tender:"
+msgstr "المنافسة المرتبطة:"

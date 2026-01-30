@@ -1,4 +1,5 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, _
+from odoo.exceptions import UserError
 
 
 class CrmLead(models.Model):
@@ -8,11 +9,59 @@ class CrmLead(models.Model):
     tender_count = fields.Integer('Tender Count', compute='_compute_tender_count')
 
     etimad_tender_id = fields.Many2one('ics.etimad.tender', string='Etimad Tender')
+    
+    # Control fields for Etimad-sourced opportunities
+    is_from_etimad = fields.Boolean('Created from Etimad', 
+        compute='_compute_is_from_etimad', store=True,
+        help='This opportunity was created from Etimad tender and is controlled by Tender Management')
+    
+    active_tender_id = fields.Many2one('ics.tender', 
+        string='Active Tender', compute='_compute_active_tender', store=True,
+        help='The primary active tender linked to this opportunity')
+    
+    @api.depends('etimad_tender_id')
+    def _compute_is_from_etimad(self):
+        """Mark opportunities created from Etimad scraper"""
+        for lead in self:
+            lead.is_from_etimad = bool(lead.etimad_tender_id)
+    
+    @api.depends('tender_ids', 'tender_ids.state')
+    def _compute_active_tender(self):
+        """Find the most recent active tender"""
+        for lead in self:
+            if lead.tender_ids:
+                # Get most recent non-cancelled tender
+                active_tender = lead.tender_ids.filtered(
+                    lambda t: t.state != 'cancelled'
+                ).sorted('create_date', reverse=True)
+                lead.active_tender_id = active_tender[0] if active_tender else False
+            else:
+                lead.active_tender_id = False
 
     @api.depends('tender_ids')
     def _compute_tender_count(self):
         for lead in self:
             lead.tender_count = len(lead.tender_ids)
+    
+    def write(self, vals):
+        """Prevent editing Etimad-sourced opportunities from CRM"""
+        # Check if trying to change critical fields from CRM interface
+        protected_fields = {'stage_id', 'probability', 'expected_revenue', 'date_deadline'}
+        
+        if any(field in vals for field in protected_fields):
+            for lead in self:
+                # Allow if no active tender or if called from tender module
+                if lead.active_tender_id and not self._context.get('from_tender_sync'):
+                    raise UserError(_(
+                        'This opportunity is controlled by Tender Management.\n\n'
+                        'Linked Tender: %s\n'
+                        'Current State: %s\n\n'
+                        'To modify this opportunity, please update the tender instead.\n'
+                        'Changes to the tender will automatically sync to this opportunity.'
+                    ) % (lead.active_tender_id.name, 
+                         dict(lead.active_tender_id._fields['state'].selection).get(lead.active_tender_id.state)))
+        
+        return super(CrmLead, self).write(vals)
 
     def action_view_tenders(self):
         self.ensure_one()

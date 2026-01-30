@@ -230,8 +230,14 @@ class Tender(models.Model):
         return super(Tender, self).create(vals)
     
     def write(self, vals):
-        """Auto-create project when tender is won"""
+        """Auto-create project when tender is won & sync CRM stages"""
         res = super(Tender, self).write(vals)
+        
+        # Sync CRM opportunity stage when tender state changes
+        if vals.get('state'):
+            for tender in self:
+                if tender.lead_id:
+                    tender._sync_crm_stage()
         
         # Auto-create project when tender becomes 'won'
         if vals.get('state') == 'won':
@@ -244,6 +250,78 @@ class Tender(models.Model):
                 tender._auto_create_project()
         
         return res
+    
+    def _sync_crm_stage(self):
+        """Synchronize tender state to CRM opportunity stage"""
+        self.ensure_one()
+        
+        if not self.lead_id:
+            return
+        
+        # Map tender states to CRM stages
+        stage_mapping = self._get_crm_stage_mapping()
+        
+        crm_stage_name = stage_mapping.get(self.state)
+        if not crm_stage_name:
+            return
+        
+        # Find CRM stage
+        crm_stage = self.env['crm.stage'].search([
+            ('name', '=ilike', crm_stage_name)
+        ], limit=1)
+        
+        if not crm_stage:
+            # Try to find by partial match
+            for stage_name in [crm_stage_name, crm_stage_name.split()[0]]:
+                crm_stage = self.env['crm.stage'].search([
+                    ('name', 'ilike', stage_name)
+                ], limit=1)
+                if crm_stage:
+                    break
+        
+        if crm_stage:
+            # Update CRM opportunity with context to bypass lock
+            self.lead_id.with_context(from_tender_sync=True).write({
+                'stage_id': crm_stage.id,
+                'probability': self._get_crm_probability(),
+            })
+            
+            # Log the sync in CRM
+            self.lead_id.message_post(
+                body=_('Stage synchronized from Tender: <a href="/web#id=%s&model=ics.tender">%s</a><br/>Tender State: %s') % (
+                    self.id, self.name, dict(self._fields['state'].selection).get(self.state)
+                ),
+                subject=_('Tender Stage Update')
+            )
+    
+    def _get_crm_stage_mapping(self):
+        """Map tender states to CRM stage names"""
+        return {
+            'draft': 'New',  # or 'Qualification'
+            'technical': 'Qualified',  # Technical analysis phase
+            'financial': 'Proposition',  # Financial offer preparation
+            'quotation': 'Proposition',  # Quotation ready
+            'submitted': 'Proposition',  # Submitted to customer
+            'evaluation': 'Negotiation',  # Under customer evaluation
+            'won': 'Won',  # Tender won
+            'lost': 'Lost',  # Tender lost
+            'cancelled': 'Lost',  # Cancelled
+        }
+    
+    def _get_crm_probability(self):
+        """Get probability based on tender state"""
+        probability_mapping = {
+            'draft': 5,
+            'technical': 20,
+            'financial': 40,
+            'quotation': 60,
+            'submitted': 75,
+            'evaluation': 85,
+            'won': 100,
+            'lost': 0,
+            'cancelled': 0,
+        }
+        return probability_mapping.get(self.state, 20)
     
     def _auto_create_project(self):
         """Automatically create project from won tender with task template"""
