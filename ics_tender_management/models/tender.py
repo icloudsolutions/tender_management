@@ -426,23 +426,43 @@ class Tender(models.Model):
 
         vendor = vendors[0]
 
-        purchase_order = self.env['purchase.order'].create({
-            'partner_id': vendor.id,
-            'tender_id': self.id,
-            'origin': self.name,
-            'date_order': fields.Datetime.now(),
-        })
+        # Build purchase order vals with only available fields
+        po_model = self.env['purchase.order']
+        po_fields = po_model._fields.keys()
+        
+        po_vals = {'partner_id': vendor.id}
+        
+        if 'tender_id' in po_fields:
+            po_vals['tender_id'] = self.id
+        if 'origin' in po_fields:
+            po_vals['origin'] = self.name
+        if 'date_order' in po_fields:
+            po_vals['date_order'] = fields.Datetime.now()
+            
+        purchase_order = po_model.create(po_vals)
 
+        # Build purchase order line vals with only available fields
+        pol_model = self.env['purchase.order.line']
+        pol_fields = pol_model._fields.keys()
+        
         for boq_line in self.boq_line_ids:
-            self.env['purchase.order.line'].create({
+            pol_vals = {
                 'order_id': purchase_order.id,
                 'product_id': boq_line.product_id.id,
-                'name': boq_line.name,
-                'product_qty': boq_line.quantity,
-                'product_uom': boq_line.uom_id.id,
-                'price_unit': boq_line.selected_vendor_price / boq_line.quantity if boq_line.quantity else 0,
-                'date_planned': fields.Datetime.now(),
-            })
+            }
+            
+            if 'name' in pol_fields:
+                pol_vals['name'] = boq_line.name
+            if 'product_qty' in pol_fields:
+                pol_vals['product_qty'] = boq_line.quantity
+            if 'product_uom' in pol_fields:
+                pol_vals['product_uom'] = boq_line.uom_id.id
+            if 'price_unit' in pol_fields:
+                pol_vals['price_unit'] = boq_line.selected_vendor_price / boq_line.quantity if boq_line.quantity else 0
+            if 'date_planned' in pol_fields:
+                pol_vals['date_planned'] = fields.Datetime.now()
+                
+            pol_model.create(pol_vals)
 
         return {
             'name': _('Purchase Order'),
@@ -461,27 +481,47 @@ class Tender(models.Model):
 
         vendors = lines_with_vendor.mapped('selected_vendor_id')
         created_orders = self.env['purchase.order']
+        
+        # Get available fields once to avoid repeated lookups
+        po_model = self.env['purchase.order']
+        po_fields = po_model._fields.keys()
+        pol_model = self.env['purchase.order.line']
+        pol_fields = pol_model._fields.keys()
 
         for vendor in vendors:
             vendor_lines = lines_with_vendor.filtered(lambda l: l.selected_vendor_id == vendor)
 
-            purchase_order = self.env['purchase.order'].create({
-                'partner_id': vendor.id,
-                'tender_id': self.id,
-                'origin': self.name,
-                'date_order': fields.Datetime.now(),
-            })
+            # Build purchase order vals with only available fields
+            po_vals = {'partner_id': vendor.id}
+            
+            if 'tender_id' in po_fields:
+                po_vals['tender_id'] = self.id
+            if 'origin' in po_fields:
+                po_vals['origin'] = self.name
+            if 'date_order' in po_fields:
+                po_vals['date_order'] = fields.Datetime.now()
+                
+            purchase_order = po_model.create(po_vals)
 
+            # Build purchase order line vals with only available fields
             for boq_line in vendor_lines:
-                self.env['purchase.order.line'].create({
+                pol_vals = {
                     'order_id': purchase_order.id,
                     'product_id': boq_line.product_id.id,
-                    'name': boq_line.name,
-                    'product_qty': boq_line.quantity,
-                    'product_uom': boq_line.uom_id.id,
-                    'price_unit': boq_line.selected_vendor_price / boq_line.quantity if boq_line.quantity else 0,
-                    'date_planned': fields.Datetime.now(),
-                })
+                }
+                
+                if 'name' in pol_fields:
+                    pol_vals['name'] = boq_line.name
+                if 'product_qty' in pol_fields:
+                    pol_vals['product_qty'] = boq_line.quantity
+                if 'product_uom' in pol_fields:
+                    pol_vals['product_uom'] = boq_line.uom_id.id
+                if 'price_unit' in pol_fields:
+                    pol_vals['price_unit'] = boq_line.selected_vendor_price / boq_line.quantity if boq_line.quantity else 0
+                if 'date_planned' in pol_fields:
+                    pol_vals['date_planned'] = fields.Datetime.now()
+                    
+                pol_model.create(pol_vals)
 
             created_orders |= purchase_order
 
