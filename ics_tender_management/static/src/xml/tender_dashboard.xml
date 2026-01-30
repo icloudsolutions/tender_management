@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="ics_tender_management.Dashboard">
-        <div class="ics_tender_dashboard">
+        <div class="ics_tender_dashboard" style="width: 100%; height: 100%; overflow-y: auto; overflow-x: hidden;">
             <t t-if="state.isLoading">
                 <div class="d-flex justify-content-center align-items-center" style="min-height: 400px;">
                     <div class="text-center">

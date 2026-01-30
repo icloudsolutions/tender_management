@@ -2,6 +2,10 @@
     padding: 20px;
     background-color: #f8f9fc;
     min-height: 100vh;
+    height: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-width: 100%;
 
     .dashboard-header {
         h2 {
@@ -80,9 +84,13 @@
 
     .chart-container {
         position: relative;
+        height: 300px;
+        max-height: 400px;
+        overflow: visible;
 
         canvas {
             max-height: 100%;
+            max-width: 100%;
         }
     }
 
@@ -215,8 +223,27 @@
         }
     }
 
+    .row {
+        margin-bottom: 1rem;
+    }
+
+    // Ensure cards don't break layout
+    .col-xl-3, .col-md-6, .col-lg-6 {
+        margin-bottom: 1rem;
+        min-width: 0;
+        flex-shrink: 0;
+    }
+
+    @media (max-width: 1200px) {
+        .col-xl-3 {
+            flex: 0 0 50%;
+            max-width: 50%;
+        }
+    }
+
     @media (max-width: 768px) {
         padding: 10px;
+        overflow-x: hidden;
 
         .dashboard-header {
             h2 {
@@ -225,7 +252,30 @@
         }
 
         .chart-container {
+            height: 250px !important;
+            max-height: 250px !important;
+        }
+
+        .col-xl-3, .col-md-6, .col-lg-6 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+
+        .card-body {
+            padding: 0.75rem !important;
+        }
+    }
+
+    @media (max-width: 576px) {
+        padding: 5px;
+
+        .h5 {
+            font-size: 1rem;
+        }
+
+        .chart-container {
             height: 200px !important;
+            max-height: 200px !important;
         }
     }
 }

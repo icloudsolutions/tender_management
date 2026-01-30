@@ -248,13 +248,25 @@ class Tender(models.Model):
         if not self.boq_line_ids:
             raise UserError(_('Please add BoQ lines before creating a purchase agreement.'))
 
-        requisition = self.env['purchase.requisition'].create({
+        # Try to get the purchase requisition type, fallback gracefully if not found
+        try:
+            type_id = self.env.ref('purchase_requisition.type_multi').id
+        except ValueError:
+            # Odoo 18: type_multi might not exist, try to get any blanket order type
+            type_obj = self.env['purchase.requisition.type'].search([('name', 'ilike', 'blanket')], limit=1)
+            type_id = type_obj.id if type_obj else False
+
+        vals = {
             'tender_id': self.id,
             'user_id': self.user_id.id,
             'ordering_date': fields.Date.today(),
             'schedule_date': self.submission_deadline.date() if self.submission_deadline else False,
-            'type_id': self.env.ref('purchase_requisition.type_multi').id,
-        })
+        }
+        
+        if type_id:
+            vals['type_id'] = type_id
+
+        requisition = self.env['purchase.requisition'].create(vals)
 
         for boq_line in self.boq_line_ids:
             self.env['purchase.requisition.line'].create({
