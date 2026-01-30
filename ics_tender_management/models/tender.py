@@ -772,15 +772,22 @@ class Tender(models.Model):
             self.lead_id.with_context(from_tender_sync=True).action_set_won()
 
     def action_mark_lost(self):
+        """Open wizard to mark tender as lost with reason"""
         self.ensure_one()
+        
+        # Create wizard
+        wizard = self.env['ics.tender.mark.lost.wizard'].create({
+            'tender_id': self.id,
+        })
+        
         return {
-            'name': _('Lost Reason'),
+            'name': _('Mark Tender as Lost'),
             'type': 'ir.actions.act_window',
-            'res_model': 'ics.tender',
+            'res_model': 'ics.tender.mark.lost.wizard',
             'view_mode': 'form',
-            'res_id': self.id,
+            'res_id': wizard.id,
             'target': 'new',
-            'context': {'default_state': 'lost'},
+            'context': self.env.context,
         }
 
     def action_view_boq_lines(self):

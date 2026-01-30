@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <record id="view_mark_lost_wizard_form" model="ir.ui.view">
+            <field name="name">ics.tender.mark.lost.wizard.form</field>
+            <field name="model">ics.tender.mark.lost.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Mark Tender as Lost">
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <i class="fa fa-times-circle text-danger"/> Mark Tender as Lost
+                            </h1>
+                        </div>
+                        
+                        <group>
+                            <group>
+                                <field name="tender_name"/>
+                                <field name="tender_title"/>
+                            </group>
+                        </group>
+                        
+                        <div class="alert alert-warning" role="alert">
+                            <strong><i class="fa fa-exclamation-triangle"/> Important:</strong>
+                            <p class="mb-0">
+                                You are about to mark this tender as <strong>Lost</strong>.
+                                Please provide a detailed reason below.
+                            </p>
+                        </div>
+                        
+                        <group>
+                            <field name="lost_reason" placeholder="Enter detailed reason why the tender was lost..." nolabel="1" required="1"/>
+                        </group>
+                        
+                        <separator string="Appeal Options (حق الإعتراض)"/>
+                        
+                        <div class="alert alert-info" role="alert">
+                            <strong><i class="fa fa-info-circle"/> Appeal Right Available:</strong>
+                            <p class="mb-0">
+                                <strong>English:</strong> Your company has the right to appeal this decision. 
+                                An activity will be created to guide you through the appeal process.
+                            </p>
+                            <p class="mb-0 mt-2">
+                                <strong>العربية:</strong> الشركة لها الحق في تقديم إعتراض على نتيجة المنافسة. 
+                                سيتم إنشاء نشاط لإرشادك خلال عملية الإعتراض.
+                            </p>
+                        </div>
+                        
+                        <group>
+                            <field name="immediate_appeal"/>
+                            <field name="appeal_notes" placeholder="Add any initial notes about your planned appeal..." invisible="not immediate_appeal"/>
+                        </group>
+                        
+                    </sheet>
+                    <footer>
+                        <button name="action_confirm_lost" string="Confirm - Mark as Lost" type="object" class="btn-danger"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        
+    </data>
+</odoo>
