@@ -188,8 +188,9 @@ class Tender(models.Model):
             tender.attachment_count = attachment.get(tender.id, 0)
 
     @api.model
-    def _read_group_stage_ids(self, stages, domain, order):
-        return self.env['ics.tender.stage'].search([], order=order)
+    def _read_group_stage_ids(self, stages, domain):
+        """Odoo 18: group_expand no longer receives 'order' parameter"""
+        return self.env['ics.tender.stage'].search([], order='sequence, id')
 
     def action_start_technical_study(self):
         self.ensure_one()

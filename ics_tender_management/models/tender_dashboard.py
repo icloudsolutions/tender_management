@@ -17,7 +17,7 @@ class IcsTenderDashboard(models.Model):
 
         total_tenders = tender_obj.search_count([])
 
-        # Prefer the explicit workflow field on the tender
+        # Use the workflow field on the tender (Odoo 18 compatible; no stage flags required)
         draft_tenders = tender_obj.search_count([('state', '=', 'draft')])
         active_tenders = tender_obj.search_count([('state', 'in', ['technical', 'financial', 'quotation', 'submitted', 'evaluation'])])
         won_tenders = tender_obj.search_count([('state', '=', 'won')])
@@ -60,10 +60,11 @@ class IcsTenderDashboard(models.Model):
 
         all_tenders = tender_obj.search([])
         for tender in all_tenders:
+            # Offers exist on BoQ lines in this module
             for line in tender.boq_line_ids:
                 offers = line.vendor_offer_ids
                 total_offers += len(offers)
-                # In this module, "accepted" means "selected" vendor offer
+                # Treat "accepted" as the selected vendor offer
                 accepted_offers += len(offers.filtered(lambda o: o.is_selected))
 
         pending_offers = max(total_offers - accepted_offers, 0)
@@ -208,34 +209,35 @@ class IcsTenderDashboard(models.Model):
 
     def _get_project_execution_stats(self):
         """Get project execution statistics for won tenders"""
-        tender_obj = self.env['ics.tender.management']
+        tender_obj = self.env['ics.tender']
         project_obj = self.env['project.project']
 
-        won_tenders = tender_obj.search([('stage_id.is_won', '=', True)])
+        won_tenders = tender_obj.search([('state', '=', 'won')])
 
         total_projects = project_obj.search_count([('tender_id', 'in', won_tenders.ids)])
 
-        in_execution = project_obj.search_count([
-            ('tender_id', 'in', won_tenders.ids),
-            ('stage_id.is_closed', '=', False)
-        ])
+        # Be defensive: some databases don't have project "closed" fields.
+        in_execution = 0
+        completed = 0
+        supply_in_execution = 0
+        maintenance_in_execution = 0
 
-        completed = project_obj.search_count([
-            ('tender_id', 'in', won_tenders.ids),
-            ('stage_id.is_closed', '=', True)
-        ])
-
-        supply_in_execution = project_obj.search_count([
-            ('tender_id.tender_category', '=', 'supply'),
-            ('tender_id', 'in', won_tenders.ids),
-            ('stage_id.is_closed', '=', False)
-        ])
-
-        maintenance_in_execution = project_obj.search_count([
-            ('tender_id.tender_category', '=', 'maintenance'),
-            ('tender_id', 'in', won_tenders.ids),
-            ('stage_id.is_closed', '=', False)
-        ])
+        # If project has a stage_id with an is_closed flag, use it; otherwise leave 0/0.
+        if 'stage_id' in project_obj._fields:
+            stage_model = project_obj._fields['stage_id'].comodel_name
+            if stage_model and 'is_closed' in self.env[stage_model]._fields:
+                in_execution = project_obj.search_count([('tender_id', 'in', won_tenders.ids), ('stage_id.is_closed', '=', False)])
+                completed = project_obj.search_count([('tender_id', 'in', won_tenders.ids), ('stage_id.is_closed', '=', True)])
+                supply_in_execution = project_obj.search_count([
+                    ('tender_id.tender_category', '=', 'supply'),
+                    ('tender_id', 'in', won_tenders.ids),
+                    ('stage_id.is_closed', '=', False),
+                ])
+                maintenance_in_execution = project_obj.search_count([
+                    ('tender_id.tender_category', '=', 'maintenance'),
+                    ('tender_id', 'in', won_tenders.ids),
+                    ('stage_id.is_closed', '=', False),
+                ])
 
         return {
             'total_projects': total_projects,
@@ -247,23 +249,23 @@ class IcsTenderDashboard(models.Model):
 
     def _get_procedure_compliance(self):
         """Get procedure compliance metrics based on ICS procedures"""
-        tender_obj = self.env['ics.tender.management']
+        tender_obj = self.env['ics.tender']
         project_obj = self.env['project.project']
 
         won_supply = tender_obj.search_count([
-            ('stage_id.is_won', '=', True),
+            ('state', '=', 'won'),
             ('tender_category', '=', 'supply')
         ])
 
         won_maintenance = tender_obj.search_count([
-            ('stage_id.is_won', '=', True),
+            ('state', '=', 'won'),
             ('tender_category', '=', 'maintenance')
         ])
 
         supply_with_projects = 0
         if won_supply > 0:
             supply_tenders = tender_obj.search([
-                ('stage_id.is_won', '=', True),
+                ('state', '=', 'won'),
                 ('tender_category', '=', 'supply')
             ])
             supply_with_projects = project_obj.search_count([
@@ -273,7 +275,7 @@ class IcsTenderDashboard(models.Model):
         maintenance_with_projects = 0
         if won_maintenance > 0:
             maintenance_tenders = tender_obj.search([
-                ('stage_id.is_won', '=', True),
+                ('state', '=', 'won'),
                 ('tender_category', '=', 'maintenance')
             ])
             maintenance_with_projects = project_obj.search_count([
@@ -295,10 +297,10 @@ class IcsTenderDashboard(models.Model):
 
     def _get_win_loss_ratio(self):
         """Calculate win/loss ratio and success rate"""
-        tender_obj = self.env['ics.tender.management']
+        tender_obj = self.env['ics.tender']
 
-        won_count = tender_obj.search_count([('stage_id.is_won', '=', True)])
-        lost_count = tender_obj.search_count([('stage_id.is_lost', '=', True)])
+        won_count = tender_obj.search_count([('state', '=', 'won')])
+        lost_count = tender_obj.search_count([('state', '=', 'lost')])
 
         total_decided = won_count + lost_count
         win_rate = (won_count / total_decided * 100) if total_decided > 0 else 0
