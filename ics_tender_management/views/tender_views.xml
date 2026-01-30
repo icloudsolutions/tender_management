@@ -260,6 +260,141 @@
                                     </group>
                                 </group>
                             </page>
+                            <!-- Legacy CRM Migration Tabs -->
+                            <page string="Tendering Details" name="tendering_details">
+                                <group>
+                                    <group string="Tender Information">
+                                        <field name="etimad_link" widget="url"/>
+                                        <field name="tender_completion_time"/>
+                                        <field name="tender_submission_method"/>
+                                        <field name="tender_booklet_price"/>
+                                    </group>
+                                    <group string="Booklet Purchase">
+                                        <field name="booklet_purchased"/>
+                                        <field name="booklet_purchase_receipt" invisible="not booklet_purchased"/>
+                                        <field name="booklet_purchase_request_date" invisible="not booklet_purchased"/>
+                                        <field name="booklet_purchase_date" invisible="not booklet_purchased"/>
+                                    </group>
+                                </group>
+                                <group>
+                                    <group string="Site Visit">
+                                        <field name="site_visit_required"/>
+                                        <field name="site_visit_date" widget="datetime" invisible="not site_visit_required"/>
+                                        <field name="documents_required_for_site" filename="documents_required_filename" invisible="not site_visit_required"/>
+                                        <field name="documents_required_filename" invisible="1"/>
+                                    </group>
+                                    <group string="Inquiries">
+                                        <field name="last_inquiry_date"/>
+                                        <field name="required_inquiries"/>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="Qualification" name="qualification">
+                                <group>
+                                    <group string="Evaluation">
+                                        <field name="presales_employee" widget="many2one_avatar_user"/>
+                                        <field name="evaluation_criteria_file" filename="evaluation_criteria_filename"/>
+                                        <field name="evaluation_criteria_filename" invisible="1"/>
+                                        <field name="required_certifications_file" filename="required_certifications_filename"/>
+                                        <field name="required_certifications_filename" invisible="1"/>
+                                        <field name="estimated_project_value"/>
+                                    </group>
+                                    <group string="Decision">
+                                        <field name="winning_probability"/>
+                                        <field name="client_relationship"/>
+                                        <field name="participation_decision"/>
+                                        <field name="non_participation_reason" invisible="participation_decision"/>
+                                        <field name="challenges"/>
+                                    </group>
+                                </group>
+                                <separator string="Project Scope of Work"/>
+                                <field name="project_scope_of_work" placeholder="Detailed project scope..."/>
+                            </page>
+                            <page string="Approvals" name="approvals">
+                                <group>
+                                    <group string="Management Approvals">
+                                        <field name="approval_direct_manager" widget="boolean_toggle"/>
+                                        <field name="approval_department_manager" widget="boolean_toggle"/>
+                                        <field name="approval_financial_manager" widget="boolean_toggle"/>
+                                        <field name="approval_ceo" widget="boolean_toggle"/>
+                                    </group>
+                                    <group string="Document Status">
+                                        <field name="tender_documents_uploaded" widget="boolean_toggle"/>
+                                        <field name="file_submission_required" widget="boolean_toggle"/>
+                                        <field name="file_submission_date" invisible="not file_submission_required"/>
+                                        <field name="documents_upload_for_review" filename="documents_upload_filename"/>
+                                        <field name="documents_upload_filename" invisible="1"/>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="Offer Results" name="offer_results">
+                                <group>
+                                    <group string="Offer Opening">
+                                        <field name="offer_opening_date" widget="datetime"/>
+                                        <field name="financial_offer_opening_date" widget="datetime"/>
+                                        <field name="competing_companies_file" filename="competing_companies_filename"/>
+                                        <field name="competing_companies_filename" invisible="1"/>
+                                    </group>
+                                    <group string="Offer Status">
+                                        <field name="offer_accepted" widget="boolean_toggle"/>
+                                        <field name="offer_rejection_reason" invisible="offer_accepted"/>
+                                        <field name="financial_offer_accepted" widget="boolean_toggle"/>
+                                        <field name="financial_offer_rejection_reason" invisible="financial_offer_accepted"/>
+                                    </group>
+                                </group>
+                                <group>
+                                    <group string="Extensions &amp; Appeals">
+                                        <field name="offer_extension_requested" widget="boolean_toggle"/>
+                                        <field name="extension_awarded" widget="boolean_toggle" invisible="not offer_extension_requested"/>
+                                        <field name="extension_rejection_reason" invisible="extension_awarded or not offer_extension_requested"/>
+                                        <field name="discount_requested" widget="boolean_toggle"/>
+                                        <field name="appeal_submitted" widget="boolean_toggle"/>
+                                    </group>
+                                    <group string="Award Details">
+                                        <field name="awarded_company" options="{'no_create_edit': True}"/>
+                                        <field name="amount_awarded"/>
+                                        <field name="award_date"/>
+                                        <field name="award_letter_file" filename="award_letter_filename"/>
+                                        <field name="award_letter_filename" invisible="1"/>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="Team &amp; Suppliers" name="team_suppliers">
+                                <group>
+                                    <group string="Communication Team">
+                                        <field name="tender_employee" widget="many2one_avatar_user"/>
+                                        <field name="sales_representative" widget="many2one_avatar_user"/>
+                                    </group>
+                                    <group string="Selected Suppliers">
+                                        <field name="selected_suppliers_ids" widget="many2many_tags" options="{'no_create_edit': True}"/>
+                                    </group>
+                                </group>
+                                <separator string="Tender Communication Team"/>
+                                <field name="tender_team_ids">
+                                    <list editable="bottom">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="employee_id" widget="many2one_avatar_user"/>
+                                        <field name="role"/>
+                                        <field name="contact_info"/>
+                                        <field name="phone"/>
+                                        <field name="notes"/>
+                                    </list>
+                                </field>
+                                <separator string="Potential Suppliers"/>
+                                <field name="potential_suppliers_ids">
+                                    <list editable="bottom">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="partner_id" options="{'no_create_edit': True}"/>
+                                        <field name="scope_of_work"/>
+                                        <field name="evaluation_score"/>
+                                        <field name="status"/>
+                                        <field name="phone"/>
+                                        <field name="email"/>
+                                        <field name="city"/>
+                                        <field name="currency_id" invisible="1"/>
+                                    </list>
+                                </field>
+                            </page>
                         </notebook>
                     </sheet>
                     <chatter/> 

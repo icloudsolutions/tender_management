@@ -2422,3 +2422,526 @@ msgstr ""
 #: model:mail.template,subject:ics_tender_management.email_template_tender_won
 msgid "🎉 Congratulations! Tender Won - ${object.name}"
 msgstr ""
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__etimad_link
+msgid "Etimad Tender Link"
+msgstr "رابط المنافسة في إعتماد"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__tender_completion_time
+msgid "Tender Completion Time (Months)"
+msgstr "مدة تنفيذ المنافسة (بالأشهر)"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__tender_submission_method
+msgid "Submission Method"
+msgstr "طريقة التقديم"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__tender_booklet_price
+msgid "Tender Booklet Price"
+msgstr "سعر كراسة الشروط"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__booklet_purchased
+msgid "Booklet Purchased?"
+msgstr "هل تم شراء الكراسة؟"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__booklet_purchase_receipt
+msgid "Purchase Receipt Number"
+msgstr "رقم إيصال الشراء"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__booklet_purchase_request_date
+msgid "Date of Booklet Purchase Request"
+msgstr "تاريخ طلب شراء الكراسة"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__booklet_purchase_date
+msgid "Date of Purchase"
+msgstr "تاريخ الشراء"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__site_visit_required
+msgid "Site Visit Required"
+msgstr "زيارة الموقع مطلوبة"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__site_visit_date
+msgid "Site Visit Date"
+msgstr "تاريخ زيارة الموقع"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__last_inquiry_date
+msgid "Last Date for Inquiries"
+msgstr "آخر موعد للاستفسارات"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__offer_opening_date
+msgid "Offer Opening Date"
+msgstr "تاريخ فتح العروض"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__financial_offer_opening_date
+msgid "Financial Offer Opening Date"
+msgstr "تاريخ فتح العروض المالية"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__competing_companies_file
+msgid "Upload Competing Companies Prices"
+msgstr "رفع أسعار الشركات المنافسة"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__offer_accepted
+msgid "Offer Accepted"
+msgstr "تم قبول العرض"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__offer_rejection_reason
+msgid "Reasons for Offer Rejection"
+msgstr "أسباب رفض العرض"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__financial_offer_accepted
+msgid "Financial Offer Accepted"
+msgstr "تم قبول العرض المالي"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__financial_offer_rejection_reason
+msgid "Reason for Rejected Financial Offer"
+msgstr "سبب رفض العرض المالي"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__offer_extension_requested
+msgid "Offer Extension"
+msgstr "طلب تمديد العرض"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__extension_awarded
+msgid "Extension Awarded"
+msgstr "تم منح التمديد"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__extension_rejection_reason
+msgid "Reason for Extension Rejected"
+msgstr "سبب رفض التمديد"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__discount_requested
+msgid "Discount Requested"
+msgstr "طلب خصم"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__appeal_submitted
+msgid "Appeal Submitted"
+msgstr "تم تقديم تظلم"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__awarded_company
+msgid "Awarded Company"
+msgstr "الشركة الفائزة"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__amount_awarded
+msgid "Amount Awarded"
+msgstr "قيمة الترسية"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__award_date
+msgid "Date Awarded"
+msgstr "تاريخ الترسية"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__award_letter_file
+msgid "Upload Award Letter"
+msgstr "رفع خطاب الترسية"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__approval_direct_manager
+msgid "Approval from Direct Manager"
+msgstr "موافقة المدير المباشر"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__approval_department_manager
+msgid "Approval from Department Manager"
+msgstr "موافقة مدير القسم"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__approval_financial_manager
+msgid "Approval from Financial Manager"
+msgstr "موافقة المدير المالي"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__approval_ceo
+msgid "CEO Approval"
+msgstr "موافقة الرئيس التنفيذي"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__presales_employee
+msgid "Presales Employee"
+msgstr "موظف ما قبل البيع"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__evaluation_criteria_file
+msgid "Evaluation Criteria"
+msgstr "معايير التقييم"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__required_certifications_file
+msgid "Required Certifications"
+msgstr "الشهادات المطلوبة"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__project_scope_of_work
+msgid "Project Scope of Work"
+msgstr "نطاق العمل للمشروع"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__estimated_project_value
+msgid "Estimated Project Value"
+msgstr "القيمة التقديرية للمشروع"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__required_inquiries
+msgid "Required Inquiries/Questions"
+msgstr "الاستفسارات / الأسئلة المطلوبة"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__challenges
+msgid "Challenges"
+msgstr "التحديات"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__winning_probability
+msgid "Winning Probability"
+msgstr "احتمالية الفوز"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__client_relationship
+msgid "Client Relationship"
+msgstr "علاقة العميل"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__participation_decision
+msgid "Participating in Tender"
+msgstr "المشاركة في المنافسة"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__non_participation_reason
+msgid "Reasons for Non-Participation"
+msgstr "أسباب عدم المشاركة"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__tender_documents_uploaded
+msgid "Update Tender Documents"
+msgstr "تحديث مستندات المنافسة"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__documents_required_for_site
+msgid "Documents Required For Site Visit"
+msgstr "المستندات المطلوبة لزيارة الموقع"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__file_submission_required
+msgid "File Submission"
+msgstr "تقديم الملفات"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__file_submission_date
+msgid "Final Time and Date for Final Offers Approval"
+msgstr "الموعد النهائي لاعتماد العروض النهائية"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__documents_upload_for_review
+msgid "Document Upload for Review"
+msgstr "رفع المستندات للمراجعة"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__tender_team_ids
+msgid "Tender Communication Team"
+msgstr "فريق التواصل للمنافسة"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__tender_employee
+msgid "Tender Employee"
+msgstr "موظف المنافسة"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__sales_representative
+msgid "Sales Representative"
+msgstr "مندوب المبيعات"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__selected_suppliers_ids
+msgid "Selected Suppliers"
+msgstr "الموردون المختارون"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__potential_suppliers_ids
+msgid "Potential Suppliers"
+msgstr "الموردون المحتملون"
+
+#. module: ics_tender_management
+#: model:ir.model,name:ics_tender_management.model_ics_tender_team
+msgid "Tender Communication Team"
+msgstr "فريق التواصل للمنافسة"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_team__employee_id
+msgid "Team Member"
+msgstr "عضو الفريق"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_team__role
+msgid "Role"
+msgstr "الدور"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_team__contact_info
+msgid "Contact Info"
+msgstr "معلومات الاتصال"
+
+#. module: ics_tender_management
+#: model:ir.model,name:ics_tender_management.model_ics_tender_supplier
+msgid "Tender Potential Suppliers"
+msgstr "الموردون المحتملون للمنافسة"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_supplier__partner_id
+msgid "Supplier"
+msgstr "المورد"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_supplier__scope_of_work
+msgid "Scope of Work / Scope within Tender"
+msgstr "نطاق العمل / النطاق ضمن المنافسة"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_supplier__evaluation_score
+msgid "Evaluation Score"
+msgstr "درجة التقييم"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_supplier__account_receivable
+msgid "Account Receivable"
+msgstr "حساب مدين"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_supplier__account_payable
+msgid "Account Payable"
+msgstr "حساب دائن"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_supplier__status
+msgid "Status"
+msgstr "الحالة"
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_tender_form
+msgid "Tendering Details"
+msgstr "تفاصيل المنافسة"
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_tender_form
+msgid "Tender Information"
+msgstr "معلومات المنافسة"
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_tender_form
+msgid "Booklet Purchase"
+msgstr "شراء الكراسة"
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_tender_form
+msgid "Site Visit"
+msgstr "زيارة الموقع"
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_tender_form
+msgid "Inquiries"
+msgstr "الاستفسارات"
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_tender_form
+msgid "Qualification"
+msgstr "التأهيل"
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_tender_form
+msgid "Evaluation"
+msgstr "التقييم"
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_tender_form
+msgid "Decision"
+msgstr "القرار"
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_tender_form
+msgid "Project Scope of Work"
+msgstr "نطاق العمل للمشروع"
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_tender_form
+msgid "Approvals"
+msgstr "الموافقات"
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_tender_form
+msgid "Management Approvals"
+msgstr "موافقات الإدارة"
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_tender_form
+msgid "Document Status"
+msgstr "حالة المستندات"
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_tender_form
+msgid "Offer Results"
+msgstr "نتائج العروض"
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_tender_form
+msgid "Offer Opening"
+msgstr "فتح العروض"
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_tender_form
+msgid "Offer Status"
+msgstr "حالة العرض"
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_tender_form
+msgid "Extensions &amp; Appeals"
+msgstr "التمديدات والتظلمات"
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_tender_form
+msgid "Award Details"
+msgstr "تفاصيل الترسية"
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_tender_form
+msgid "Team &amp; Suppliers"
+msgstr "الفريق والموردون"
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_tender_form
+msgid "Communication Team"
+msgstr "فريق التواصل"
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_tender_form
+msgid "Selected Suppliers"
+msgstr "الموردون المختارون"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_team__sequence
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_supplier__sequence
+msgid "Sequence"
+msgstr "التسلسل"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_team__notes
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_supplier__notes
+msgid "Notes"
+msgstr "ملاحظات"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_team__phone
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_supplier__phone
+msgid "Phone"
+msgstr "الهاتف"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_supplier__email
+msgid "Email"
+msgstr "البريد الإلكتروني"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_supplier__city
+msgid "City"
+msgstr "المدينة"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,selection:ics_tender_management.field_ics_tender__tender_submission_method
+msgid "Electronic"
+msgstr "إلكتروني"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,selection:ics_tender_management.field_ics_tender__tender_submission_method
+msgid "Manual"
+msgstr "يدوي"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,selection:ics_tender_management.field_ics_tender__tender_submission_method
+msgid "Both"
+msgstr "كلاهما"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,selection:ics_tender_management.field_ics_tender__client_relationship
+msgid "New Client"
+msgstr "عميل جديد"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,selection:ics_tender_management.field_ics_tender__client_relationship
+msgid "Existing Client"
+msgstr "عميل حالي"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,selection:ics_tender_management.field_ics_tender__client_relationship
+msgid "Strategic Partner"
+msgstr "شريك استراتيجي"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,selection:ics_tender_management.field_ics_tender_team__role
+msgid "Tender Responsible Employee"
+msgstr "الموظف المسؤول عن المنافسة"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,selection:ics_tender_management.field_ics_tender_team__role
+msgid "Technical Specialist"
+msgstr "أخصائي فني"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,selection:ics_tender_management.field_ics_tender_team__role
+msgid "Financial Analyst"
+msgstr "محلل مالي"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,selection:ics_tender_management.field_ics_tender_team__role
+msgid "Legal Advisor"
+msgstr "مستشار قانوني"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,selection:ics_tender_management.field_ics_tender_team__role
+msgid "Other"
+msgstr "آخر"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,selection:ics_tender_management.field_ics_tender_supplier__status
+msgid "Potential"
+msgstr "محتمل"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,selection:ics_tender_management.field_ics_tender_supplier__status
+msgid "Invited"
+msgstr "مدعو"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,selection:ics_tender_management.field_ics_tender_supplier__status
+msgid "Responded"
+msgstr "استجاب"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,selection:ics_tender_management.field_ics_tender_supplier__status
+msgid "Selected"
+msgstr "محدد"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,selection:ics_tender_management.field_ics_tender_supplier__status
+msgid "Rejected"
+msgstr "مرفوض"

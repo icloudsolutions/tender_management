@@ -125,6 +125,104 @@ class Tender(models.Model):
     expected_revenue = fields.Monetary('Expected Revenue', currency_field='currency_id')
     actual_revenue = fields.Monetary('Actual Revenue', currency_field='currency_id')
 
+    # ========== LEGACY CRM MIGRATION FIELDS ==========
+    # Tendering Details
+    etimad_link = fields.Char('Etimad Tender Link', help='URL to the tender on Etimad portal')
+    tender_completion_time = fields.Integer('Tender Completion Time (Months)', help='Expected project duration in months')
+    tender_submission_method = fields.Selection([
+        ('electronic', 'Electronic'),
+        ('manual', 'Manual'),
+        ('both', 'Both')
+    ], string='Submission Method', default='electronic')
+    tender_booklet_price = fields.Monetary('Tender Booklet Price', currency_field='currency_id')
+    
+    # Booklet Purchase Details
+    booklet_purchased = fields.Boolean('Booklet Purchased?', default=False)
+    booklet_purchase_receipt = fields.Char('Purchase Receipt Number')
+    booklet_purchase_request_date = fields.Date('Date of Booklet Purchase Request')
+    booklet_purchase_date = fields.Date('Date of Purchase')
+    
+    # Site Visit & Inquiries
+    site_visit_required = fields.Boolean('Site Visit Required', default=False)
+    site_visit_date = fields.Datetime('Site Visit Date')
+    last_inquiry_date = fields.Date('Last Date for Inquiries')
+    
+    # Offer Opening Dates
+    offer_opening_date = fields.Datetime('Offer Opening Date')
+    financial_offer_opening_date = fields.Datetime('Financial Offer Opening Date')
+    
+    # Competing Companies & Prices
+    competing_companies_file = fields.Binary('Upload Competing Companies Prices')
+    competing_companies_filename = fields.Char('Competing Companies File Name')
+    
+    # Offer Acceptance/Rejection
+    offer_accepted = fields.Boolean('Offer Accepted', default=False)
+    offer_rejection_reason = fields.Text('Reasons for Offer Rejection')
+    financial_offer_accepted = fields.Boolean('Financial Offer Accepted', default=False)
+    financial_offer_rejection_reason = fields.Text('Reason for Rejected Financial Offer')
+    
+    # Extensions & Appeals
+    offer_extension_requested = fields.Boolean('Offer Extension', default=False)
+    extension_awarded = fields.Boolean('Extension Awarded', default=False)
+    extension_rejection_reason = fields.Text('Reason for Extension Rejected')
+    discount_requested = fields.Boolean('Discount Requested', default=False)
+    appeal_submitted = fields.Boolean('Appeal Submitted', default=False)
+    
+    # Award Details
+    awarded_company = fields.Many2one('res.partner', string='Awarded Company')
+    amount_awarded = fields.Monetary('Amount Awarded', currency_field='currency_id')
+    award_date = fields.Date('Date Awarded')
+    award_letter_file = fields.Binary('Upload Award Letter')
+    award_letter_filename = fields.Char('Award Letter File Name')
+    
+    # Approvals
+    approval_direct_manager = fields.Boolean('Approval from Direct Manager', default=False)
+    approval_department_manager = fields.Boolean('Approval from Department Manager', default=False)
+    approval_financial_manager = fields.Boolean('Approval from Financial Manager', default=False)
+    approval_ceo = fields.Boolean('CEO Approval', default=False)
+    
+    # Qualification Phase
+    presales_employee = fields.Many2one('res.users', string='Presales Employee')
+    evaluation_criteria_file = fields.Binary('Evaluation Criteria')
+    evaluation_criteria_filename = fields.Char('Evaluation Criteria File Name')
+    required_certifications_file = fields.Binary('Required Certifications')
+    required_certifications_filename = fields.Char('Required Certifications File Name')
+    project_scope_of_work = fields.Html('Project Scope of Work')
+    estimated_project_value = fields.Monetary('Estimated Project Value', currency_field='currency_id')
+    required_inquiries = fields.Text('Required Inquiries/Questions')
+    
+    # Evaluation Phase
+    challenges = fields.Text('Challenges')
+    winning_probability = fields.Float('Winning Probability', help='Probability percentage (0-100)')
+    client_relationship = fields.Selection([
+        ('new', 'New Client'),
+        ('existing', 'Existing Client'),
+        ('strategic', 'Strategic Partner')
+    ], string='Client Relationship')
+    participation_decision = fields.Boolean('Participating in Tender', default=True)
+    non_participation_reason = fields.Text('Reasons for Non-Participation')
+    
+    # Document Management
+    tender_documents_uploaded = fields.Boolean('Update Tender Documents', default=False)
+    documents_required_for_site = fields.Binary('Documents Required For Site Visit')
+    documents_required_filename = fields.Char('Documents Required File Name')
+    file_submission_required = fields.Boolean('File Submission', default=False)
+    file_submission_date = fields.Date('Final Time and Date for Final Offers Approval')
+    documents_upload_for_review = fields.Binary('Document Upload for Review')
+    documents_upload_filename = fields.Char('Documents Upload File Name')
+    
+    # Communication Team
+    tender_team_ids = fields.One2many('ics.tender.team', 'tender_id', string='Tender Communication Team')
+    tender_employee = fields.Many2one('res.users', string='Tender Employee')
+    sales_representative = fields.Many2one('res.users', string='Sales Representative')
+    
+    # Supplier Selection
+    selected_suppliers_ids = fields.Many2many('res.partner', 'tender_supplier_rel', 
+        'tender_id', 'partner_id', string='Selected Suppliers', 
+        domain=[('supplier_rank', '>', 0)])
+    potential_suppliers_ids = fields.One2many('ics.tender.supplier', 'tender_id', 
+        string='Potential Suppliers')
+
     @api.model
     def create(self, vals):
         if vals.get('name', _('New')) == _('New'):

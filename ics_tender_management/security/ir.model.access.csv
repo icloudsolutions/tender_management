@@ -23,3 +23,7 @@ access_ics_tender_import_boq_wizard_user,ics.tender.import.boq.wizard.user,model
 access_ics_tender_import_boq_wizard_manager,ics.tender.import.boq.wizard.manager,model_ics_tender_import_boq_wizard,group_tender_manager,1,1,1,1
 access_ics_tender_export_boq_wizard_user,ics.tender.export.boq.wizard.user,model_ics_tender_export_boq_wizard,group_tender_user,1,1,1,1
 access_ics_tender_export_boq_wizard_manager,ics.tender.export.boq.wizard.manager,model_ics_tender_export_boq_wizard,group_tender_manager,1,1,1,1
+access_ics_tender_team_user,ics.tender.team.user,model_ics_tender_team,group_tender_user,1,1,1,0
+access_ics_tender_team_manager,ics.tender.team.manager,model_ics_tender_team,group_tender_manager,1,1,1,1
+access_ics_tender_supplier_user,ics.tender.supplier.user,model_ics_tender_supplier,group_tender_user,1,1,1,0
+access_ics_tender_supplier_manager,ics.tender.supplier.manager,model_ics_tender_supplier,group_tender_manager,1,1,1,1
