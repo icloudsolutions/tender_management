@@ -183,6 +183,10 @@
                                 <field name="name" readonly="1"/>
                             </h1>
                         </div>
+                        <div class="alert alert-info" role="alert" invisible="partner_id">
+                            <strong>ℹ️ Customer Required</strong><br/>
+                            Please set a <strong>Customer</strong> below. The customer is required for generating quotations and submitting the tender.
+                        </div>
                         <group>
                             <group name="tender_info">
                                 <field name="tender_number"/>
@@ -193,7 +197,7 @@
                                     readonly="state not in ['draft', 'technical']"/>
                                 <field name="etimad_tender_id" options="{'no_create': True}"/>
                                 <field name="lead_id" options="{'no_create': True}"/>
-                                <field name="partner_id" options="{'no_create_edit': True}"/>
+                                <field name="partner_id" options="{'no_create_edit': True}" required="1"/>
                             </group>
                             <group name="tender_management">
                                 <field name="user_id" widget="many2one_avatar_user"/>

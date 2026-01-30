@@ -19,7 +19,7 @@ class Tender(models.Model):
         tracking=True, ondelete='restrict')
 
     partner_id = fields.Many2one('res.partner', string='Customer',
-        tracking=True, required=True)
+        tracking=True, required=False)
 
     tender_number = fields.Char('Tender Number', required=True, tracking=True,
         help='Official tender number from Etimad or customer')
@@ -707,6 +707,8 @@ class Tender(models.Model):
 
     def action_submit_tender(self):
         self.ensure_one()
+        if not self.partner_id:
+            raise UserError(_('Please set a Customer before submitting the tender.'))
         if not self.quotation_ids:
             raise UserError(_('Please generate a quotation before submitting the tender.'))
         self.write({'state': 'submitted'})

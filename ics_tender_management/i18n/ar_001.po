@@ -3296,3 +3296,18 @@ msgstr "لديك الحق في تقديم إعتراض على نتيجة الم�
 #: model:ir.ui.view,arch_db:ics_tender_management.view_tender_form
 msgid "You have the right to appeal. Click the checkbox above to start the appeal process."
 msgstr "لديك الحق في الإعتراض. انقر على المربع أعلاه لبدء عملية الإعتراض."
+
+#. module: ics_tender_management
+#: code:addons/ics_tender_management/models/tender.py:0
+msgid "Please set a Customer before submitting the tender."
+msgstr "يرجى تحديد العميل قبل تقديم المنافسة."
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_tender_form
+msgid "Customer Required"
+msgstr "العميل مطلوب"
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_tender_form
+msgid "Please set a <strong>Customer</strong> below. The customer is required for generating quotations and submitting the tender."
+msgstr "يرجى تحديد <strong>العميل</strong> أدناه. العميل مطلوب لإنشاء عروض الأسعار وتقديم المنافسة."
