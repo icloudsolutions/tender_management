@@ -393,6 +393,10 @@ class Tender(models.Model):
             from datetime import timedelta
             project_start = fields.Date.today()
             
+            # Check available fields on project.task for version compatibility
+            task_model = self.env['project.task']
+            available_task_fields = task_model._fields.keys()
+            
             for line in template.task_line_ids:
                 task_vals = {
                     'name': line.name,
@@ -401,18 +405,29 @@ class Tender(models.Model):
                     'description': line.description,
                     'priority': line.priority,
                     'tag_ids': [(6, 0, line.tag_ids.ids)] if line.tag_ids else False,
-                    'planned_hours': line.planned_hours,
                 }
+                
+                # Add planned_hours field if available (field name may vary by Odoo version)
+                if 'planned_hours' in available_task_fields:
+                    task_vals['planned_hours'] = line.planned_hours
+                elif 'allocated_hours' in available_task_fields:
+                    task_vals['allocated_hours'] = line.planned_hours
                 
                 # Set task deadline based on delay
                 if line.delay_days > 0:
                     task_vals['date_deadline'] = project_start + timedelta(days=line.delay_days)
                 
-                # Set assignee
-                if line.user_id:
-                    task_vals['user_ids'] = [(6, 0, [line.user_id.id])]
-                elif self.user_id:
-                    task_vals['user_ids'] = [(6, 0, [self.user_id.id])]
+                # Set assignee (check if field is user_ids or user_id)
+                if 'user_ids' in available_task_fields:
+                    if line.user_id:
+                        task_vals['user_ids'] = [(6, 0, [line.user_id.id])]
+                    elif self.user_id:
+                        task_vals['user_ids'] = [(6, 0, [self.user_id.id])]
+                elif 'user_id' in available_task_fields:
+                    if line.user_id:
+                        task_vals['user_id'] = line.user_id.id
+                    elif self.user_id:
+                        task_vals['user_id'] = self.user_id.id
                 
                 # Set stage if specified
                 if line.stage_id:
