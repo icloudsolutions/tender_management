@@ -252,6 +252,18 @@
                                 <i class="fa fa-exclamation-triangle"/> No opportunity created yet
                             </div>
                         </group>
+                        
+                        <group string="🎯 Direct Tender Integration" name="tender_info">
+                            <field name="tender_id_ics" 
+                                   string="Linked ICS Tender"
+                                   options="{'no_create': True}"/>
+                            <div invisible="not tender_id_ics" class="alert alert-success mt-2">
+                                <i class="fa fa-check-circle"/> This tender is linked directly to ICS Tender Management
+                            </div>
+                            <div invisible="tender_id_ics" class="alert alert-info mt-2">
+                                <i class="fa fa-lightbulb-o"/> Click "Create Tender Directly" to skip CRM and preserve all data
+                            </div>
+                        </group>
                     </group>
                     
                     <!-- Quick Actions Bar -->
@@ -270,6 +282,13 @@
                                     icon="fa-plus-circle"
                                     invisible="opportunity_id"
                                     title="Create a CRM opportunity from this tender"/>
+                            <button name="action_create_tender_direct" 
+                                    string="🎯 Create Tender Directly" 
+                                    type="object" 
+                                    class="btn btn-info flex-grow-1" 
+                                    icon="fa-rocket"
+                                    invisible="tender_id_ics"
+                                    title="Create ICS Tender directly (skip CRM)"/>
                         </div>
                     </group>
                     
