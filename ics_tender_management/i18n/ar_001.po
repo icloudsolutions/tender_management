@@ -30,80 +30,220 @@ msgstr "اتجاه 6 أشهر"
 #. module: ics_tender_management
 #: model:mail.template,body_html:ics_tender_management.email_template_tender_won
 msgid ""
-msgstr "<div style=\font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5;\>\n                     <div style=\background-color: white; padding: 30px; border-radius: 10px; max-width: 600px; margin: 0 auto; border-top: 5px solid #28a745;\>\n                         <h2 style=\color: #28a745; margin-top: 0;\>🎉 Congratulations! Tender Won!</h2>\n                         <p>Dear ${object.user_id.name},</p>\n                         <p style=\font-size: 18px; color: #28a745; font-weight: bold;\>\n                             Great news! We won the tender!\n                         </p>\n \n                         <div style=\background-color: #d4edda; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 5px solid #28a745;\>\n                             <h3 style=\margin-top: 0; color: #333;\>${object.tender_title}</h3>\n                             <table style=\width: 100%;\>\n                                 <tr>\n                                     <td style=\padding: 5px 0;\><strong>Tender Number:</strong></td>\n                                     <td style=\padding: 5px 0;\>${object.tender_number}</td>\n                                 </tr>\n                                 <tr>\n                                     <td style=\padding: 5px 0;\><strong>Customer:</strong></td>\n                                     <td style=\padding: 5px 0;\>${object.partner_id.name}</td>\n                                 </tr>\n                                 <tr>\n                                     <td style=\padding: 5px 0;\><strong>Quotation Amount:</strong></td>\n                                     <td style=\padding: 5px 0; font-size: 18px; color: #28a745; font-weight: bold;\>\n                                         ${'%.2f' % object.total_quotation_amount} ${object.currency_id.symbol}\n                                     </td>\n                                 </tr>\n                                 % if object.winning_reason:\n                                 <tr>\n                                     <td colspan=\2\ style=\padding: 15px 0;\>\n                                         <strong>Winning Reason:</strong><br/>\n                                         ${object.winning_reason}\n                                     </td>\n                                 </tr>\n                                 % endif\n                             </table>\n                         </div>\n \n                         <p style=\background-color: #cfe2ff; padding: 15px; border-radius: 5px; color: #084298;\>\n                             <strong>Next Steps:</strong> You can now create a project for this tender to start execution.\n                         </p>\n \n                         <p style=\margin-top: 30px;\>\n                             <a href=\%24%7Bobject.get_base_url()%7D/web#id=%24%7Bobject.id%7D&amp;model=ics.tender&amp;view_type=form\ style=\background-color: #28a745; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;\>\n                                 View Tender and Create Project\n                             </a>\n                         </p>\n \n                         <p style=\color: #666; font-size: 12px; margin-top: 30px; border-top: 1px solid #ddd; padding-top: 20px;\>\n                             This is an automated notification from ${object.company_id.name}\n                         </p>\n                     </div>\n                 </div>\n"
+"<div style=\"font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5;\">\n"
+"                    <div style=\"background-color: white; padding: 30px; border-radius: 10px; max-width: 600px; margin: 0 auto; border-top: 5px solid #28a745;\">\n"
+"                        <h2 style=\"color: #28a745; margin-top: 0;\">🎉 Congratulations! Tender Won!</h2>\n"
+"                        <p>Dear ${object.user_id.name},</p>\n"
+"                        <p style=\"font-size: 18px; color: #28a745; font-weight: bold;\">\n"
+"                            Great news! We won the tender!\n"
+"                        </p>\n"
+"\n"
+"                        <div style=\"background-color: #d4edda; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 5px solid #28a745;\">\n"
+"                            <h3 style=\"margin-top: 0; color: #333;\">${object.tender_title}</h3>\n"
+"                            <table style=\"width: 100%;\">\n"
+"                                <tr>\n"
+"                                    <td style=\"padding: 5px 0;\"><strong>Tender Number:</strong></td>\n"
+"                                    <td style=\"padding: 5px 0;\">${object.tender_number}</td>\n"
+"                                </tr>\n"
+"                                <tr>\n"
+"                                    <td style=\"padding: 5px 0;\"><strong>Customer:</strong></td>\n"
+"                                    <td style=\"padding: 5px 0;\">${object.partner_id.name}</td>\n"
+"                                </tr>\n"
+"                                <tr>\n"
+"                                    <td style=\"padding: 5px 0;\"><strong>Quotation Amount:</strong></td>\n"
+"                                    <td style=\"padding: 5px 0; font-size: 18px; color: #28a745; font-weight: bold;\">\n"
+"                                        ${'%.2f' % object.total_quotation_amount} ${object.currency_id.symbol}\n"
+"                                    </td>\n"
+"                                </tr>\n"
+"                                % if object.winning_reason:\n"
+"                                <tr>\n"
+"                                    <td colspan=\"2\" style=\"padding: 15px 0;\">\n"
+"                                        <strong>Winning Reason:</strong><br/>\n"
+"                                        ${object.winning_reason}\n"
+"                                    </td>\n"
+"                                </tr>\n"
+"                                % endif\n"
+"                            </table>\n"
+"                        </div>\n"
+"\n"
+"                        <p style=\"background-color: #cfe2ff; padding: 15px; border-radius: 5px; color: #084298;\">\n"
+"                            <strong>Next Steps:</strong> You can now create a project for this tender to start execution.\n"
+"                        </p>\n"
+"\n"
+"                        <p style=\"margin-top: 30px;\">\n"
+"                            <a href=\"%24%7Bobject.get_base_url()%7D/web#id=%24%7Bobject.id%7D&amp;model=ics.tender&amp;view_type=form\" style=\"background-color: #28a745; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;\">\n"
+"                                View Tender and Create Project\n"
+"                            </a>\n"
+"                        </p>\n"
+"\n"
+"                        <p style=\"color: #666; font-size: 12px; margin-top: 30px; border-top: 1px solid #ddd; padding-top: 20px;\">\n"
+"                            This is an automated notification from ${object.company_id.name}\n"
+"                        </p>\n"
+"                    </div>\n"
+"                </div>\n"
+"            "
+msgstr ""
 
 #. module: ics_tender_management
 #: model:mail.template,body_html:ics_tender_management.email_template_tender_urgent_deadline
 msgid ""
-msgstr "<div style=\font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5;\>\n                     <div style=\background-color: white; padding: 30px; border-radius: 10px; max-width: 600px; margin: 0 auto; border-top: 5px solid #dc3545;\>\n                         <h2 style=\color: #dc3545; margin-top: 0;\>⚠️ URGENT: Tender Deadline Approaching</h2>\n                         <p>Dear ${object.user_id.name},</p>\n                         <p style=\font-size: 16px; color: #dc3545; font-weight: bold;\>\n                             This tender has only ${object.days_to_deadline} days remaining until the submission deadline!\n                         </p>\n \n                         <div style=\background-color: #fff3cd; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 5px solid #ffc107;\>\n                             <h3 style=\margin-top: 0; color: #333;\>${object.tender_title}</h3>\n                             <table style=\width: 100%;\>\n                                 <tr>\n                                     <td style=\padding: 5px 0;\><strong>Tender Number:</strong></td>\n                                     <td style=\padding: 5px 0;\>${object.tender_number}</td>\n                                 </tr>\n                                 <tr>\n                                     <td style=\padding: 5px 0;\><strong>Current Status:</strong></td>\n                                     <td style=\padding: 5px 0;\>${dict(object._fields['state'].selection).get(object.state)}</td>\n                                 </tr>\n                                 <tr>\n                                     <td style=\padding: 5px 0;\><strong>Deadline:</strong></td>\n                                     <td style=\padding: 5px 0; color: #dc3545; font-weight: bold; font-size: 16px;\>\n                                         ${format_datetime(object.submission_deadline, dt_format='MMM dd, yyyy HH:mm')}\n                                     </td>\n                                 </tr>\n                             </table>\n                         </div>\n \n                         <p style=\background-color: #f8d7da; padding: 15px; border-radius: 5px; color: #721c24;\>\n                             <strong>Action Required:</strong> Please review and complete all pending tasks for this tender immediately.\n                         </p>\n \n                         <p style=\margin-top: 30px;\>\n                             <a href=\%24%7Bobject.get_base_url()%7D/web#id=%24%7Bobject.id%7D&amp;model=ics.tender&amp;view_type=form\ style=\background-color: #dc3545; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;\>\n                                 Review Tender Now\n                             </a>\n                         </p>\n \n                         <p style=\color: #666; font-size: 12px; margin-top: 30px; border-top: 1px solid #ddd; padding-top: 20px;\>\n                             This is an automated notification from ${object.company_id.name}\n                         </p>\n                     </div>\n                 </div>\n"
+"<div style=\"font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5;\">\n"
+"                    <div style=\"background-color: white; padding: 30px; border-radius: 10px; max-width: 600px; margin: 0 auto; border-top: 5px solid #dc3545;\">\n"
+"                        <h2 style=\"color: #dc3545; margin-top: 0;\">⚠️ URGENT: Tender Deadline Approaching</h2>\n"
+"                        <p>Dear ${object.user_id.name},</p>\n"
+"                        <p style=\"font-size: 16px; color: #dc3545; font-weight: bold;\">\n"
+"                            This tender has only ${object.days_to_deadline} days remaining until the submission deadline!\n"
+"                        </p>\n"
+"\n"
+"                        <div style=\"background-color: #fff3cd; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 5px solid #ffc107;\">\n"
+"                            <h3 style=\"margin-top: 0; color: #333;\">${object.tender_title}</h3>\n"
+"                            <table style=\"width: 100%;\">\n"
+"                                <tr>\n"
+"                                    <td style=\"padding: 5px 0;\"><strong>Tender Number:</strong></td>\n"
+"                                    <td style=\"padding: 5px 0;\">${object.tender_number}</td>\n"
+"                                </tr>\n"
+"                                <tr>\n"
+"                                    <td style=\"padding: 5px 0;\"><strong>Current Status:</strong></td>\n"
+"                                    <td style=\"padding: 5px 0;\">${dict(object._fields['state'].selection).get(object.state)}</td>\n"
+"                                </tr>\n"
+"                                <tr>\n"
+"                                    <td style=\"padding: 5px 0;\"><strong>Deadline:</strong></td>\n"
+"                                    <td style=\"padding: 5px 0; color: #dc3545; font-weight: bold; font-size: 16px;\">\n"
+"                                        ${format_datetime(object.submission_deadline, dt_format='MMM dd, yyyy HH:mm')}\n"
+"                                    </td>\n"
+"                                </tr>\n"
+"                            </table>\n"
+"                        </div>\n"
+"\n"
+"                        <p style=\"background-color: #f8d7da; padding: 15px; border-radius: 5px; color: #721c24;\">\n"
+"                            <strong>Action Required:</strong> Please review and complete all pending tasks for this tender immediately.\n"
+"                        </p>\n"
+"\n"
+"                        <p style=\"margin-top: 30px;\">\n"
+"                            <a href=\"%24%7Bobject.get_base_url()%7D/web#id=%24%7Bobject.id%7D&amp;model=ics.tender&amp;view_type=form\" style=\"background-color: #dc3545; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;\">\n"
+"                                Review Tender Now\n"
+"                            </a>\n"
+"                        </p>\n"
+"\n"
+"                        <p style=\"color: #666; font-size: 12px; margin-top: 30px; border-top: 1px solid #ddd; padding-top: 20px;\">\n"
+"                            This is an automated notification from ${object.company_id.name}\n"
+"                        </p>\n"
+"                    </div>\n"
+"                </div>\n"
+"            "
+msgstr ""
 
 #. module: ics_tender_management
 #: model:mail.template,body_html:ics_tender_management.email_template_tender_created
 msgid ""
-msgstr "<div style=\font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5;\>\n                     <div style=\background-color: white; padding: 30px; border-radius: 10px; max-width: 600px; margin: 0 auto;\>\n                         <h2 style=\color: #667eea; margin-top: 0;\>New Tender Created</h2>\n                         <p>Dear ${object.user_id.name},</p>\n                         <p>A new tender has been created and assigned to you:</p>\n \n                         <div style=\background-color: #f8f9fa; padding: 20px; border-radius: 5px; margin: 20px 0;\>\n                             <h3 style=\margin-top: 0; color: #333;\>${object.tender_title}</h3>\n                             <table style=\width: 100%;\>\n                                 <tr>\n                                     <td style=\padding: 5px 0;\><strong>Tender Number:</strong></td>\n                                     <td style=\padding: 5px 0;\>${object.tender_number}</td>\n                                 </tr>\n                                 <tr>\n                                     <td style=\padding: 5px 0;\><strong>Customer:</strong></td>\n                                     <td style=\padding: 5px 0;\>${object.partner_id.name}</td>\n                                 </tr>\n                                 <tr>\n                                     <td style=\padding: 5px 0;\><strong>Category:</strong></td>\n                                     <td style=\padding: 5px 0;\>${dict(object._fields['tender_category'].selection).get(object.tender_category)}</td>\n                                 </tr>\n                                 <tr>\n                                     <td style=\padding: 5px 0;\><strong>Submission Deadline:</strong></td>\n                                     <td style=\padding: 5px 0; color: #dc3545; font-weight: bold;\>${format_datetime(object.submission_deadline, dt_format='MMM dd, yyyy HH:mm')}</td>\n                                 </tr>\n                                 <tr>\n                                     <td style=\padding: 5px 0;\><strong>Days Remaining:</strong></td>\n                                     <td style=\padding: 5px 0;\>${object.days_to_deadline} days</td>\n                                 </tr>\n                             </table>\n                         </div>\n \n                         <p style=\margin-top: 30px;\>\n                             <a href=\%24%7Bobject.get_base_url()%7D/web#id=%24%7Bobject.id%7D&amp;model=ics.tender&amp;view_type=form\ style=\background-color: #667eea; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;\>\n                                 View Tender\n                             </a>\n                         </p>\n \n                         <p style=\color: #666; font-size: 12px; margin-top: 30px; border-top: 1px solid #ddd; padding-top: 20px;\>\n                             This is an automated notification from ${object.company_id.name}\n                         </p>\n                     </div>\n                 </div>\n"
+"<div style=\"font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5;\">\n"
+"                    <div style=\"background-color: white; padding: 30px; border-radius: 10px; max-width: 600px; margin: 0 auto;\">\n"
+"                        <h2 style=\"color: #667eea; margin-top: 0;\">New Tender Created</h2>\n"
+"                        <p>Dear ${object.user_id.name},</p>\n"
+"                        <p>A new tender has been created and assigned to you:</p>\n"
+"\n"
+"                        <div style=\"background-color: #f8f9fa; padding: 20px; border-radius: 5px; margin: 20px 0;\">\n"
+"                            <h3 style=\"margin-top: 0; color: #333;\">${object.tender_title}</h3>\n"
+"                            <table style=\"width: 100%;\">\n"
+"                                <tr>\n"
+"                                    <td style=\"padding: 5px 0;\"><strong>Tender Number:</strong></td>\n"
+"                                    <td style=\"padding: 5px 0;\">${object.tender_number}</td>\n"
+"                                </tr>\n"
+"                                <tr>\n"
+"                                    <td style=\"padding: 5px 0;\"><strong>Customer:</strong></td>\n"
+"                                    <td style=\"padding: 5px 0;\">${object.partner_id.name}</td>\n"
+"                                </tr>\n"
+"                                <tr>\n"
+"                                    <td style=\"padding: 5px 0;\"><strong>Category:</strong></td>\n"
+"                                    <td style=\"padding: 5px 0;\">${dict(object._fields['tender_category'].selection).get(object.tender_category)}</td>\n"
+"                                </tr>\n"
+"                                <tr>\n"
+"                                    <td style=\"padding: 5px 0;\"><strong>Submission Deadline:</strong></td>\n"
+"                                    <td style=\"padding: 5px 0; color: #dc3545; font-weight: bold;\">${format_datetime(object.submission_deadline, dt_format='MMM dd, yyyy HH:mm')}</td>\n"
+"                                </tr>\n"
+"                                <tr>\n"
+"                                    <td style=\"padding: 5px 0;\"><strong>Days Remaining:</strong></td>\n"
+"                                    <td style=\"padding: 5px 0;\">${object.days_to_deadline} days</td>\n"
+"                                </tr>\n"
+"                            </table>\n"
+"                        </div>\n"
+"\n"
+"                        <p style=\"margin-top: 30px;\">\n"
+"                            <a href=\"%24%7Bobject.get_base_url()%7D/web#id=%24%7Bobject.id%7D&amp;model=ics.tender&amp;view_type=form\" style=\"background-color: #667eea; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;\">\n"
+"                                View Tender\n"
+"                            </a>\n"
+"                        </p>\n"
+"\n"
+"                        <p style=\"color: #666; font-size: 12px; margin-top: 30px; border-top: 1px solid #ddd; padding-top: 20px;\">\n"
+"                            This is an automated notification from ${object.company_id.name}\n"
+"                        </p>\n"
+"                    </div>\n"
+"                </div>\n"
+"            "
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_kanban
 msgid "<span class=\"badge badge-danger ms-2\">Urgent!</span>"
-msgstr "<span class=\badge badge-danger ms-2\>Urgent!</span>"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_purchase_requisition_form_inherit_tender
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_sale_order_form_inherit_tender
 msgid "<span class=\"o_stat_text\">View Tender</span>"
-msgstr "<span class=\o_stat_text\>View Tender</span>"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.report_tender_boq_document
 msgid "<span> - </span>"
-msgstr "<span> - </span>"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_generate_quotation_wizard_form
 msgid "<span>%</span>"
-msgstr "<span>%</span>"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.report_tender_boq_document
 msgid "<span>Bill of Quantities</span>"
-msgstr "<span>جدول الكميات</span>"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.report_tender_boq_document
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.report_tender_document
 msgid "<span>Tender: </span>"
-msgstr "<span>المنافسة: </span>"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.report_tender_document
 msgid "<strong>Category:</strong>"
-msgstr "<strong>الفئة:</strong>"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.report_tender_boq_document
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.report_tender_document
 msgid "<strong>Customer:</strong>"
-msgstr "<strong>العميل:</strong>"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.report_tender_boq_document
 msgid "<strong>Date:</strong>"
-msgstr "<strong>التاريخ:</strong>"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.report_tender_document
 msgid "<strong>Description:</strong>"
-msgstr "<strong>الوصف:</strong>"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_import_boq_wizard_form
 msgid "<strong>Description</strong> - Product description (required)"
-msgstr "<strong>الوصف</strong> - وصف المنتج (مطلوب)"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_import_boq_wizard_form
 msgid "<strong>Estimated Cost</strong> - Total estimated cost (numeric)"
-msgstr "<strong>التكلفة المقدرة</strong> - إجمالي التكلفة المقدرة (رقمي)"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_generate_quotation_wizard_form
@@ -116,12 +256,16 @@ msgstr "<strong>إنشاء عرض سعر:</strong> يقوم هذا المعال�
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_import_boq_wizard_form
 msgid ""
-msgstr "<strong>Note:</strong> The first row should contain column headers.\n                                 If a product code is provided and exists in the system, it will be linked automatically."
+"<strong>Note:</strong> The first row should contain column headers.\n"
+"                                If a product code is provided and exists in the system, it will be linked automatically."
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_import_boq_wizard_form
 msgid ""
-msgstr "<strong>Product Code</strong> - Product internal reference or barcode  (optional)"
+"<strong>Product Code</strong> - Product internal reference or barcode "
+"(optional)"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_vendor_comparison_wizard_form
@@ -134,7 +278,7 @@ msgstr "<strong>وضع المنتج:</strong> يمكنك اختيار موردي
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_import_boq_wizard_form
 msgid "<strong>Quantity</strong> - Quantity (required, numeric)"
-msgstr "<strong>الكمية</strong> - الكمية (مطلوب، رقمي)"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_vendor_comparison_wizard_form
@@ -157,7 +301,9 @@ msgstr "<strong>آخر موعد للتقديم:</strong>"
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_import_boq_wizard_form
 msgid ""
-msgstr "<strong>Technical Specifications</strong> - Detailed specifications  (optional)"
+"<strong>Technical Specifications</strong> - Detailed specifications "
+"(optional)"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.report_tender_document
@@ -182,17 +328,17 @@ msgstr "<strong>إجمالي قيمة عرض السعر:</strong>"
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.report_tender_document
 msgid "<strong>Total Vendor Cost:</strong>"
-msgstr "<strong>إجمالي تكلفة المورد:</strong>"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.report_tender_boq_document
 msgid "<strong>Total:</strong>"
-msgstr "<strong>الإجمالي:</strong>"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_import_boq_wizard_form
 msgid "<strong>UoM</strong> - Unit of Measure (e.g., Unit, KG, Meter)"
-msgstr "<strong>وحدة القياس</strong> - (مثل: وحدة، كجم، متر)"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-javascript
@@ -203,7 +349,7 @@ msgstr "العروض المقبولة"
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__message_needaction
 msgid "Action Needed"
-msgstr "إجراء مطلوب"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__active
@@ -226,104 +372,104 @@ msgstr "المنافسات النشطة"
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__activity_ids
 msgid "Activities"
-msgstr "الأنشطة"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__activity_exception_decoration
 msgid "Activity Exception Decoration"
-msgstr "تزيين استثناء النشاط"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__activity_state
 msgid "Activity State"
-msgstr "حالة النشاط"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__activity_type_icon
 msgid "Activity Type Icon"
-msgstr "أيقونة نوع النشاط"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__actual_revenue
 msgid "Actual Revenue"
-msgstr "الإيرادات الفعلية"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_boq_line_form
 msgid "Additional notes..."
-msgstr "ملاحظات إضافية..."
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.ui.menu,name:ics_tender_management.menu_tender_all
 msgid "All Tenders"
-msgstr "جميع المنافسات"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__announcement_date
 msgid "Announcement Date"
-msgstr "تاريخ الإعلان"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields.selection,name:ics_tender_management.selection__ics_tender_import_boq_wizard__import_option__append
 msgid "Append to Existing Lines"
-msgstr "إضافة إلى البنود الموجودة"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_vendor_comparison_wizard_form
 msgid "Apply Best Vendors per Product"
-msgstr "تطبيق أفضل مورد لكل منتج"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_vendor_comparison_wizard_form
 msgid "Apply Selected Vendor"
-msgstr "تطبيق المورد المحدد"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_search
 msgid "Archived"
-msgstr "مؤرشف"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__message_attachment_count
 msgid "Attachment Count"
-msgstr "عدد المرفقات"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
 #: code:addons/ics_tender_management/models/tender.py:0
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__attachment_count
 msgid "Attachments"
-msgstr "المرفقات"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_vendor_comparison_wizard_form
 msgid "Auto-Select Best"
-msgstr "تحديد تلقائي للأفضل"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_vendor_comparison_wizard_form
 msgid "Automatically select the vendor with the lowest total price"
-msgstr "تحديد المورد صاحب أقل سعر إجمالي تلقائياً"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_vendor_comparison_wizard__available_vendor_ids
 msgid "Available Vendors"
-msgstr "الموردون المتاحون"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_vendor_comparison_line__available_vendor_ids
 msgid "Available Vendors for this product"
-msgstr "الموردون المتاحون لهذا المنتج"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_vendor_comparison_line__best_offer_total
 msgid "Best Total Price"
-msgstr "أفضل سعر إجمالي"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_vendor_comparison_line__best_offer_unit_price
 msgid "Best Unit Price"
-msgstr "أفضل سعر للوحدة"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_vendor_comparison_line__best_vendor_id
@@ -334,12 +480,13 @@ msgstr "أفضل مورد"
 #. odoo-python
 #: code:addons/ics_tender_management/wizard/vendor_comparison_wizard.py:0
 msgid "Best Vendor Selected"
-msgstr "تم اختيار أفضل مورد"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,help:ics_tender_management.field_ics_tender_vendor_comparison_line__best_vendor_id
 msgid ""
-msgstr "أفضل مورد بناءً على أقل سعر. يمكنك تغيير هذا الاختيار يدوياً."
+"Best vendor based on lowest price. You can change this selection manually."
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
@@ -352,7 +499,7 @@ msgstr "جدول الكميات"
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__boq_line_ids
 msgid "Bill of Quantities Lines"
-msgstr "بنود جدول الكميات"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_vendor_comparison_line__boq_line_id
@@ -370,7 +517,7 @@ msgstr "بنود جدول الكميات"
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__lead_id
 msgid "CRM Lead/Opportunity"
-msgstr "فرصة/عميل محتمل"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_create_project_wizard_form
@@ -379,7 +526,7 @@ msgstr "فرصة/عميل محتمل"
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_import_boq_wizard_form
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_vendor_comparison_wizard_form
 msgid "Cancel"
-msgstr "إلغاء"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ics.tender.stage,name:ics_tender_management.stage_cancelled
@@ -396,12 +543,12 @@ msgstr "الفئة"
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_vendor_comparison_wizard_form
 msgid "Choose a vendor..."
-msgstr "اختر مورداً..."
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__color
 msgid "Color Index"
-msgstr "فهرس الألوان"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__company_id
@@ -423,12 +570,12 @@ msgstr "مقارنة الموردين"
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_vendor_comparison_wizard__line_ids
 msgid "Comparison Lines"
-msgstr "بنود المقارنة"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.ui.menu,name:ics_tender_management.menu_tender_config
 msgid "Configuration"
-msgstr "الإعدادات"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields.selection,name:ics_tender_management.selection__ics_tender__tender_category__construction
@@ -438,12 +585,12 @@ msgstr "إنشاءات"
 #. module: ics_tender_management
 #: model:ir.model.fields.selection,name:ics_tender_management.selection__ics_tender__tender_category__consulting
 msgid "Consulting"
-msgstr "Consulting"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_quotation_line_preview__cost
 msgid "Cost"
-msgstr "Cost"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
@@ -456,37 +603,37 @@ msgstr "إنشاء مشروع"
 #. module: ics_tender_management
 #: model:ir.model,name:ics_tender_management.model_ics_tender_project_wizard
 msgid "Create Project from Tender"
-msgstr "Create Project from Tender"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_form
 msgid "Create Purchase Order(s)"
-msgstr "Create Purchase Order(s)"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_form
 msgid "Create RFQ (Purchase Agreement)"
-msgstr "Create RFQ (Purchase Agreement)"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_project_wizard__create_from_boq
 msgid "Create Tasks from BoQ"
-msgstr "Create Tasks from BoQ"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_crm_lead_form_inherit_tender
 msgid "Create Tender"
-msgstr "Create Tender"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,help:ics_tender_management.field_ics_tender_project_wizard__create_from_boq
 msgid "Create project tasks from tender BoQ lines"
-msgstr "Create project tasks from tender BoQ lines"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.actions.act_window,help:ics_tender_management.action_tender
 msgid "Create your first Tender"
-msgstr "Create your first Tender"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__create_uid
@@ -502,7 +649,7 @@ msgstr "Create your first Tender"
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_vendor_comparison_wizard__create_uid
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_vendor_offer__create_uid
 msgid "Created by"
-msgstr "أنشئ بواسطة"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__create_date
@@ -518,7 +665,7 @@ msgstr "أنشئ بواسطة"
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_vendor_comparison_wizard__create_date
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_vendor_offer__create_date
 msgid "Created on"
-msgstr "أنشئ في"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__currency_id
@@ -548,17 +695,17 @@ msgstr "لوحة التحكم"
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__days_to_deadline
 msgid "Days to Deadline"
-msgstr "Days to Deadline"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_kanban
 msgid "Delete"
-msgstr "Delete"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_vendor_offer__delivery_lead_time
 msgid "Delivery Lead Time (Days)"
-msgstr "Delivery Lead Time (Days)"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__description
@@ -583,17 +730,17 @@ msgstr "الوصف"
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_vendor_comparison_wizard__display_name
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_vendor_offer__display_name
 msgid "Display Name"
-msgstr "اسم العرض"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_form
 msgid "Documents"
-msgstr "Documents"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.actions.act_url,name:ics_tender_management.action_download_boq_template
 msgid "Download BoQ Template"
-msgstr "تحميل نموذج جدول الكميات"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_import_boq_wizard_form
@@ -616,28 +763,28 @@ msgstr "المنافسات المسودة"
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_kanban
 msgid "Dropdown menu"
-msgstr "Dropdown menu"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_kanban
 msgid "Edit"
-msgstr "Edit"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_generate_quotation_wizard_form
 msgid "Enter terms and conditions..."
-msgstr "Enter terms and conditions..."
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,help:ics_tender_management.field_ics_tender_stage__requirements
 msgid "Enter the requirements needed to move to this stage"
-msgstr "Enter the requirements needed to move to this stage"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
 #: code:addons/ics_tender_management/wizard/import_boq_wizard.py:0
 msgid "Error importing file: %s"
-msgstr "Error importing file: %s"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_boq_line__estimated_cost
@@ -649,7 +796,7 @@ msgstr "التكلفة التقديرية"
 #: model:ir.model.fields,field_description:ics_tender_management.field_crm_lead__etimad_tender_id
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__etimad_tender_id
 msgid "Etimad Tender"
-msgstr "Etimad Tender"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-javascript
@@ -660,44 +807,44 @@ msgstr "منافسات اعتماد"
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_import_boq_wizard__file
 msgid "Excel File"
-msgstr "ملف Excel"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_import_boq_wizard_form
 msgid "Excel File Format"
-msgstr "Excel File Format"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
 #: code:addons/ics_tender_management/wizard/import_boq_wizard.py:0
 msgid "Excel file must contain headers and at least one data row"
-msgstr "Excel file must contain headers and at least one data row"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__expected_revenue
 msgid "Expected Revenue"
-msgstr "Expected Revenue"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model,name:ics_tender_management.model_ics_tender_export_boq_wizard
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_export_boq_wizard_form
 msgid "Export BoQ to Excel"
-msgstr "Export BoQ to Excel"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_export_boq_wizard_form
 msgid "Export Options"
-msgstr "Export Options"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_export_boq_wizard_form
 msgid "Export to Excel"
-msgstr "تصدير إلى Excel"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_import_boq_wizard__filename
 msgid "Filename"
-msgstr "Filename"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ics.tender.stage,name:ics_tender_management.stage_financial
@@ -716,27 +863,27 @@ msgstr "الملخص المالي"
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_stage__fold
 msgid "Folded in Kanban"
-msgstr "Folded in Kanban"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__message_follower_ids
 msgid "Followers"
-msgstr "المتابعون"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__message_partner_ids
 msgid "Followers (Partners)"
-msgstr "المتابعون (الشركاء)"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,help:ics_tender_management.field_ics_tender__activity_type_icon
 msgid "Font awesome icon e.g. fa-tasks"
-msgstr "Font awesome icon e.g. fa-tasks"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,help:ics_tender_management.field_ics_tender_vendor_comparison_wizard__single_vendor_id
 msgid "For Single Vendor mode: This vendor will be applied to all products"
-msgstr "For Single Vendor mode: This vendor will be applied to all products"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
@@ -759,27 +906,27 @@ msgstr "إنشاء عرض سعر المبيعات"
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_search
 msgid "Group By"
-msgstr "تجميع حسب"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__has_message
 msgid "Has Message"
-msgstr "يحتوي على رسالة"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields.selection,name:ics_tender_management.selection__ics_tender__priority__2
 msgid "High"
-msgstr "High"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_search
 msgid "High Priority"
-msgstr "High Priority"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model,name:ics_tender_management.model_ics_tender_dashboard
 msgid "ICS Tender Dashboard"
-msgstr "ICS Tender Dashboard"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__id
@@ -795,107 +942,112 @@ msgstr "ICS Tender Dashboard"
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_vendor_comparison_wizard__id
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_vendor_offer__id
 msgid "ID"
-msgstr "المعرف"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__activity_exception_icon
 msgid "Icon"
-msgstr "Icon"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,help:ics_tender_management.field_ics_tender__activity_exception_icon
 msgid "Icon to indicate an exception activity."
-msgstr "Icon to indicate an exception activity."
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,help:ics_tender_management.field_ics_tender__message_needaction
 msgid "If checked, new messages require your attention."
-msgstr "If checked, new messages require your attention."
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,help:ics_tender_management.field_ics_tender__message_has_error
 #: model:ir.model.fields,help:ics_tender_management.field_ics_tender__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
-msgstr "If checked, some messages have a delivery error."
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,help:ics_tender_management.field_ics_tender_quotation_wizard__use_vendor_costs
 msgid ""
-msgstr "If checked, uses selected vendor prices. Otherwise uses estimated costs."
+"If checked, uses selected vendor prices. Otherwise uses estimated costs."
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_import_boq_wizard_form
 msgid "Import"
-msgstr "استيراد"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model,name:ics_tender_management.model_ics_tender_import_boq_wizard
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_import_boq_wizard_form
 msgid "Import BoQ from Excel"
-msgstr "Import BoQ from Excel"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_import_boq_wizard__import_option
 msgid "Import Option"
-msgstr "خيار الاستيراد"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
 #: code:addons/ics_tender_management/wizard/import_boq_wizard.py:0
 msgid ""
-msgstr "Import completed with errors:\n Imported: %s lines\n Errors:\n %s"
+"Import completed with errors:\n"
+"Imported: %s lines\n"
+"Errors:\n"
+"%s"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_export_boq_wizard__include_specifications
 msgid "Include Technical Specifications"
-msgstr "Include Technical Specifications"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_export_boq_wizard__include_vendor_offers
 msgid "Include Vendor Offers"
-msgstr "Include Vendor Offers"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,help:ics_tender_management.field_ics_tender_export_boq_wizard__include_vendor_offers
 msgid "Include vendor offers in separate columns"
-msgstr "Include vendor offers in separate columns"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__notes
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_form
 msgid "Internal Notes"
-msgstr "Internal Notes"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_form
 msgid "Internal notes and comments..."
-msgstr "Internal notes and comments..."
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
 #: code:addons/ics_tender_management/wizard/import_boq_wizard.py:0
 msgid "Invalid Excel file. Please upload a valid .xls or .xlsx file"
-msgstr "Invalid Excel file. Please upload a valid .xls or .xlsx file"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__message_is_follower
 msgid "Is Follower"
-msgstr "متابع"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_stage__is_lost
 msgid "Is Lost Stage"
-msgstr "Is Lost Stage"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_stage__is_won
 msgid "Is Won Stage"
-msgstr "Is Won Stage"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.report_tender_boq_document
 msgid "Item"
-msgstr "Item"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__write_uid
@@ -911,7 +1063,7 @@ msgstr "Item"
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_vendor_comparison_wizard__write_uid
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_vendor_offer__write_uid
 msgid "Last Updated by"
-msgstr "آخر تحديث بواسطة"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__write_date
@@ -927,7 +1079,7 @@ msgstr "آخر تحديث بواسطة"
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_vendor_comparison_wizard__write_date
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_vendor_offer__write_date
 msgid "Last Updated on"
-msgstr "آخر تحديث في"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model,name:ics_tender_management.model_crm_lead
@@ -937,23 +1089,23 @@ msgstr "عميل مهتم/فرصة "
 #. module: ics_tender_management
 #: model:ir.model.fields,help:ics_tender_management.field_ics_tender_project_wizard__create_from_sale_order
 msgid "Link project to sales order if available"
-msgstr "Link project to sales order if available"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_project_wizard__create_from_sale_order
 msgid "Link to Sales Order"
-msgstr "Link to Sales Order"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,help:ics_tender_management.field_ics_tender__etimad_tender_id
 msgid "Link to the scraped tender from Etimad portal"
-msgstr "Link to the scraped tender from Etimad portal"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-javascript
 #: code:addons/ics_tender_management/static/src/xml/tender_dashboard.xml:0
 msgid "Loading Dashboard..."
-msgstr "Loading Dashboard..."
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ics.tender.stage,name:ics_tender_management.stage_lost
@@ -968,17 +1120,17 @@ msgstr "خاسر"
 #: code:addons/ics_tender_management/models/tender.py:0
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__lost_reason
 msgid "Lost Reason"
-msgstr "Lost Reason"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields.selection,name:ics_tender_management.selection__ics_tender__priority__0
 msgid "Low"
-msgstr "Low"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields.selection,name:ics_tender_management.selection__ics_tender__tender_category__maintenance
 msgid "Maintenance & Operation"
-msgstr "Maintenance & Operation"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-javascript
@@ -989,17 +1141,17 @@ msgstr "مشاريع الصيانة والتشغيل"
 #. module: ics_tender_management
 #: model:ir.module.category,description:ics_tender_management.module_category_tender_management
 msgid "Manage tender processes and workflows"
-msgstr "Manage tender processes and workflows"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:res.groups,name:ics_tender_management.group_tender_manager
 msgid "Manager"
-msgstr "Manager"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_quotation_line_preview__margin
 msgid "Margin"
-msgstr "الهامش"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__margin_percentage
@@ -1011,43 +1163,43 @@ msgstr "هامش الربح %"
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.report_tender_document
 msgid "Margin ("
-msgstr "Margin ("
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__margin_amount
 msgid "Margin Amount"
-msgstr "Margin Amount"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
 #: code:addons/ics_tender_management/wizard/generate_quotation_wizard.py:0
 msgid "Margin percentage cannot be negative."
-msgstr "Margin percentage cannot be negative."
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_form
 msgid "Mark as Lost"
-msgstr "Mark as Lost"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_form
 msgid "Mark as Won"
-msgstr "Mark as Won"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__message_has_error
 msgid "Message Delivery error"
-msgstr "Message Delivery error"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__message_ids
 msgid "Messages"
-msgstr "الرسائل"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__my_activity_date_deadline
 msgid "My Activity Deadline"
-msgstr "My Activity Deadline"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.actions.act_window,name:ics_tender_management.action_tender_my
@@ -1060,73 +1212,78 @@ msgstr "منافساتي"
 #. odoo-python
 #: code:addons/ics_tender_management/models/tender.py:0
 msgid "New"
-msgstr "جديد"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:mail.template,subject:ics_tender_management.email_template_tender_created
 msgid "New Tender Created: ${object.name}"
-msgstr "New Tender Created: ${object.name}"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-javascript
 #: code:addons/ics_tender_management/static/src/xml/tender_dashboard.xml:0
 msgid "New | جديد"
-msgstr "New | جديد"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__activity_calendar_event_id
 msgid "Next Activity Calendar Event"
-msgstr "Next Activity Calendar Event"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__activity_date_deadline
 msgid "Next Activity Deadline"
-msgstr "الموعد النهائي للنشاط التالي"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__activity_summary
 msgid "Next Activity Summary"
-msgstr "ملخص النشاط التالي"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__activity_type_id
 msgid "Next Activity Type"
-msgstr "نوع النشاط التالي"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
 #: code:addons/ics_tender_management/wizard/generate_quotation_wizard.py:0
 msgid "No BoQ lines found in the tender."
-msgstr "No BoQ lines found in the tender."
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
 #: code:addons/ics_tender_management/wizard/vendor_comparison_wizard.py:0
 msgid "No BoQ lines found in this tender. Please add products first."
-msgstr "No BoQ lines found in this tender. Please add products first."
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
 #: code:addons/ics_tender_management/wizard/vendor_comparison_wizard.py:0
 msgid "No BoQ lines found."
-msgstr "No BoQ lines found."
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
 #: code:addons/ics_tender_management/wizard/vendor_comparison_wizard.py:0
 msgid ""
-msgstr "No common vendor found with offers for all products.\n Please ensure at least one vendor has submitted offers for all items."
+"No common vendor found with offers for all products.\n"
+"Please ensure at least one vendor has submitted offers for all items."
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
 #: code:addons/ics_tender_management/wizard/vendor_comparison_wizard.py:0
 msgid ""
-msgstr "No vendor offers found!\n \n Please ensure vendors have submitted their offers before comparing."
+"No vendor offers found!\n"
+"\n"
+"Please ensure vendors have submitted their offers before comparing."
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields.selection,name:ics_tender_management.selection__ics_tender__priority__1
 msgid "Normal"
-msgstr "Normal"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_boq_line__notes
@@ -1138,44 +1295,44 @@ msgstr "ملاحظات"
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__message_needaction_counter
 msgid "Number of Actions"
-msgstr "Number of Actions"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_boq_line__offer_count
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_vendor_comparison_line__offer_count
 msgid "Number of Offers"
-msgstr "Number of Offers"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__message_has_error_counter
 msgid "Number of errors"
-msgstr "Number of errors"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,help:ics_tender_management.field_ics_tender__message_needaction_counter
 msgid "Number of messages requiring action"
-msgstr "Number of messages requiring action"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,help:ics_tender_management.field_ics_tender__message_has_error_counter
 msgid "Number of messages with delivery error"
-msgstr "Number of messages with delivery error"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_boq_line_tree
 msgid "Offers"
-msgstr "Offers"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,help:ics_tender_management.field_ics_tender__tender_number
 msgid "Official tender number from Etimad or customer"
-msgstr "Official tender number from Etimad or customer"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
 #: code:addons/ics_tender_management/wizard/create_project_wizard.py:0
 msgid "Only won tenders can be converted to projects."
-msgstr "Only won tenders can be converted to projects."
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__opening_date
@@ -1203,65 +1360,65 @@ msgstr "العروض قيد الانتظار"
 #. odoo-python
 #: code:addons/ics_tender_management/models/tender.py:0
 msgid "Please add BoQ lines before creating a purchase agreement."
-msgstr "Please add BoQ lines before creating a purchase agreement."
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
 #: code:addons/ics_tender_management/models/tender.py:0
 msgid "Please add BoQ lines before preparing quotation."
-msgstr "Please add BoQ lines before preparing quotation."
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
 #: code:addons/ics_tender_management/models/tender.py:0
 msgid "Please add BoQ lines before starting financial study."
-msgstr "Please add BoQ lines before starting financial study."
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
 #: code:addons/ics_tender_management/models/tender.py:0
 msgid "Please generate a quotation before submitting the tender."
-msgstr "Please generate a quotation before submitting the tender."
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
 #: code:addons/ics_tender_management/wizard/vendor_comparison_wizard.py:0
 msgid "Please select a vendor for Single Vendor mode."
-msgstr "Please select a vendor for Single Vendor mode."
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
 #: code:addons/ics_tender_management/models/tender.py:0
 msgid "Please select a vendor for the products."
-msgstr "Please select a vendor for the products."
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
 #: code:addons/ics_tender_management/models/tender.py:0
 msgid "Please select vendors for at least one product."
-msgstr "Please select vendors for at least one product."
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
 #: code:addons/ics_tender_management/wizard/generate_quotation_wizard.py:0
 msgid "Please set a customer on the tender before generating quotation."
-msgstr "Please set a customer on the tender before generating quotation."
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
 #: code:addons/ics_tender_management/wizard/import_boq_wizard.py:0
 msgid "Please upload an Excel file"
-msgstr "Please upload an Excel file"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_form
 msgid "Prepare Quotation"
-msgstr "Prepare Quotation"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_quotation_wizard__line_preview_ids
 msgid "Preview Lines"
-msgstr "Preview Lines"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_quotation_wizard__pricelist_id
@@ -1271,7 +1428,7 @@ msgstr "قائمة الأسعار"
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__priority
 msgid "Priority"
-msgstr "الأولوية"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_boq_line__product_id
@@ -1283,12 +1440,12 @@ msgstr "المنتج"
 #. module: ics_tender_management
 #: model:ir.model.fields.selection,name:ics_tender_management.selection__ics_tender__tender_type__product_wise
 msgid "Product-wise Vendor Selection"
-msgstr "Product-wise Vendor Selection"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_generate_quotation_wizard_form
 msgid "Profit margin to add on top of costs (e.g., enter 20 for 20% margin)"
-msgstr "Profit margin to add on top of costs (e.g., enter 20 for 20% margin)"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
@@ -1300,17 +1457,17 @@ msgstr "المشروع"
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_create_project_wizard_form
 msgid "Project Configuration"
-msgstr "Project Configuration"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_project_wizard__user_id
 msgid "Project Manager"
-msgstr "Project Manager"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_project_wizard__name
 msgid "Project Name"
-msgstr "اسم المشروع"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
@@ -1319,43 +1476,43 @@ msgstr "اسم المشروع"
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__project_ids
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_form
 msgid "Projects"
-msgstr "المشاريع"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
 #: code:addons/ics_tender_management/models/tender.py:0
 msgid "Purchase Agreement"
-msgstr "اتفاقية الشراء"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
 #: code:addons/ics_tender_management/models/tender.py:0
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__requisition_count
 msgid "Purchase Agreements"
-msgstr "اتفاقيات الشراء"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__requisition_ids
 msgid "Purchase Agreements (RFQs)"
-msgstr "Purchase Agreements (RFQs)"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__document_purchase_date
 msgid "Purchase Documents Date"
-msgstr "Purchase Documents Date"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
 #: code:addons/ics_tender_management/models/tender.py:0
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_vendor_offer__purchase_order_id
 msgid "Purchase Order"
-msgstr "Purchase Order"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
 #: code:addons/ics_tender_management/models/tender.py:0
 msgid "Purchase Orders"
-msgstr "أوامر الشراء"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model,name:ics_tender_management.model_purchase_requisition
@@ -1366,12 +1523,12 @@ msgstr "طلب الشراء"
 #. odoo-python
 #: code:addons/ics_tender_management/wizard/import_boq_wizard.py:0
 msgid "Python xlwt library is required for Excel export. Please install it."
-msgstr "Python xlwt library is required for Excel export. Please install it."
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.report_tender_boq_document
 msgid "Qty"
-msgstr "الكمية"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_boq_line__quantity
@@ -1385,12 +1542,12 @@ msgstr "الكمية"
 #. odoo-python
 #: code:addons/ics_tender_management/models/tender_boq.py:0
 msgid "Quantity must be greater than zero."
-msgstr "Quantity must be greater than zero."
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model,name:ics_tender_management.model_ics_tender_quotation_line_preview
 msgid "Quotation Line Preview"
-msgstr "معاينة بند عرض السعر"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ics.tender.stage,name:ics_tender_management.stage_quotation
@@ -1415,35 +1572,36 @@ msgstr "صلاحية عرض السعر"
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__quotation_ids
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_form
 msgid "Quotations"
-msgstr "Quotations"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_form
 msgid "RFQs"
-msgstr "RFQs"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__rating_ids
 msgid "Ratings"
-msgstr "Ratings"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-javascript
 #: code:addons/ics_tender_management/static/src/xml/tender_dashboard.xml:0
 msgid ""
-msgstr "Real-time overview of your tender operations | لوحة متابعة إدارة المشاريع"
+"Real-time overview of your tender operations | لوحة متابعة إدارة المشاريع"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_project_project__tender_id
 #: model:ir.model.fields,field_description:ics_tender_management.field_purchase_requisition__tender_id
 #: model:ir.model.fields,field_description:ics_tender_management.field_sale_order__tender_id
 msgid "Related Tender"
-msgstr "Related Tender"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields.selection,name:ics_tender_management.selection__ics_tender_import_boq_wizard__import_option__replace
 msgid "Replace Existing Lines"
-msgstr "استبدال البنود الموجودة"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_stage__requirements
@@ -1454,17 +1612,17 @@ msgstr "المتطلبات"
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__user_id
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_search
 msgid "Responsible"
-msgstr "المسؤول"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__activity_user_id
 msgid "Responsible User"
-msgstr "المستخدم المسؤول"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__message_has_sms_error
 msgid "SMS Delivery error"
-msgstr "SMS Delivery error"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model,name:ics_tender_management.model_sale_order
@@ -1482,7 +1640,7 @@ msgstr "عرض سعر مبيعات"
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__team_id
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_search
 msgid "Sales Team"
-msgstr "Sales Team"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_vendor_comparison_line__savings
@@ -1493,7 +1651,7 @@ msgstr "التوفير"
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_vendor_comparison_line__savings_percentage
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_vendor_comparison_wizard_form
 msgid "Savings %"
-msgstr "Savings %"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_search
@@ -1503,34 +1661,34 @@ msgstr "البحث في المنافسات"
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_boq_line_form
 msgid "Select"
-msgstr "Select"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_vendor_comparison_wizard_form
 msgid "Select Vendor"
-msgstr "Select Vendor"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_vendor_offer__is_selected
 msgid "Selected"
-msgstr "محدد"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_boq_line__selected_vendor_id
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_vendor_comparison_wizard__single_vendor_id
 msgid "Selected Vendor"
-msgstr "المورد المحدد"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_boq_line__selected_vendor_price
 msgid "Selected Vendor Price"
-msgstr "Selected Vendor Price"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
 #: code:addons/ics_tender_management/wizard/vendor_comparison_wizard.py:0
 msgid "Selected: %s (Total: %s)"
-msgstr "Selected: %s (Total: %s)"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_boq_line__sequence
@@ -1541,48 +1699,60 @@ msgstr "التسلسل"
 #. module: ics_tender_management
 #: model:ir.model.fields.selection,name:ics_tender_management.selection__ics_tender__tender_category__services
 msgid "Services"
-msgstr "Services"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
 #: code:addons/ics_tender_management/models/tender.py:0
 msgid ""
-msgstr "Single Vendor Mode requires all products to be assigned to vendors.\n Missing vendor selection for: %s"
+"Single Vendor Mode requires all products to be assigned to vendors.\n"
+"Missing vendor selection for: %s"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
 #: code:addons/ics_tender_management/models/tender.py:0
 msgid ""
-msgstr "Single Vendor Mode requires all products to use the same vendor.\n Currently selected vendors: %s"
+"Single Vendor Mode requires all products to use the same vendor.\n"
+"Currently selected vendors: %s"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
 #: code:addons/ics_tender_management/models/tender.py:0
 msgid ""
-msgstr "Single Vendor Mode: All products must have a vendor selected.\n Missing selections for: %s"
+"Single Vendor Mode: All products must have a vendor selected.\n"
+"Missing selections for: %s"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
 #: code:addons/ics_tender_management/models/tender.py:0
 msgid ""
-msgstr "Single Vendor Mode: All products must use the same vendor.\n Please select only one vendor for all products."
+"Single Vendor Mode: All products must use the same vendor.\n"
+"Please select only one vendor for all products."
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields.selection,name:ics_tender_management.selection__ics_tender__tender_type__single_vendor
 msgid "Single Vendor for All Products"
-msgstr "Single Vendor for All Products"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_form
 msgid ""
-msgstr "Single Vendor: Creates 1 PO. Product-wise: Creates multiple POs per vendor"
+"Single Vendor: Creates 1 PO. Product-wise: Creates multiple POs per vendor"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,help:ics_tender_management.field_ics_tender__tender_type
 #: model:ir.model.fields,help:ics_tender_management.field_ics_tender_boq_line__tender_type
 #: model:ir.model.fields,help:ics_tender_management.field_ics_tender_vendor_comparison_wizard__tender_type
 msgid ""
-msgstr "Single Vendor: Select one vendor for all products (all prices mandatory).  Product-wise: Select different vendors per product (prices optional,  multiple POs)."
+"Single Vendor: Select one vendor for all products (all prices mandatory). "
+"Product-wise: Select different vendors per product (prices optional, "
+"multiple POs)."
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__stage_id
@@ -1598,27 +1768,30 @@ msgstr "اسم المرحلة"
 #. module: ics_tender_management
 #: model:ir.model.constraint,message:ics_tender_management.constraint_ics_tender_stage_name_uniq
 msgid "Stage name must be unique!"
-msgstr "Stage name must be unique!"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_project_wizard__date_start
 msgid "Start Date"
-msgstr "تاريخ البدء"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_form
 msgid "Start Financial Study"
-msgstr "Start Financial Study"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_form
 msgid "Start Technical Study"
-msgstr "Start Technical Study"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.actions.act_window,help:ics_tender_management.action_tender
 msgid ""
-msgstr "Start managing tenders from Etimad portal or create them manually.\n                     Track technical and financial studies, compare vendor offers,\n                     and generate quotations with built-in margin calculation."
+"Start managing tenders from Etimad portal or create them manually.\n"
+"                    Track technical and financial studies, compare vendor offers,\n"
+"                    and generate quotations with built-in margin calculation."
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__state
@@ -1629,12 +1802,16 @@ msgstr "الحالة"
 #. module: ics_tender_management
 #: model:ir.model.fields,help:ics_tender_management.field_ics_tender__activity_state
 msgid ""
-msgstr "Status based on activities\n Overdue: Due date is already passed\n Today: Activity date is today\n Planned: Future activities."
+"Status based on activities\n"
+"Overdue: Due date is already passed\n"
+"Today: Activity date is today\n"
+"Planned: Future activities."
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_search
 msgid "Submission Date"
-msgstr "Submission Date"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__submission_deadline
@@ -1644,12 +1821,12 @@ msgstr "آخر موعد للتقديم"
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_search
 msgid "Submission Month"
-msgstr "Submission Month"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_form
 msgid "Submit Tender"
-msgstr "Submit Tender"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ics.tender.stage,name:ics_tender_management.stage_submitted
@@ -1662,7 +1839,7 @@ msgstr "تم التقديم"
 #. odoo-python
 #: code:addons/ics_tender_management/wizard/import_boq_wizard.py:0
 msgid "Success"
-msgstr "Success"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields.selection,name:ics_tender_management.selection__ics_tender__tender_category__supply
@@ -1781,27 +1958,27 @@ msgstr "توزيع أنواع المنافسات"
 #. module: ics_tender_management
 #: model:ir.model,name:ics_tender_management.model_ics_tender_vendor_offer
 msgid "Tender Vendor Offer"
-msgstr "Tender Vendor Offer"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_form
 msgid "Tender description and requirements..."
-msgstr "Tender description and requirements..."
+msgstr ""
 
 #. module: ics_tender_management
 #: model:mail.template,name:ics_tender_management.email_template_tender_created
 msgid "Tender: Created"
-msgstr "Tender: Created"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:mail.template,name:ics_tender_management.email_template_tender_urgent_deadline
 msgid "Tender: Urgent Deadline"
-msgstr "Tender: Urgent Deadline"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:mail.template,name:ics_tender_management.email_template_tender_won
 msgid "Tender: Won"
-msgstr "Tender: Won"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.actions.act_window,name:ics_tender_management.action_tender
@@ -1833,28 +2010,37 @@ msgstr "الشروط والأحكام"
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_import_boq_wizard_form
 msgid "The Excel file should contain the following columns in order:"
-msgstr "The Excel file should contain the following columns in order:"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
 #: code:addons/ics_tender_management/wizard/vendor_comparison_wizard.py:0
 msgid "This action is only for Single Vendor mode."
-msgstr "This action is only for Single Vendor mode."
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,help:ics_tender_management.field_ics_tender_stage__fold
 msgid ""
-msgstr "This stage is folded in the kanban view when there are no records in that  stage to display."
+"This stage is folded in the kanban view when there are no records in that "
+"stage to display."
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_create_project_wizard_form
 msgid ""
-msgstr "This will create a new project linked to this tender.\n                                 <br/>\n                                 If \Create Tasks from BoQ\ is checked, each BoQ line will be converted into a project task.\n                                 <br/>\n                                 If \Link to Sales Order\ is checked and a confirmed sales order is selected, the project will be linked to it."
+"This will create a new project linked to this tender.\n"
+"                                <br/>\n"
+"                                If \"Create Tasks from BoQ\" is checked, each BoQ line will be converted into a project task.\n"
+"                                <br/>\n"
+"                                If \"Link to Sales Order\" is checked and a confirmed sales order is selected, the project will be linked to it."
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_export_boq_wizard_form
 msgid ""
-msgstr "This will export all BoQ lines to an Excel file.\n                                 The file will be downloaded automatically and also attached to the tender."
+"This will export all BoQ lines to an Excel file.\n"
+"                                The file will be downloaded automatically and also attached to the tender."
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_quotation_line_preview__total
@@ -1862,7 +2048,7 @@ msgstr "This will export all BoQ lines to an Excel file.\n                      
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_boq_line_form
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_list
 msgid "Total"
-msgstr "الإجمالي"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_quotation_wizard__total_amount
@@ -1873,13 +2059,13 @@ msgstr "إجمالي المبلغ"
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_vendor_comparison_wizard_form
 msgid "Total Best Offers"
-msgstr "Total Best Offers"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_vendor_comparison_wizard__total_best_price
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_vendor_comparison_wizard_form
 msgid "Total Best Price"
-msgstr "Total Best Price"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-javascript
@@ -1898,12 +2084,12 @@ msgstr "إجمالي التكلفة"
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_form
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_vendor_comparison_wizard_form
 msgid "Total Estimated"
-msgstr "Total Estimated"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__total_estimated_cost
 msgid "Total Estimated Cost"
-msgstr "إجمالي التكلفة المقدرة"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_quotation_wizard__total_margin
@@ -1926,12 +2112,12 @@ msgstr "إجمالي السعر"
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__total_quotation_amount
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_generate_quotation_wizard_form
 msgid "Total Quotation Amount"
-msgstr "إجمالي مبلغ عرض السعر"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_vendor_comparison_wizard_form
 msgid "Total Savings"
-msgstr "Total Savings"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-javascript
@@ -1944,12 +2130,12 @@ msgstr "إجمالي المنافسات"
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_boq_line_tree
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_form
 msgid "Total Vendor Cost"
-msgstr "Total Vendor Cost"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,help:ics_tender_management.field_ics_tender__activity_exception_decoration
 msgid "Type of the exception activity on record."
-msgstr "Type of the exception activity on record."
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ics.tender.stage,name:ics_tender_management.stage_evaluation
@@ -1980,14 +2166,16 @@ msgstr "وحدة القياس"
 #. module: ics_tender_management
 #: model:ir.model.fields,help:ics_tender_management.field_ics_tender_import_boq_wizard__file
 msgid ""
-msgstr "Upload Excel file with columns: Product Code, Description, Quantity, UoM,  Estimated Cost"
+"Upload Excel file with columns: Product Code, Description, Quantity, UoM, "
+"Estimated Cost"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__is_urgent
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_form
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_search
 msgid "Urgent"
-msgstr "عاجل"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.actions.act_window,name:ics_tender_management.action_tender_urgent
@@ -2003,7 +2191,7 @@ msgstr "استخدام تكاليف المورد المحدد"
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_generate_quotation_wizard_form
 msgid "Use actual vendor prices if selected, otherwise use estimated costs"
-msgstr "Use actual vendor prices if selected, otherwise use estimated costs"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:res.groups,name:ics_tender_management.group_tender_user
@@ -2019,22 +2207,24 @@ msgstr "المورد"
 #. odoo-python
 #: code:addons/ics_tender_management/wizard/vendor_comparison_wizard.py:0
 msgid ""
-msgstr "Vendor %s has no offer for product: %s\n Please ensure the selected vendor has submitted offers for all products."
+"Vendor %s has no offer for product: %s\n"
+"Please ensure the selected vendor has submitted offers for all products."
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_vendor_comparison_wizard_form
 msgid "Vendor Comparison"
-msgstr "مقارنة الموردين"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model,name:ics_tender_management.model_ics_tender_vendor_comparison_line
 msgid "Vendor Comparison Line"
-msgstr "Vendor Comparison Line"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model,name:ics_tender_management.model_ics_tender_vendor_comparison_wizard
 msgid "Vendor Comparison Wizard"
-msgstr "Vendor Comparison Wizard"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
@@ -2042,42 +2232,42 @@ msgstr "Vendor Comparison Wizard"
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_boq_line__vendor_offer_ids
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_boq_line_form
 msgid "Vendor Offers"
-msgstr "عروض الموردين"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_boq_line_form
 msgid "Vendor Selection"
-msgstr "Vendor Selection"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields.selection,name:ics_tender_management.selection__ics_tender__priority__3
 msgid "Very High"
-msgstr "Very High"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_vendor_comparison_wizard_form
 msgid "View All Offers"
-msgstr "View All Offers"
+msgstr ""
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_vendor_comparison_wizard_form
 msgid "View all vendor offers for this product"
-msgstr "View all vendor offers for this product"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__website_message_ids
 msgid "Website Messages"
-msgstr "رسائل الموقع"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,help:ics_tender_management.field_ics_tender__website_message_ids
 msgid "Website communication history"
-msgstr "سجل اتصالات الموقع"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__winning_reason
 msgid "Winning Reason"
-msgstr "Winning Reason"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_quotation_line_preview__wizard_id
@@ -2108,130 +2298,130 @@ msgstr "المنافسات الفائزة"
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_form
 msgid "Won/Lost Details"
-msgstr "Won/Lost Details"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-python
 #: code:addons/ics_tender_management/models/tender.py:0
 msgid "You can only create a project for won tenders."
-msgstr "You can only create a project for won tenders."
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,help:ics_tender_management.field_ics_tender_boq_line__estimated_cost
 msgid "Your initial estimated cost for this line"
-msgstr "Your initial estimated cost for this line"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-javascript
 #: code:addons/ics_tender_management/static/src/xml/tender_dashboard.xml:0
 msgid "إجمالي العروض"
-msgstr "إجمالي العروض"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-javascript
 #: code:addons/ics_tender_management/static/src/xml/tender_dashboard.xml:0
 msgid "إجمالي المشاريع"
-msgstr "إجمالي المشاريع"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-javascript
 #: code:addons/ics_tender_management/static/src/xml/tender_dashboard.xml:0
 msgid "إجمالي الميزانية"
-msgstr "إجمالي الميزانية"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-javascript
 #: code:addons/ics_tender_management/static/src/xml/tender_dashboard.xml:0
 msgid "اتجاه المشاريع (6 أشهر)"
-msgstr "اتجاه المشاريع (6 أشهر)"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-javascript
 #: code:addons/ics_tender_management/static/src/xml/tender_dashboard.xml:0
 msgid "العروض المقبولة"
-msgstr "العروض المقبولة"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-javascript
 #: code:addons/ics_tender_management/static/src/xml/tender_dashboard.xml:0
 msgid "العروض قيد المراجعة"
-msgstr "العروض قيد المراجعة"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-javascript
 #: code:addons/ics_tender_management/static/src/xml/tender_dashboard.xml:0
 msgid "المشاريع المكتسبة"
-msgstr "المشاريع المكتسبة"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-javascript
 #: code:addons/ics_tender_management/static/src/xml/tender_dashboard.xml:0
 msgid "المشاريع النشطة"
-msgstr "المشاريع النشطة"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-javascript
 #: code:addons/ics_tender_management/static/src/xml/tender_dashboard.xml:0
 msgid "المشاريع حسب الفئة"
-msgstr "المشاريع حسب الفئة"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-javascript
 #: code:addons/ics_tender_management/static/src/xml/tender_dashboard.xml:0
 msgid "المشاريع حسب المرحلة"
-msgstr "المشاريع حسب المرحلة"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-javascript
 #: code:addons/ics_tender_management/static/src/xml/tender_dashboard.xml:0
 msgid "المشاريع قيد الإعداد"
-msgstr "المشاريع قيد الإعداد"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-javascript
 #: code:addons/ics_tender_management/static/src/xml/tender_dashboard.xml:0
 msgid "الملخص المالي"
-msgstr "الملخص المالي"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-javascript
 #: code:addons/ics_tender_management/static/src/xml/tender_dashboard.xml:0
 msgid "توزيع المشاريع حسب النوع"
-msgstr "توزيع المشاريع حسب النوع"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-javascript
 #: code:addons/ics_tender_management/static/src/xml/tender_dashboard.xml:0
 msgid "مشاريع التوريد"
-msgstr "مشاريع التوريد"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-javascript
 #: code:addons/ics_tender_management/static/src/xml/tender_dashboard.xml:0
 msgid "مشاريع الصيانة والتشغيل"
-msgstr "مشاريع الصيانة والتشغيل"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-javascript
 #: code:addons/ics_tender_management/static/src/xml/tender_dashboard.xml:0
 msgid "ميزانية المشاريع المكتسبة"
-msgstr "ميزانية المشاريع المكتسبة"
+msgstr ""
 
 #. module: ics_tender_management
 #. odoo-javascript
 #: code:addons/ics_tender_management/static/src/xml/tender_dashboard.xml:0
 msgid "ميزانية المشاريع النشطة"
-msgstr "ميزانية المشاريع النشطة"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:mail.template,subject:ics_tender_management.email_template_tender_urgent_deadline
 msgid "⚠️ URGENT: Tender Deadline Approaching - ${object.name}"
-msgstr "⚠️ URGENT: Tender Deadline Approaching - ${object.name}"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:mail.template,subject:ics_tender_management.email_template_tender_won
 msgid "🎉 Congratulations! Tender Won - ${object.name}"
-msgstr "🎉 Congratulations! Tender Won - ${object.name}"
+msgstr ""
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__etimad_link
