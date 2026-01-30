@@ -895,13 +895,13 @@ msgstr "إنشاء عرض سعر"
 #. module: ics_tender_management
 #: model:ir.model,name:ics_tender_management.model_ics_tender_quotation_wizard
 msgid "Generate Quotation Wizard"
-msgstr ""
+msgstr "معالج إنشاء عرض السعر"
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_generate_quotation_wizard_form
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_form
 msgid "Generate Sales Quotation"
-msgstr ""
+msgstr "إنشاء عرض سعر المبيعات"
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_search
@@ -1348,7 +1348,7 @@ msgstr "أخرى"
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_quotation_wizard__payment_term_id
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_vendor_offer__payment_terms
 msgid "Payment Terms"
-msgstr ""
+msgstr "شروط السداد"
 
 #. module: ics_tender_management
 #. odoo-javascript
@@ -1423,7 +1423,7 @@ msgstr ""
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_quotation_wizard__pricelist_id
 msgid "Pricelist"
-msgstr ""
+msgstr "قائمة الأسعار"
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__priority
@@ -1558,12 +1558,12 @@ msgstr ""
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_generate_quotation_wizard_form
 msgid "Quotation Preview"
-msgstr ""
+msgstr "معاينة عرض السعر"
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_quotation_wizard__validity_date
 msgid "Quotation Validity"
-msgstr ""
+msgstr "صلاحية عرض السعر"
 
 #. module: ics_tender_management
 #. odoo-python
@@ -1886,7 +1886,7 @@ msgstr "المنافسة"
 #. module: ics_tender_management
 #: model:ir.model,name:ics_tender_management.model_ics_tender_boq_line
 msgid "Tender Bill of Quantities Line"
-msgstr ""
+msgstr "بند جدول كميات المنافسة"
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__tender_category
@@ -1896,12 +1896,12 @@ msgstr "فئة المنافسة"
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_crm_lead__tender_count
 msgid "Tender Count"
-msgstr ""
+msgstr "عدد المنافسات"
 
 #. module: ics_tender_management
 #: model:ir.actions.client,name:ics_tender_management.action_ics_tender_dashboard
 msgid "Tender Dashboard"
-msgstr ""
+msgstr "لوحة تحكم المنافسات"
 
 #. module: ics_tender_management
 #: model:ir.model,name:ics_tender_management.model_ics_tender
@@ -1924,7 +1924,7 @@ msgstr "رقم المنافسة"
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__name
 msgid "Tender Reference"
-msgstr ""
+msgstr "مرجع المنافسة"
 
 #. module: ics_tender_management
 #: model:ir.model,name:ics_tender_management.model_ics_tender_stage
@@ -2005,7 +2005,7 @@ msgstr "المنافسات حسب المرحلة"
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_quotation_wizard__notes
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_generate_quotation_wizard_form
 msgid "Terms and Conditions"
-msgstr ""
+msgstr "الشروط والأحكام"
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_import_boq_wizard_form
@@ -2186,7 +2186,7 @@ msgstr "المنافسات العاجلة"
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_quotation_wizard__use_vendor_costs
 msgid "Use Selected Vendor Costs"
-msgstr ""
+msgstr "استخدام تكاليف المورد المحدد"
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_generate_quotation_wizard_form
@@ -2273,7 +2273,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_quotation_line_preview__wizard_id
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_vendor_comparison_line__wizard_id
 msgid "Wizard"
-msgstr ""
+msgstr "المعالج"
 
 #. module: ics_tender_management
 #: model:ics.tender.stage,name:ics_tender_management.stage_won
