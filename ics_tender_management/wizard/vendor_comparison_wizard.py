@@ -20,7 +20,21 @@ class VendorComparisonWizard(models.TransientModel):
 
     single_vendor_id = fields.Many2one('res.partner', string='Selected Vendor',
         help='For Single Vendor mode: This vendor will be applied to all products',
-        domain=[('is_company', '=', True)])
+        domain="[('id', 'in', available_vendor_ids)]")
+    
+    available_vendor_ids = fields.Many2many('res.partner', 
+        compute='_compute_available_vendors', 
+        string='Available Vendors')
+
+    @api.depends('tender_id', 'tender_id.boq_line_ids.vendor_offer_ids')
+    def _compute_available_vendors(self):
+        """Compute vendors who have submitted at least one offer"""
+        for wizard in self:
+            if wizard.tender_id:
+                vendor_ids = wizard.tender_id.boq_line_ids.mapped('vendor_offer_ids.vendor_id').ids
+                wizard.available_vendor_ids = [(6, 0, vendor_ids)]
+            else:
+                wizard.available_vendor_ids = [(5, 0, 0)]
 
     @api.depends('line_ids.best_offer_total')
     def _compute_totals(self):
@@ -32,7 +46,25 @@ class VendorComparisonWizard(models.TransientModel):
         res = super(VendorComparisonWizard, self).default_get(fields_list)
         if self._context.get('default_tender_id'):
             tender = self.env['ics.tender'].browse(self._context['default_tender_id'])
+            
+            # Validate that BoQ lines exist
+            if not tender.boq_line_ids:
+                raise UserError(_('No BoQ lines found in this tender. Please add products first.'))
+            
+            # Check if any vendor offers exist
+            total_offers = self.env['ics.tender.vendor.offer'].search_count([
+                ('boq_line_id', 'in', tender.boq_line_ids.ids)
+            ])
+            
+            if total_offers == 0:
+                raise UserError(_(
+                    'No vendor offers found!\n\n'
+                    'Please ensure vendors have submitted their offers before comparing.'
+                ))
+            
             lines = []
+            lines_without_offers = []
+            
             for boq_line in tender.boq_line_ids:
                 vendor_offers = self.env['ics.tender.vendor.offer'].search([
                     ('boq_line_id', '=', boq_line.id)
@@ -51,7 +83,18 @@ class VendorComparisonWizard(models.TransientModel):
                         'best_offer_total': best_offer.total_price,
                         'offer_count': len(vendor_offers),
                     }))
+                else:
+                    # Track lines without offers for warning
+                    lines_without_offers.append(boq_line.name or boq_line.product_id.name)
+            
             res['line_ids'] = lines
+            
+            # Show warning if some lines don't have offers
+            if lines_without_offers:
+                # Note: Can't raise UserError here as we want to show the wizard
+                # The warning will be displayed in the view
+                pass
+                
         return res
 
     def action_apply_selection(self):
@@ -86,12 +129,20 @@ class VendorComparisonWizard(models.TransientModel):
         return {'type': 'ir.actions.act_window_close'}
 
     def _apply_product_wise_selection(self):
+        """Apply vendor selection for product-wise mode"""
         for line in self.line_ids:
             if line.best_vendor_id:
-                line.boq_line_id.write({
-                    'selected_vendor_id': line.best_vendor_id.id,
-                    'selected_vendor_price': line.best_offer_total,
-                })
+                # Get the actual offer for this vendor-product combination
+                vendor_offer = self.env['ics.tender.vendor.offer'].search([
+                    ('boq_line_id', '=', line.boq_line_id.id),
+                    ('vendor_id', '=', line.best_vendor_id.id)
+                ], limit=1)
+                
+                if vendor_offer:
+                    line.boq_line_id.write({
+                        'selected_vendor_id': line.best_vendor_id.id,
+                        'selected_vendor_price': vendor_offer.total_price,
+                    })
 
         return {'type': 'ir.actions.act_window_close'}
 
@@ -167,7 +218,13 @@ class VendorComparisonLine(models.TransientModel):
     estimated_cost = fields.Monetary('Estimated Cost', readonly=True,
         currency_field='currency_id')
 
-    best_vendor_id = fields.Many2one('res.partner', string='Best Vendor', readonly=True)
+    best_vendor_id = fields.Many2one('res.partner', string='Best Vendor',
+        help='Best vendor based on lowest price. You can change this selection manually.',
+        domain="[('id', 'in', available_vendor_ids)]")
+    
+    available_vendor_ids = fields.Many2many('res.partner',
+        compute='_compute_available_vendors_for_line',
+        string='Available Vendors for this product')
 
     best_offer_unit_price = fields.Float('Best Unit Price', readonly=True)
 
@@ -183,6 +240,16 @@ class VendorComparisonLine(models.TransientModel):
 
     savings_percentage = fields.Float('Savings %', compute='_compute_savings')
 
+    @api.depends('boq_line_id', 'boq_line_id.vendor_offer_ids')
+    def _compute_available_vendors_for_line(self):
+        """Compute vendors who have offers for this specific product"""
+        for line in self:
+            if line.boq_line_id:
+                vendor_ids = line.boq_line_id.vendor_offer_ids.mapped('vendor_id').ids
+                line.available_vendor_ids = [(6, 0, vendor_ids)]
+            else:
+                line.available_vendor_ids = [(5, 0, 0)]
+
     @api.depends('estimated_cost', 'best_offer_total')
     def _compute_savings(self):
         for line in self:
@@ -195,6 +262,19 @@ class VendorComparisonLine(models.TransientModel):
             else:
                 line.savings = 0.0
                 line.savings_percentage = 0.0
+    
+    @api.onchange('best_vendor_id')
+    def _onchange_best_vendor_id(self):
+        """Update prices when vendor selection changes"""
+        if self.best_vendor_id and self.boq_line_id:
+            vendor_offer = self.env['ics.tender.vendor.offer'].search([
+                ('boq_line_id', '=', self.boq_line_id.id),
+                ('vendor_id', '=', self.best_vendor_id.id)
+            ], limit=1)
+            
+            if vendor_offer:
+                self.best_offer_unit_price = vendor_offer.unit_price
+                self.best_offer_total = vendor_offer.total_price
 
     def action_view_offers(self):
         self.ensure_one()

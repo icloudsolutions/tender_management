@@ -23,10 +23,10 @@
                         </group>
                         <group invisible="tender_type != 'single_vendor'">
                             <group>
+                                <field name="available_vendor_ids" invisible="1"/>
                                 <label for="single_vendor_id" string="Select Vendor"/>
                                 <div class="o_row">
                                     <field name="single_vendor_id"
-                                        domain="[('id', 'in', [])]"
                                         options="{'no_create': True, 'no_create_edit': True}"
                                         placeholder="Choose a vendor..."/>
                                     <button name="action_select_best_common_vendor"
@@ -49,20 +49,24 @@
                         <notebook>
                             <page string="Vendor Comparison" name="comparison">
                                 <field name="line_ids">
-                                    <list decoration-success="savings > 0" decoration-danger="savings &lt; 0">
-                                        <field name="product_id"/>
-                                        <field name="quantity"/>
-                                        <field name="uom_id"/>
-                                        <field name="estimated_cost" sum="Total Estimated"/>
-                                        <field name="best_vendor_id"/>
-                                        <field name="best_offer_unit_price"/>
-                                        <field name="best_offer_total" sum="Total Best Offers"/>
-                                        <field name="offer_count"/>
-                                        <field name="savings" sum="Total Savings"/>
-                                        <field name="savings_percentage" string="Savings %"/>
+                                    <list decoration-success="savings > 0" decoration-danger="savings &lt; 0" editable="bottom">
+                                        <field name="product_id" readonly="1"/>
+                                        <field name="quantity" readonly="1"/>
+                                        <field name="uom_id" readonly="1"/>
+                                        <field name="estimated_cost" sum="Total Estimated" readonly="1"/>
+                                        <field name="best_vendor_id" 
+                                            readonly="parent.tender_type == 'single_vendor'"
+                                            options="{'no_create': True, 'no_create_edit': True}"/>
+                                        <field name="best_offer_unit_price" readonly="1"/>
+                                        <field name="best_offer_total" sum="Total Best Offers" readonly="1"/>
+                                        <field name="offer_count" readonly="1"/>
+                                        <field name="savings" sum="Total Savings" readonly="1"/>
+                                        <field name="savings_percentage" string="Savings %" readonly="1"/>
                                         <field name="currency_id" invisible="1"/>
+                                        <field name="available_vendor_ids" invisible="1"/>
                                         <button name="action_view_offers" type="object"
-                                            string="View All Offers" class="btn-link"/>
+                                            string="View All Offers" icon="fa-eye" 
+                                            title="View all vendor offers for this product"/>
                                     </list>
                                 </field>
                             </page>
