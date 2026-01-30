@@ -259,26 +259,53 @@ class Tender(models.Model):
                 type_obj = self.env['purchase.requisition.type'].search([('name', 'ilike', 'blanket')], limit=1)
                 type_id = type_obj.id if type_obj else False
 
-        vals = {
-            'tender_id': self.id,
-            'user_id': self.user_id.id,
-            'ordering_date': fields.Date.today(),
-            'schedule_date': self.submission_deadline.date() if self.submission_deadline else False,
-        }
+        # Build vals dict with only fields that exist in the model
+        requisition_model = self.env['purchase.requisition']
+        available_fields = requisition_model._fields.keys()
         
-        if type_id:
+        vals = {}
+        
+        # Add tender_id if field exists
+        if 'tender_id' in available_fields:
+            vals['tender_id'] = self.id
+            
+        # Add user_id if field exists
+        if 'user_id' in available_fields:
+            vals['user_id'] = self.user_id.id
+            
+        # Add ordering_date if field exists (might not exist in some versions)
+        if 'ordering_date' in available_fields:
+            vals['ordering_date'] = fields.Date.today()
+            
+        # Add schedule_date if field exists
+        if 'schedule_date' in available_fields and self.submission_deadline:
+            vals['schedule_date'] = self.submission_deadline.date()
+        
+        # Add type_id if we found one
+        if type_id and 'type_id' in available_fields:
             vals['type_id'] = type_id
 
-        requisition = self.env['purchase.requisition'].create(vals)
+        requisition = requisition_model.create(vals)
 
+        # Create requisition lines from BoQ
+        line_model = self.env['purchase.requisition.line']
+        line_fields = line_model._fields.keys()
+        
         for boq_line in self.boq_line_ids:
-            self.env['purchase.requisition.line'].create({
+            line_vals = {
                 'requisition_id': requisition.id,
                 'product_id': boq_line.product_id.id,
-                'product_qty': boq_line.quantity,
-                'product_uom_id': boq_line.uom_id.id,
-                'price_unit': boq_line.estimated_cost / boq_line.quantity if boq_line.quantity else 0,
-            })
+            }
+            
+            # Add optional fields if they exist
+            if 'product_qty' in line_fields:
+                line_vals['product_qty'] = boq_line.quantity
+            if 'product_uom_id' in line_fields:
+                line_vals['product_uom_id'] = boq_line.uom_id.id
+            if 'price_unit' in line_fields:
+                line_vals['price_unit'] = boq_line.estimated_cost / boq_line.quantity if boq_line.quantity else 0
+                
+            line_model.create(line_vals)
 
         return {
             'name': _('Purchase Agreement'),
