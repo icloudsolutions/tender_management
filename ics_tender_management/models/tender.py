@@ -167,6 +167,18 @@ class Tender(models.Model):
     extension_rejection_reason = fields.Text('Reason for Extension Rejected')
     discount_requested = fields.Boolean('Discount Requested', default=False)
     appeal_submitted = fields.Boolean('Appeal Submitted', default=False)
+    appeal_submission_date = fields.Date('Appeal Submission Date')
+    appeal_letter_file = fields.Binary('Appeal Letter')
+    appeal_letter_filename = fields.Char('Appeal Letter Filename')
+    appeal_reason = fields.Text('Appeal Reason')
+    appeal_status = fields.Selection([
+        ('pending', 'Pending Response'),
+        ('accepted', 'Appeal Accepted'),
+        ('rejected', 'Appeal Rejected'),
+        ('withdrawn', 'Withdrawn')
+    ], string='Appeal Status')
+    appeal_response_date = fields.Date('Appeal Response Date')
+    appeal_response_notes = fields.Text('Appeal Response Notes')
     
     # Award Details
     awarded_company = fields.Many2one('res.partner', string='Awarded Company')
@@ -230,12 +242,19 @@ class Tender(models.Model):
         return super(Tender, self).create(vals)
     
     def write(self, vals):
-        """Auto-create project when tender is won & sync CRM stages"""
+        """Auto-create project when tender is won & sync CRM stages & trigger activities"""
+        old_states = {tender.id: tender.state for tender in self}
+        
         res = super(Tender, self).write(vals)
         
-        # Sync CRM opportunity stage when tender state changes
+        # Trigger activities when state changes
         if vals.get('state'):
             for tender in self:
+                old_state = old_states.get(tender.id)
+                if old_state != tender.state:
+                    tender._trigger_state_activities(old_state, tender.state)
+                
+                # Sync CRM opportunity stage
                 if tender.lead_id:
                     tender._sync_crm_stage()
         
@@ -248,6 +267,16 @@ class Tender(models.Model):
                 
                 # Auto-create project with task template
                 tender._auto_create_project()
+        
+        # Trigger appeal workflow when tender is lost
+        if vals.get('state') == 'lost':
+            for tender in self:
+                tender._trigger_appeal_option()
+        
+        # Handle site visit requirement
+        if vals.get('site_visit_required') and vals['site_visit_required']:
+            for tender in self:
+                tender._schedule_site_visit_activity()
         
         return res
     
@@ -392,6 +421,212 @@ class Tender(models.Model):
                 self.env['project.task'].create(task_vals)
         
         return project
+    
+    def _trigger_state_activities(self, old_state, new_state):
+        """Trigger automated activities when tender state changes"""
+        self.ensure_one()
+        
+        activities_map = {
+            'draft': self._activity_draft_qualification,
+            'technical': self._activity_technical_study,
+            'financial': self._activity_financial_study,
+            'quotation': self._activity_quotation_review,
+            'submitted': self._activity_post_submission,
+            'evaluation': self._activity_under_evaluation,
+        }
+        
+        activity_method = activities_map.get(new_state)
+        if activity_method:
+            activity_method()
+    
+    def _activity_draft_qualification(self):
+        """Activities for Draft/Qualification phase"""
+        self.ensure_one()
+        
+        # Activity 1: Download Etimad documents
+        if self.etimad_tender_id or self.etimad_link:
+            self.activity_schedule(
+                'mail.mail_activity_data_todo',
+                summary=_('📥 Download Tender Documents from Etimad'),
+                note=_(
+                    '<strong>Action Required:</strong><br/>'
+                    '<ul>'
+                    '<li>Login to your Etimad account</li>'
+                    '<li>Download all tender documents</li>'
+                    '<li>Review technical specifications</li>'
+                    '<li>Attach documents to this tender</li>'
+                    '</ul>'
+                    '<br/><strong>Etimad Link:</strong> %s'
+                ) % (self.etimad_link or 'Check Etimad Portal'),
+                user_id=self.user_id.id,
+                date_deadline=fields.Date.today()
+            )
+        
+        # Activity 2: Site visit scheduling (if required)
+        if self.site_visit_required and not self.site_visit_date:
+            self._schedule_site_visit_activity()
+    
+    def _schedule_site_visit_activity(self):
+        """Schedule site visit activity"""
+        self.ensure_one()
+        
+        self.activity_schedule(
+            'mail.mail_activity_data_meeting',
+            summary=_('📍 Schedule Site Visit (الزيارة الميدانية)'),
+            note=_(
+                '<strong>Site Visit Required</strong><br/>'
+                '<ul>'
+                '<li>Coordinate site visit date with customer</li>'
+                '<li>Prepare required documents for site</li>'
+                '<li>Assign team members for visit</li>'
+                '<li>Update site visit date in tender form</li>'
+                '</ul>'
+            ),
+            user_id=self.user_id.id,
+            date_deadline=self.last_inquiry_date or fields.Date.today()
+        )
+    
+    def _activity_technical_study(self):
+        """Activities for Technical Study phase"""
+        self.ensure_one()
+        
+        self.activity_schedule(
+            'mail.mail_activity_data_todo',
+            summary=_('📋 Complete Technical Study & BoQ'),
+            note=_(
+                '<strong>Technical Phase Tasks:</strong><br/>'
+                '<ul>'
+                '<li>Review technical specifications</li>'
+                '<li>Import/create Bill of Quantities</li>'
+                '<li>Define product requirements</li>'
+                '<li>Identify potential vendors</li>'
+                '<li>Estimate quantities and costs</li>'
+                '</ul>'
+            ),
+            user_id=self.user_id.id,
+            date_deadline=fields.Date.today()
+        )
+    
+    def _activity_financial_study(self):
+        """Activities for Financial Study phase"""
+        self.ensure_one()
+        
+        # Activity: Request vendor quotes
+        self.activity_schedule(
+            'mail.mail_activity_data_todo',
+            summary=_('💰 Request Vendor Quotations'),
+            note=_(
+                '<strong>Financial Phase Tasks:</strong><br/>'
+                '<ul>'
+                '<li>Send RFQs to selected vendors</li>'
+                '<li>Collect and review vendor offers</li>'
+                '<li>Compare vendor prices</li>'
+                '<li>Select best vendors per product</li>'
+                '<li>Calculate final margin</li>'
+                '</ul>'
+            ),
+            user_id=self.user_id.id,
+            date_deadline=fields.Date.today()
+        )
+    
+    def _activity_quotation_review(self):
+        """Activities for Quotation phase"""
+        self.ensure_one()
+        
+        self.activity_schedule(
+            'mail.mail_activity_data_todo',
+            summary=_('📄 Review & Approve Quotation'),
+            note=_(
+                '<strong>Quotation Review:</strong><br/>'
+                '<ul>'
+                '<li>Review generated quotation</li>'
+                '<li>Verify prices and margins</li>'
+                '<li>Get internal approvals</li>'
+                '<li>Prepare submission documents</li>'
+                '<li>Final quality check</li>'
+                '</ul>'
+            ),
+            user_id=self.user_id.id,
+            date_deadline=self.submission_deadline.date() if self.submission_deadline else fields.Date.today()
+        )
+    
+    def _activity_post_submission(self):
+        """Activities after submission"""
+        self.ensure_one()
+        
+        self.activity_schedule(
+            'mail.mail_activity_data_todo',
+            summary=_('✅ Confirm Submission & Track'),
+            note=_(
+                '<strong>Post-Submission:</strong><br/>'
+                '<ul>'
+                '<li>Confirm submission receipt from customer</li>'
+                '<li>Monitor tender evaluation timeline</li>'
+                '<li>Prepare for clarification questions</li>'
+                '<li>Track opening date</li>'
+                '</ul>'
+            ),
+            user_id=self.user_id.id,
+            date_deadline=self.opening_date.date() if self.opening_date else fields.Date.today()
+        )
+    
+    def _activity_under_evaluation(self):
+        """Activities during evaluation phase"""
+        self.ensure_one()
+        
+        self.activity_schedule(
+            'mail.mail_activity_data_todo',
+            summary=_('🔍 Monitor Evaluation & Prepare Response'),
+            note=_(
+                '<strong>Evaluation Phase:</strong><br/>'
+                '<ul>'
+                '<li>Monitor customer evaluation progress</li>'
+                '<li>Respond to clarification requests</li>'
+                '<li>Prepare for negotiations if needed</li>'
+                '<li>Track competitor information</li>'
+                '<li>Stay ready for final presentations</li>'
+                '</ul>'
+            ),
+            user_id=self.user_id.id,
+            date_deadline=fields.Date.today()
+        )
+    
+    def _trigger_appeal_option(self):
+        """Trigger appeal workflow when tender is lost"""
+        self.ensure_one()
+        
+        self.activity_schedule(
+            'mail.mail_activity_data_todo',
+            summary=_('⚖️ Consider Appeal (إعتراض) - You Have the Right!'),
+            note=_(
+                '<strong style="color: #d9534f;">Tender Lost - Appeal Option Available</strong><br/><br/>'
+                
+                '<strong>🔴 حق الإعتراض متاح:</strong><br/>'
+                'الشركة لها الحق في تقديم إعتراض على نتيجة المنافسة.<br/><br/>'
+                
+                '<strong>الخطوات المطلوبة:</strong><br/>'
+                '<ol>'
+                '<li><strong>إعداد خطاب الإعتراض:</strong> قم بإعداد خطاب رسمي يوضح أسباب الإعتراض</li>'
+                '<li><strong>إرسال الإعتراض:</strong> قدم الخطاب للجهة المعنية عبر القنوات الرسمية</li>'
+                '<li><strong>إنتظار الرد:</strong> راقب استجابة الجهة الحكومية</li>'
+                '<li><strong>المتابعة:</strong> هناك إمكانية أن يتم قبول الطلب</li>'
+                '</ol><br/>'
+                
+                '<strong>Actions in Tender Form:</strong><br/>'
+                '<ul>'
+                '<li>Go to "Offer Results" tab</li>'
+                '<li>Check "Appeal Submitted" checkbox</li>'
+                '<li>Upload appeal letter</li>'
+                '<li>Enter appeal reason</li>'
+                '<li>Set submission date</li>'
+                '<li>Track response status</li>'
+                '</ul><br/>'
+                
+                '<strong>⏰ Act quickly - appeals are usually time-sensitive!</strong>'
+            ),
+            user_id=self.user_id.id,
+            date_deadline=fields.Date.today()
+        )
 
     @api.depends('submission_deadline')
     def _compute_days_to_deadline(self):

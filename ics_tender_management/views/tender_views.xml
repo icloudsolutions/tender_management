@@ -348,8 +348,38 @@
                                         <field name="extension_awarded" widget="boolean_toggle" invisible="not offer_extension_requested"/>
                                         <field name="extension_rejection_reason" invisible="extension_awarded or not offer_extension_requested"/>
                                         <field name="discount_requested" widget="boolean_toggle"/>
-                                        <field name="appeal_submitted" widget="boolean_toggle"/>
                                     </group>
+                                </group>
+                                <group string="Appeal Workflow (حق الإعتراض)" invisible="state not in ['lost', 'evaluation']">
+                                    <group>
+                                        <field name="appeal_submitted" widget="boolean_toggle"/>
+                                        <field name="appeal_submission_date" invisible="not appeal_submitted"/>
+                                        <field name="appeal_letter_file" filename="appeal_letter_filename" invisible="not appeal_submitted"/>
+                                        <field name="appeal_letter_filename" invisible="1"/>
+                                        <field name="appeal_reason" invisible="not appeal_submitted"/>
+                                    </group>
+                                    <group invisible="not appeal_submitted">
+                                        <field name="appeal_status" widget="badge" 
+                                            decoration-info="appeal_status == 'pending'"
+                                            decoration-success="appeal_status == 'accepted'"
+                                            decoration-danger="appeal_status == 'rejected'"
+                                            decoration-muted="appeal_status == 'withdrawn'"/>
+                                        <field name="appeal_response_date"/>
+                                        <field name="appeal_response_notes"/>
+                                    </group>
+                                </group>
+                                <div class="alert alert-info" role="alert" invisible="state != 'lost' or appeal_submitted">
+                                    <strong>💡 حق الإعتراض متاح</strong>
+                                    <p class="mb-0">
+                                        لديك الحق في تقديم إعتراض على نتيجة المنافسة. 
+                                        قد يتم قبول الإعتراض إذا كانت الأسباب وجيهة.
+                                    </p>
+                                    <p class="mb-0 mt-2">
+                                        <strong>You have the right to appeal.</strong>
+                                        Click the checkbox above to start the appeal process.
+                                    </p>
+                                </div>
+                                <group>
                                     <group string="Award Details">
                                         <field name="awarded_company" options="{'no_create_edit': True}"/>
                                         <field name="amount_awarded"/>

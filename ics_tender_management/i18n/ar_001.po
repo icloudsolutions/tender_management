@@ -3151,3 +3151,148 @@ msgstr "هذه الفرصة مرتبطة بمنافسة نشطة ولا يمكن
 #: model:ir.ui.view,arch_db:ics_tender_management.view_crm_lead_form_inherit_tender
 msgid "Linked Tender:"
 msgstr "المنافسة المرتبطة:"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__appeal_submission_date
+msgid "Appeal Submission Date"
+msgstr "تاريخ تقديم الإعتراض"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__appeal_letter_file
+msgid "Appeal Letter"
+msgstr "خطاب الإعتراض"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__appeal_reason
+msgid "Appeal Reason"
+msgstr "سبب الإعتراض"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__appeal_status
+msgid "Appeal Status"
+msgstr "حالة الإعتراض"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__appeal_response_date
+msgid "Appeal Response Date"
+msgstr "تاريخ الرد على الإعتراض"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__appeal_response_notes
+msgid "Appeal Response Notes"
+msgstr "ملاحظات الرد على الإعتراض"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,selection:ics_tender_management.field_ics_tender__appeal_status
+msgid "Pending Response"
+msgstr "في انتظار الرد"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,selection:ics_tender_management.field_ics_tender__appeal_status
+msgid "Appeal Accepted"
+msgstr "تم قبول الإعتراض"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,selection:ics_tender_management.field_ics_tender__appeal_status
+msgid "Appeal Rejected"
+msgstr "تم رفض الإعتراض"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,selection:ics_tender_management.field_ics_tender__appeal_status
+msgid "Withdrawn"
+msgstr "تم السحب"
+
+#. module: ics_tender_management
+#: code:addons/ics_tender_management/models/tender.py
+msgid "📥 Download Tender Documents from Etimad"
+msgstr "📥 تحميل مستندات المنافسة من إعتماد"
+
+#. module: ics_tender_management
+#: code:addons/ics_tender_management/models/tender.py
+msgid "<strong>Action Required:</strong><br/><ul><li>Login to your Etimad account</li><li>Download all tender documents</li><li>Review technical specifications</li><li>Attach documents to this tender</li></ul><br/><strong>Etimad Link:</strong> %s"
+msgstr "<strong>إجراء مطلوب:</strong><br/><ul><li>تسجيل الدخول إلى حساب إعتماد الخاص بك</li><li>تحميل جميع مستندات المنافسة</li><li>مراجعة المواصفات الفنية</li><li>إرفاق المستندات بهذه المنافسة</li></ul><br/><strong>رابط إعتماد:</strong> %s"
+
+#. module: ics_tender_management
+#: code:addons/ics_tender_management/models/tender.py
+msgid "📍 Schedule Site Visit (الزيارة الميدانية)"
+msgstr "📍 جدولة الزيارة الميدانية"
+
+#. module: ics_tender_management
+#: code:addons/ics_tender_management/models/tender.py
+msgid "<strong>Site Visit Required</strong><br/><ul><li>Coordinate site visit date with customer</li><li>Prepare required documents for site</li><li>Assign team members for visit</li><li>Update site visit date in tender form</li></ul>"
+msgstr "<strong>الزيارة الميدانية مطلوبة</strong><br/><ul><li>تنسيق موعد الزيارة الميدانية مع العميل</li><li>تجهيز المستندات المطلوبة للزيارة</li><li>تعيين أعضاء الفريق للزيارة</li><li>تحديث تاريخ الزيارة في نموذج المنافسة</li></ul>"
+
+#. module: ics_tender_management
+#: code:addons/ics_tender_management/models/tender.py
+msgid "📋 Complete Technical Study & BoQ"
+msgstr "📋 إكمال الدراسة الفنية وجدول الكميات"
+
+#. module: ics_tender_management
+#: code:addons/ics_tender_management/models/tender.py
+msgid "<strong>Technical Phase Tasks:</strong><br/><ul><li>Review technical specifications</li><li>Import/create Bill of Quantities</li><li>Define product requirements</li><li>Identify potential vendors</li><li>Estimate quantities and costs</li></ul>"
+msgstr "<strong>مهام المرحلة الفنية:</strong><br/><ul><li>مراجعة المواصفات الفنية</li><li>استيراد/إنشاء جدول الكميات</li><li>تحديد متطلبات المنتجات</li><li>تحديد الموردين المحتملين</li><li>تقدير الكميات والتكاليف</li></ul>"
+
+#. module: ics_tender_management
+#: code:addons/ics_tender_management/models/tender.py
+msgid "💰 Request Vendor Quotations"
+msgstr "💰 طلب عروض أسعار الموردين"
+
+#. module: ics_tender_management
+#: code:addons/ics_tender_management/models/tender.py
+msgid "<strong>Financial Phase Tasks:</strong><br/><ul><li>Send RFQs to selected vendors</li><li>Collect and review vendor offers</li><li>Compare vendor prices</li><li>Select best vendors per product</li><li>Calculate final margin</li></ul>"
+msgstr "<strong>مهام المرحلة المالية:</strong><br/><ul><li>إرسال طلبات عروض الأسعار للموردين المختارين</li><li>جمع ومراجعة عروض الموردين</li><li>مقارنة أسعار الموردين</li><li>اختيار أفضل الموردين لكل منتج</li><li>حساب الهامش النهائي</li></ul>"
+
+#. module: ics_tender_management
+#: code:addons/ics_tender_management/models/tender.py
+msgid "📄 Review & Approve Quotation"
+msgstr "📄 مراجعة واعتماد عرض السعر"
+
+#. module: ics_tender_management
+#: code:addons/ics_tender_management/models/tender.py
+msgid "<strong>Quotation Review:</strong><br/><ul><li>Review generated quotation</li><li>Verify prices and margins</li><li>Get internal approvals</li><li>Prepare submission documents</li><li>Final quality check</li></ul>"
+msgstr "<strong>مراجعة عرض السعر:</strong><br/><ul><li>مراجعة عرض السعر المُنشأ</li><li>التحقق من الأسعار والهوامش</li><li>الحصول على الموافقات الداخلية</li><li>تجهيز مستندات التقديم</li><li>الفحص النهائي للجودة</li></ul>"
+
+#. module: ics_tender_management
+#: code:addons/ics_tender_management/models/tender.py
+msgid "✅ Confirm Submission & Track"
+msgstr "✅ تأكيد التقديم والمتابعة"
+
+#. module: ics_tender_management
+#: code:addons/ics_tender_management/models/tender.py
+msgid "<strong>Post-Submission:</strong><br/><ul><li>Confirm submission receipt from customer</li><li>Monitor tender evaluation timeline</li><li>Prepare for clarification questions</li><li>Track opening date</li></ul>"
+msgstr "<strong>ما بعد التقديم:</strong><br/><ul><li>تأكيد استلام التقديم من العميل</li><li>متابعة جدول التقييم</li><li>الاستعداد للأسئلة التوضيحية</li><li>تتبع تاريخ الفتح</li></ul>"
+
+#. module: ics_tender_management
+#: code:addons/ics_tender_management/models/tender.py
+msgid "🔍 Monitor Evaluation & Prepare Response"
+msgstr "🔍 متابعة التقييم وإعداد الردود"
+
+#. module: ics_tender_management
+#: code:addons/ics_tender_management/models/tender.py
+msgid "<strong>Evaluation Phase:</strong><br/><ul><li>Monitor customer evaluation progress</li><li>Respond to clarification requests</li><li>Prepare for negotiations if needed</li><li>Track competitor information</li><li>Stay ready for final presentations</li></ul>"
+msgstr "<strong>مرحلة التقييم:</strong><br/><ul><li>متابعة تقدم تقييم العميل</li><li>الرد على طلبات التوضيح</li><li>الاستعداد للمفاوضات عند الحاجة</li><li>تتبع معلومات المنافسين</li><li>الاستعداد للعروض النهائية</li></ul>"
+
+#. module: ics_tender_management
+#: code:addons/ics_tender_management/models/tender.py
+msgid "⚖️ Consider Appeal (إعتراض) - You Have the Right!"
+msgstr "⚖️ النظر في الإعتراض - لديك الحق!"
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_tender_form
+msgid "Appeal Workflow (حق الإعتراض)"
+msgstr "سير عمل الإعتراض"
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_tender_form
+msgid "💡 حق الإعتراض متاح"
+msgstr ""
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_tender_form
+msgid "لديك الحق في تقديم إعتراض على نتيجة المنافسة. قد يتم قبول الإعتراض إذا كانت الأسباب وجيهة."
+msgstr ""
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_tender_form
+msgid "You have the right to appeal. Click the checkbox above to start the appeal process."
+msgstr "لديك الحق في الإعتراض. انقر على المربع أعلاه لبدء عملية الإعتراض."
