@@ -34,6 +34,27 @@ class CreateProjectWizard(models.TransientModel):
     
     use_task_template = fields.Boolean('Use Task Template', default=True,
         help='Create tasks from template instead of BoQ')
+    
+    existing_project_ids = fields.Many2many('project.project', 
+        string='Existing Projects',
+        compute='_compute_existing_projects',
+        help='Projects already created for this tender')
+    
+    has_existing_projects = fields.Boolean('Has Existing Projects',
+        compute='_compute_existing_projects')
+    
+    @api.depends('tender_id')
+    def _compute_existing_projects(self):
+        for wizard in self:
+            if wizard.tender_id:
+                projects = self.env['project.project'].search([
+                    ('tender_id', '=', wizard.tender_id.id)
+                ])
+                wizard.existing_project_ids = [(6, 0, projects.ids)]
+                wizard.has_existing_projects = bool(projects)
+            else:
+                wizard.existing_project_ids = False
+                wizard.has_existing_projects = False
 
     @api.model
     def default_get(self, fields_list):
@@ -81,6 +102,19 @@ class CreateProjectWizard(models.TransientModel):
 
         if self.tender_id.state != 'won':
             raise UserError(_('Only won tenders can be converted to projects.'))
+        
+        # Check if project already exists for this tender
+        if self.tender_id.project_count > 0:
+            existing_projects = self.env['project.project'].search([
+                ('tender_id', '=', self.tender_id.id)
+            ])
+            project_names = ', '.join(existing_projects.mapped('name'))
+            raise UserError(_(
+                'A project already exists for this tender:\n\n'
+                '%s\n\n'
+                'Please use the existing project instead of creating a duplicate.\n'
+                'If you need to modify the project, use the "View Projects" button.'
+            ) % project_names)
 
         project_vals = {
             'name': self.name,
@@ -118,3 +152,39 @@ class CreateProjectWizard(models.TransientModel):
             'res_id': project.id,
             'target': 'current',
         }
+    
+    def _create_tasks_from_template(self, project):
+        """Create project tasks from selected template"""
+        self.ensure_one()
+        
+        if not self.task_template_id or not self.task_template_id.task_line_ids:
+            return
+        
+        project_start = self.date_start or fields.Date.today()
+        
+        for line in self.task_template_id.task_line_ids:
+            task_vals = {
+                'name': line.name,
+                'project_id': project.id,
+                'partner_id': self.partner_id.id,
+                'description': line.description,
+                'priority': line.priority,
+                'tag_ids': [(6, 0, line.tag_ids.ids)] if line.tag_ids else False,
+                'planned_hours': line.planned_hours,
+            }
+            
+            # Set task start date based on delay
+            if line.delay_days > 0:
+                task_vals['date_deadline'] = project_start + timedelta(days=line.delay_days)
+            
+            # Set assignee
+            if line.user_id:
+                task_vals['user_ids'] = [(6, 0, [line.user_id.id])]
+            elif self.user_id:
+                task_vals['user_ids'] = [(6, 0, [self.user_id.id])]
+            
+            # Set stage if specified
+            if line.stage_id:
+                task_vals['stage_id'] = line.stage_id.id
+            
+            self.env['project.task'].create(task_vals)

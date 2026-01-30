@@ -8,6 +8,27 @@
             <field name="arch" type="xml">
                 <form string="Create Project">
                     <sheet>
+                        <!-- Warning for existing projects -->
+                        <div class="alert alert-warning" role="alert" invisible="not has_existing_projects">
+                            <strong>⚠️ Warning: Project Already Exists!</strong>
+                            <p class="mb-0">
+                                This tender already has an active project. 
+                                Creating a duplicate may cause confusion and data fragmentation.
+                            </p>
+                            <field name="existing_project_ids" readonly="1" nolabel="1">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="user_id"/>
+                                    <field name="date_start"/>
+                                </tree>
+                            </field>
+                            <p class="mt-2 mb-0">
+                                <strong>Recommendation:</strong> Use the existing project instead. 
+                                Click "View Projects" on the tender form to access it.
+                            </p>
+                        </div>
+                        <field name="has_existing_projects" invisible="1"/>
+                        
                         <group>
                             <group>
                                 <field name="tender_id" readonly="1"/>

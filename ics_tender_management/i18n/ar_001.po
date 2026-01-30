@@ -3061,3 +3061,43 @@ msgstr "وضع جدول الكميات:"
 #: model:ir.ui.view,arch_db:ics_tender_management.view_create_project_wizard_form
 msgid "Each Bill of Quantities line will be converted into a project task."
 msgstr "سيتم تحويل كل بند من جدول الكميات إلى مهمة مشروع."
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_project_wizard__existing_project_ids
+msgid "Existing Projects"
+msgstr "المشاريع الموجودة"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_project_wizard__has_existing_projects
+msgid "Has Existing Projects"
+msgstr "يوجد مشاريع"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,help:ics_tender_management.field_ics_tender_project_wizard__existing_project_ids
+msgid "Projects already created for this tender"
+msgstr "المشاريع التي تم إنشاؤها بالفعل لهذه المنافسة"
+
+#. module: ics_tender_management
+#: code:addons/ics_tender_management/wizard/create_project_wizard.py
+msgid "A project already exists for this tender:\\n\\n%s\\n\\nPlease use the existing project instead of creating a duplicate.\\nIf you need to modify the project, use the \"View Projects\" button."
+msgstr "يوجد بالفعل مشروع لهذه المنافسة:\\n\\n%s\\n\\nالرجاء استخدام المشروع الموجود بدلاً من إنشاء نسخة مكررة.\\nإذا كنت بحاجة إلى تعديل المشروع، استخدم زر \"عرض المشاريع\"."
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_create_project_wizard_form
+msgid "⚠️ Warning: Project Already Exists!"
+msgstr "⚠️ تحذير: المشروع موجود بالفعل!"
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_create_project_wizard_form
+msgid "This tender already has an active project. Creating a duplicate may cause confusion and data fragmentation."
+msgstr "هذه المنافسة لديها بالفعل مشروع نشط. إنشاء نسخة مكررة قد يسبب ارباكاً وتجزئة البيانات."
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_create_project_wizard_form
+msgid "Recommendation:"
+msgstr "التوصية:"
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_create_project_wizard_form
+msgid "Use the existing project instead. Click \"View Projects\" on the tender form to access it."
+msgstr "استخدم المشروع الموجود بدلاً من ذلك. انقر على \"عرض المشاريع\" في نموذج المنافسة للوصول إليه."
