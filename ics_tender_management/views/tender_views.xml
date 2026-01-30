@@ -231,41 +231,44 @@
                             </group>
                         </group>
                         <notebook>
-                            <page string="Description" name="description">
-                                <field name="description" placeholder="Tender description and requirements..."/>
-                            </page>
-                            <page string="Bill of Quantities" name="boq">
-                                <field name="boq_line_ids">
-                                    <list editable="bottom">
-                                        <field name="sequence" widget="handle"/>
-                                        <field name="product_id"/>
-                                        <field name="name"/>
-                                        <field name="quantity"/>
-                                        <field name="uom_id"/>
-                                        <field name="estimated_cost" sum="Total Estimated"/>
-                                        <field name="selected_vendor_id"/>
-                                        <field name="selected_vendor_price" sum="Total Vendor Cost"/>
-                                        <field name="currency_id" invisible="1"/>
-                                    </list>
-                                </field>
-                            </page>
-                            <page string="Internal Notes" name="notes">
-                                <field name="notes" placeholder="Internal notes and comments..."/>
-                            </page>
-                            <page string="Won/Lost Details" name="outcome"
-                                invisible="state not in ['won', 'lost']">
+                            <!-- Phase 1: Initial Information (Draft) -->
+                            <page string="1. Tender Information" name="tender_info_tab">
                                 <group>
-                                    <group>
-                                        <field name="winning_reason" invisible="state != 'won'"/>
-                                        <field name="lost_reason" invisible="state != 'lost'"/>
+                                    <group string="Description &amp; Scope">
+                                        <field name="description" placeholder="Tender description and requirements..." nolabel="1"/>
                                     </group>
-                                    <group invisible="state != 'won'">
-                                        <field name="actual_revenue"/>
+                                </group>
+                                <separator string="Tender Details"/>
+                                <group>
+                                    <group string="Source &amp; Method">
+                                        <field name="etimad_link" widget="url"/>
+                                        <field name="tender_completion_time"/>
+                                        <field name="tender_submission_method"/>
+                                    </group>
+                                    <group string="Booklet Purchase">
+                                        <field name="tender_booklet_price"/>
+                                        <field name="booklet_purchased"/>
+                                        <field name="booklet_purchase_receipt" invisible="not booklet_purchased"/>
+                                        <field name="booklet_purchase_request_date" invisible="not booklet_purchased"/>
+                                        <field name="booklet_purchase_date" invisible="not booklet_purchased"/>
+                                    </group>
+                                </group>
+                                <group>
+                                    <group string="Site Visit">
+                                        <field name="site_visit_required"/>
+                                        <field name="site_visit_date" widget="datetime" invisible="not site_visit_required"/>
+                                        <field name="documents_required_for_site" filename="documents_required_filename" invisible="not site_visit_required"/>
+                                        <field name="documents_required_filename" invisible="1"/>
+                                    </group>
+                                    <group string="Inquiries">
+                                        <field name="last_inquiry_date"/>
+                                        <field name="required_inquiries"/>
                                     </group>
                                 </group>
                             </page>
-                            <!-- Legacy CRM Migration Tabs -->
-                            <page string="Tendering Details" name="tendering_details">
+
+                            <!-- Phase 2: Qualification (Draft/Technical) -->
+                            <page string="2. Qualification &amp; Decision" name="qualification">
                                 <group>
                                     <group string="Tender Information">
                                         <field name="etimad_link" widget="url"/>
@@ -293,7 +296,6 @@
                                     </group>
                                 </group>
                             </page>
-                            <page string="Qualification" name="qualification">
                                 <group>
                                     <group string="Evaluation">
                                         <field name="presales_employee" widget="many2one_avatar_user"/>
@@ -303,7 +305,7 @@
                                         <field name="required_certifications_filename" invisible="1"/>
                                         <field name="estimated_project_value"/>
                                     </group>
-                                    <group string="Decision">
+                                    <group string="Participation Decision">
                                         <field name="winning_probability"/>
                                         <field name="client_relationship"/>
                                         <field name="participation_decision"/>
@@ -314,88 +316,11 @@
                                 <separator string="Project Scope of Work"/>
                                 <field name="project_scope_of_work" placeholder="Detailed project scope..."/>
                             </page>
-                            <page string="Approvals" name="approvals">
+
+                            <!-- Phase 3: Team & Suppliers Setup (Technical) -->
+                            <page string="3. Team &amp; Suppliers" name="team_suppliers">
                                 <group>
-                                    <group string="Management Approvals">
-                                        <field name="approval_direct_manager" widget="boolean_toggle"/>
-                                        <field name="approval_department_manager" widget="boolean_toggle"/>
-                                        <field name="approval_financial_manager" widget="boolean_toggle"/>
-                                        <field name="approval_ceo" widget="boolean_toggle"/>
-                                    </group>
-                                    <group string="Document Status">
-                                        <field name="tender_documents_uploaded" widget="boolean_toggle"/>
-                                        <field name="file_submission_required" widget="boolean_toggle"/>
-                                        <field name="file_submission_date" invisible="not file_submission_required"/>
-                                        <field name="documents_upload_for_review" filename="documents_upload_filename"/>
-                                        <field name="documents_upload_filename" invisible="1"/>
-                                    </group>
-                                </group>
-                            </page>
-                            <page string="Offer Results" name="offer_results">
-                                <group>
-                                    <group string="Offer Opening">
-                                        <field name="offer_opening_date" widget="datetime"/>
-                                        <field name="financial_offer_opening_date" widget="datetime"/>
-                                        <field name="competing_companies_file" filename="competing_companies_filename"/>
-                                        <field name="competing_companies_filename" invisible="1"/>
-                                    </group>
-                                    <group string="Offer Status">
-                                        <field name="offer_accepted" widget="boolean_toggle"/>
-                                        <field name="offer_rejection_reason" invisible="offer_accepted"/>
-                                        <field name="financial_offer_accepted" widget="boolean_toggle"/>
-                                        <field name="financial_offer_rejection_reason" invisible="financial_offer_accepted"/>
-                                    </group>
-                                </group>
-                                <group>
-                                    <group string="Extensions &amp; Appeals">
-                                        <field name="offer_extension_requested" widget="boolean_toggle"/>
-                                        <field name="extension_awarded" widget="boolean_toggle" invisible="not offer_extension_requested"/>
-                                        <field name="extension_rejection_reason" invisible="extension_awarded or not offer_extension_requested"/>
-                                        <field name="discount_requested" widget="boolean_toggle"/>
-                                    </group>
-                                </group>
-                                <group string="Appeal Workflow (حق الإعتراض)" invisible="state not in ['lost', 'evaluation']">
-                                    <group>
-                                        <field name="appeal_submitted" widget="boolean_toggle"/>
-                                        <field name="appeal_submission_date" invisible="not appeal_submitted"/>
-                                        <field name="appeal_letter_file" filename="appeal_letter_filename" invisible="not appeal_submitted"/>
-                                        <field name="appeal_letter_filename" invisible="1"/>
-                                        <field name="appeal_reason" invisible="not appeal_submitted"/>
-                                    </group>
-                                    <group invisible="not appeal_submitted">
-                                        <field name="appeal_status" widget="badge" 
-                                            decoration-info="appeal_status == 'pending'"
-                                            decoration-success="appeal_status == 'accepted'"
-                                            decoration-danger="appeal_status == 'rejected'"
-                                            decoration-muted="appeal_status == 'withdrawn'"/>
-                                        <field name="appeal_response_date"/>
-                                        <field name="appeal_response_notes"/>
-                                    </group>
-                                </group>
-                                <div class="alert alert-info" role="alert" invisible="state != 'lost' or appeal_submitted">
-                                    <strong>💡 حق الإعتراض متاح</strong>
-                                    <p class="mb-0">
-                                        لديك الحق في تقديم إعتراض على نتيجة المنافسة. 
-                                        قد يتم قبول الإعتراض إذا كانت الأسباب وجيهة.
-                                    </p>
-                                    <p class="mb-0 mt-2">
-                                        <strong>You have the right to appeal.</strong>
-                                        Click the checkbox above to start the appeal process.
-                                    </p>
-                                </div>
-                                <group>
-                                    <group string="Award Details">
-                                        <field name="awarded_company" options="{'no_create_edit': True}"/>
-                                        <field name="amount_awarded"/>
-                                        <field name="award_date"/>
-                                        <field name="award_letter_file" filename="award_letter_filename"/>
-                                        <field name="award_letter_filename" invisible="1"/>
-                                    </group>
-                                </group>
-                            </page>
-                            <page string="Team &amp; Suppliers" name="team_suppliers">
-                                <group>
-                                    <group string="Communication Team">
+                                    <group string="Responsible Team">
                                         <field name="tender_employee" widget="many2one_avatar_user"/>
                                         <field name="sales_representative" widget="many2one_avatar_user"/>
                                     </group>
@@ -428,6 +353,130 @@
                                         <field name="currency_id" invisible="1"/>
                                     </list>
                                 </field>
+                            </page>
+
+                            <!-- Phase 4: Bill of Quantities (Technical/Financial) -->
+                            <page string="4. Bill of Quantities" name="boq">
+                                <field name="boq_line_ids">
+                                    <list editable="bottom">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="product_id"/>
+                                        <field name="name"/>
+                                        <field name="quantity"/>
+                                        <field name="uom_id"/>
+                                        <field name="estimated_cost" sum="Total Estimated"/>
+                                        <field name="selected_vendor_id"/>
+                                        <field name="selected_vendor_price" sum="Total Vendor Cost"/>
+                                        <field name="currency_id" invisible="1"/>
+                                    </list>
+                                </field>
+                            </page>
+
+                            <!-- Phase 5: Approvals & Documents (Quotation) -->
+                            <page string="5. Approvals &amp; Documents" name="approvals">
+                                <group>
+                                    <group string="Management Approvals">
+                                        <field name="approval_direct_manager" widget="boolean_toggle"/>
+                                        <field name="approval_department_manager" widget="boolean_toggle"/>
+                                        <field name="approval_financial_manager" widget="boolean_toggle"/>
+                                        <field name="approval_ceo" widget="boolean_toggle"/>
+                                    </group>
+                                    <group string="Document Submission">
+                                        <field name="tender_documents_uploaded" widget="boolean_toggle"/>
+                                        <field name="file_submission_required" widget="boolean_toggle"/>
+                                        <field name="file_submission_date" invisible="not file_submission_required"/>
+                                        <field name="documents_upload_for_review" filename="documents_upload_filename"/>
+                                        <field name="documents_upload_filename" invisible="1"/>
+                                    </group>
+                                </group>
+                            </page>
+
+                            <!-- Phase 6: Offer Results & Evaluation (Submitted/Evaluation) -->
+                            <page string="6. Offer Results &amp; Evaluation" name="offer_results">
+                                <group>
+                                    <group string="Offer Opening Dates">
+                                        <field name="offer_opening_date" widget="datetime"/>
+                                        <field name="financial_offer_opening_date" widget="datetime"/>
+                                        <field name="competing_companies_file" filename="competing_companies_filename"/>
+                                        <field name="competing_companies_filename" invisible="1"/>
+                                    </group>
+                                    <group string="Technical Offer Status">
+                                        <field name="offer_accepted" widget="boolean_toggle"/>
+                                        <field name="offer_rejection_reason" invisible="offer_accepted"/>
+                                    </group>
+                                </group>
+                                <group>
+                                    <group string="Financial Offer Status">
+                                        <field name="financial_offer_accepted" widget="boolean_toggle"/>
+                                        <field name="financial_offer_rejection_reason" invisible="financial_offer_accepted"/>
+                                    </group>
+                                    <group string="Extensions &amp; Negotiations">
+                                        <field name="offer_extension_requested" widget="boolean_toggle"/>
+                                        <field name="extension_awarded" widget="boolean_toggle" invisible="not offer_extension_requested"/>
+                                        <field name="extension_rejection_reason" invisible="extension_awarded or not offer_extension_requested"/>
+                                        <field name="discount_requested" widget="boolean_toggle"/>
+                                    </group>
+                                </group>
+                            </page>
+
+                            <!-- Phase 7: Final Outcome (Won/Lost/Cancelled) -->
+                            <page string="7. Final Outcome" name="outcome"
+                                invisible="state not in ['won', 'lost', 'cancelled']">
+                                <group string="Award Details" invisible="state != 'won'">
+                                    <group>
+                                        <field name="awarded_company" options="{'no_create_edit': True}"/>
+                                        <field name="amount_awarded"/>
+                                        <field name="award_date"/>
+                                        <field name="award_letter_file" filename="award_letter_filename"/>
+                                        <field name="award_letter_filename" invisible="1"/>
+                                    </group>
+                                    <group>
+                                        <field name="winning_reason"/>
+                                        <field name="actual_revenue"/>
+                                    </group>
+                                </group>
+
+                                <separator string="Lost Reason" invisible="state != 'lost'"/>
+                                <group invisible="state != 'lost'">
+                                    <group>
+                                        <field name="lost_reason" nolabel="1"/>
+                                    </group>
+                                </group>
+
+                                <group string="Appeal Workflow (حق الإعتراض)" invisible="state != 'lost'">
+                                    <group>
+                                        <field name="appeal_submitted" widget="boolean_toggle"/>
+                                        <field name="appeal_submission_date" invisible="not appeal_submitted"/>
+                                        <field name="appeal_letter_file" filename="appeal_letter_filename" invisible="not appeal_submitted"/>
+                                        <field name="appeal_letter_filename" invisible="1"/>
+                                        <field name="appeal_reason" invisible="not appeal_submitted"/>
+                                    </group>
+                                    <group invisible="not appeal_submitted">
+                                        <field name="appeal_status" widget="badge" 
+                                            decoration-info="appeal_status == 'pending'"
+                                            decoration-success="appeal_status == 'accepted'"
+                                            decoration-danger="appeal_status == 'rejected'"
+                                            decoration-muted="appeal_status == 'withdrawn'"/>
+                                        <field name="appeal_response_date"/>
+                                        <field name="appeal_response_notes"/>
+                                    </group>
+                                </group>
+                                <div class="alert alert-info" role="alert" invisible="state != 'lost' or appeal_submitted">
+                                    <strong>💡 حق الإعتراض متاح</strong>
+                                    <p class="mb-0">
+                                        لديك الحق في تقديم إعتراض على نتيجة المنافسة. 
+                                        قد يتم قبول الإعتراض إذا كانت الأسباب وجيهة.
+                                    </p>
+                                    <p class="mb-0 mt-2">
+                                        <strong>You have the right to appeal.</strong>
+                                        Click the checkbox above to start the appeal process.
+                                    </p>
+                                </div>
+                            </page>
+
+                            <!-- Phase 8: Internal Notes -->
+                            <page string="8. Internal Notes" name="notes">
+                                <field name="notes" placeholder="Internal notes, communications, and observations..."/>
                             </page>
                         </notebook>
                     </sheet>
