@@ -45,22 +45,31 @@ class GenerateQuotationWizard(models.TransientModel):
             # Use command syntax for computed One2many fields
             lines = []
             for boq_line in wizard.tender_id.boq_line_ids:
-                if wizard.use_vendor_costs and boq_line.selected_vendor_price:
-                    cost = boq_line.selected_vendor_price
+                # Use vendor cost if selected and vendor is chosen
+                # Check for selected_vendor_id instead of price to handle $0.00 offers
+                if wizard.use_vendor_costs and boq_line.selected_vendor_id:
+                    cost = boq_line.selected_vendor_price or 0.0
                 else:
-                    cost = boq_line.estimated_cost
+                    cost = boq_line.estimated_cost or 0.0
 
+                # Calculate margin and totals
                 margin = cost * (wizard.margin_percentage / 100)
                 total = cost + margin
+                
+                # Calculate unit price safely
+                if boq_line.quantity and boq_line.quantity > 0:
+                    unit_price = total / boq_line.quantity
+                else:
+                    unit_price = total  # If no quantity, unit price = total
 
                 lines.append((0, 0, {
                     'product_id': boq_line.product_id.id,
-                    'name': boq_line.name,
+                    'name': boq_line.name or boq_line.product_id.name or 'Product',
                     'quantity': boq_line.quantity,
                     'uom_id': boq_line.uom_id.id,
                     'cost': cost,
                     'margin': margin,
-                    'unit_price': total / boq_line.quantity if boq_line.quantity else 0,
+                    'unit_price': unit_price,
                     'total': total,
                 }))
             
