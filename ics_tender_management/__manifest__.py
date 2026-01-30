@@ -1,6 +1,6 @@
 {
     'name': 'ICS Tender Management',
-    'version': '18.0.2.0.1',
+    'version': '18.0.2.1.0',
     'category': 'Sales/CRM',
     'summary': 'Complete Tender Management System for Saudi Etimad Portal Integration',
     'description': """
@@ -59,23 +59,30 @@
 
         POST-AWARD PHASE - SUPPLY PROJECTS (مشاريع التوريد)
         Fully aligned with ICS Supply Projects Procedure:
+        **WITH AUTOMATIC TASK TEMPLATE CREATION:**
 
-        1. استلام المشروع بعد الترسية (Project Receipt)
-        2. التعاقد مع الموردين (Contracting with Suppliers)
-        3. تنفيذ التوريد (Supply Execution)
-        4. الاستلام الابتدائي (Preliminary Handover)
-        5. الاستلام النهائي (Final Handover)
-        6. المستخلصات والإقفال (Invoicing & Closure)
+        1. بدء المشروع (Kick-Off)
+        2. التخطيط التشغيلي (Operational Planning)
+        3. تنفيذ الأعمال وفق كراسة الشروط (Execution per Specs)
+        4. نقل البضاعة (Transport & Logistics)
+        5. التسليم الابتدائي (Preliminary Handover)
+        6. استلام البضاعة من العميل (Customer Receipt)
+        7. المستخلصات المالية (Financial Invoicing)
+        8. المتابعة والتقارير (Monitoring & Reporting)
+        9. التسليم والإقفال (Final Handover & Closure)
 
         POST-AWARD PHASE - O&M SERVICES (مشاريع الصيانة والتشغيل)
         Fully aligned with ICS O&M Services Procedure:
+        **WITH AUTOMATIC TASK TEMPLATE CREATION:**
 
         1. بدء المشروع (Project Kick-off)
         2. التخطيط التشغيلي (Operational Planning)
-        3. تنفيذ الأعمال (Work Execution)
-        4. المتابعة والتقارير (Monitoring & Reporting)
-        5. المستخلصات المالية (Financial Invoicing)
-        6. التسليم والإقفال (Handover & Closure)
+        3. تنفيذ أعمال الصيانة الدورية (Preventive Maintenance)
+        4. التشغيل والمراقبة (Operation & Monitoring)
+        5. إدارة قطع الغيار (Spare Parts Management)
+        6. المستخلصات المالية (Financial Invoicing)
+        7. المتابعة والتقارير (Monitoring & Reporting)
+        8. مراجعة الأداء الدورية (Performance Reviews)
 
         KEY FEATURES
         - Professional dashboard with 14 metrics + 4 charts
@@ -84,6 +91,7 @@
         - Vendor comparison wizard
         - Purchase order generation
         - One-click project creation from won tenders
+        - **AUTO-PROJECT CREATION with predefined task templates**
         - Project execution tracking (Supply & O&M)
         - ICS procedure compliance monitoring
         - Win/loss performance analysis
@@ -146,6 +154,7 @@
         'data/tender_sequence.xml',
         'data/tender_stage_data.xml',
         'data/mail_template_data.xml',
+        'data/project_task_templates.xml',
         'views/tender_menus.xml',
         'views/tender_dashboard_views.xml',
         'views/tender_views.xml',

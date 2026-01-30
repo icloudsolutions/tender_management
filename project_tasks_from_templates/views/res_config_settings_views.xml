@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_inherit_project_templates" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.project.templates</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="55"/>
+        <field name="inherit_id" ref="project.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//app[@name='project']/block[@name='analytic']" position="after">
+                <block title="Project Templates" id="project_templates_block" name="project_templates">
+                    <setting id="auto_create_template_from_crm_stage_setting" 
+                             help="Automatically create project templates when CRM stages are created or updated">
+                        <field name="auto_create_template_from_crm_stage"/>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

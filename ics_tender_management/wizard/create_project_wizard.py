@@ -1,5 +1,6 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
+from datetime import timedelta
 
 
 class CreateProjectWizard(models.TransientModel):
@@ -26,6 +27,13 @@ class CreateProjectWizard(models.TransientModel):
         default=True, help='Link project to sales order if available')
 
     date_start = fields.Date('Start Date', default=fields.Date.today)
+    
+    task_template_id = fields.Many2one('ics.project.task.template', 
+        string='Task Template',
+        help='Select a task template to automatically create predefined project tasks')
+    
+    use_task_template = fields.Boolean('Use Task Template', default=True,
+        help='Create tasks from template instead of BoQ')
 
     @api.model
     def default_get(self, fields_list):
@@ -40,7 +48,33 @@ class CreateProjectWizard(models.TransientModel):
             ], limit=1)
             if confirmed_orders:
                 res['sale_order_id'] = confirmed_orders[0].id
+            
+            # Auto-select template based on tender category
+            if tender.tender_category:
+                template = self.env['ics.project.task.template'].search([
+                    ('tender_category', '=', tender.tender_category),
+                    ('active', '=', True)
+                ], limit=1)
+                if template:
+                    res['task_template_id'] = template.id
+            
+            # If no category-specific template, get general template
+            if not res.get('task_template_id'):
+                general_template = self.env['ics.project.task.template'].search([
+                    ('tender_category', '=', False),
+                    ('active', '=', True)
+                ], limit=1)
+                if general_template:
+                    res['task_template_id'] = general_template.id
         return res
+    
+    @api.onchange('use_task_template')
+    def _onchange_use_task_template(self):
+        """Toggle between template and BoQ task creation"""
+        if self.use_task_template:
+            self.create_from_boq = False
+        else:
+            self.create_from_boq = True
 
     def action_create_project(self):
         self.ensure_one()
@@ -62,7 +96,11 @@ class CreateProjectWizard(models.TransientModel):
 
         project = self.env['project.project'].create(project_vals)
 
-        if self.create_from_boq and self.tender_id.boq_line_ids:
+        # Create tasks from template
+        if self.use_task_template and self.task_template_id:
+            self._create_tasks_from_template(project)
+        # Or create tasks from BoQ
+        elif self.create_from_boq and self.tender_id.boq_line_ids:
             for boq_line in self.tender_id.boq_line_ids:
                 self.env['project.task'].create({
                     'name': boq_line.name,

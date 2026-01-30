@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ========== SUPPLY PROJECT TEMPLATE ========== -->
+        <record id="task_template_supply" model="ics.project.task.template">
+            <field name="name">Supply Project Template (توريد)</field>
+            <field name="tender_category">supply</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <!-- Supply Project Tasks -->
+        <record id="task_template_supply_line_1" model="ics.project.task.template.line">
+            <field name="template_id" ref="task_template_supply"/>
+            <field name="sequence">10</field>
+            <field name="name">بدء المشروع ( Kick-Off )</field>
+            <field name="description"><![CDATA[
+                <ul>
+                    <li>اجتماع بدء المشروع مع العميل</li>
+                    <li>مراجعة متطلبات المشروع</li>
+                    <li>تحديد نقاط الاتصال</li>
+                    <li>وضع الجدول الزمني</li>
+                </ul>
+            ]]></field>
+            <field name="planned_hours">8</field>
+            <field name="priority">3</field>
+            <field name="delay_days">0</field>
+        </record>
+
+        <record id="task_template_supply_line_2" model="ics.project.task.template.line">
+            <field name="template_id" ref="task_template_supply"/>
+            <field name="sequence">20</field>
+            <field name="name">التخطيط التشغيلي</field>
+            <field name="description"><![CDATA[
+                <ul>
+                    <li>وضع خطة التوريد</li>
+                    <li>تحديد الموردين المعتمدين</li>
+                    <li>إعداد جدول التسليم</li>
+                    <li>تخطيط الموارد والمخزون</li>
+                </ul>
+            ]]></field>
+            <field name="planned_hours">16</field>
+            <field name="priority">2</field>
+            <field name="delay_days">1</field>
+        </record>
+
+        <record id="task_template_supply_line_3" model="ics.project.task.template.line">
+            <field name="template_id" ref="task_template_supply"/>
+            <field name="sequence">30</field>
+            <field name="name">تنفيذ الأعمال وفق كراسة الشروط والمواصفات المعتمدة</field>
+            <field name="description"><![CDATA[
+                <ul>
+                    <li>طلب عروض أسعار من الموردين</li>
+                    <li>مراجعة العروض والمطابقة</li>
+                    <li>إصدار أوامر الشراء</li>
+                    <li>متابعة التصنيع/التجهيز</li>
+                    <li>فحص الجودة</li>
+                </ul>
+            ]]></field>
+            <field name="planned_hours">80</field>
+            <field name="priority">3</field>
+            <field name="delay_days">7</field>
+        </record>
+
+        <record id="task_template_supply_line_4" model="ics.project.task.template.line">
+            <field name="template_id" ref="task_template_supply"/>
+            <field name="sequence">40</field>
+            <field name="name">نقل البضاعة ( حسب متطلبات الكراسة )</field>
+            <field name="description"><![CDATA[
+                <ul>
+                    <li>ترتيب النقل والشحن</li>
+                    <li>التأمين على البضائع</li>
+                    <li>التخليص الجمركي (إن وجد)</li>
+                    <li>متابعة الشحنة</li>
+                </ul>
+            ]]></field>
+            <field name="planned_hours">24</field>
+            <field name="priority">2</field>
+            <field name="delay_days">30</field>
+        </record>
+
+        <record id="task_template_supply_line_5" model="ics.project.task.template.line">
+            <field name="template_id" ref="task_template_supply"/>
+            <field name="sequence">50</field>
+            <field name="name">التسليم الابتدائي</field>
+            <field name="description"><![CDATA[
+                <ul>
+                    <li>فحص البضائع عند الاستلام</li>
+                    <li>التحقق من المطابقة للمواصفات</li>
+                    <li>إعداد محضر استلام ابتدائي</li>
+                    <li>معالجة أي عدم مطابقة</li>
+                </ul>
+            ]]></field>
+            <field name="planned_hours">16</field>
+            <field name="priority">3</field>
+            <field name="delay_days">45</field>
+        </record>
+
+        <record id="task_template_supply_line_6" model="ics.project.task.template.line">
+            <field name="template_id" ref="task_template_supply"/>
+            <field name="sequence">60</field>
+            <field name="name">استلام البضاعة من العميل</field>
+            <field name="description"><![CDATA[
+                <ul>
+                    <li>تنسيق موعد الاستلام مع العميل</li>
+                    <li>التأكد من اكتمال جميع المستندات</li>
+                    <li>إعداد شهادة الاستلام النهائي</li>
+                    <li>توقيع محضر التسليم والاستلام</li>
+                </ul>
+            ]]></field>
+            <field name="planned_hours">8</field>
+            <field name="priority">3</field>
+            <field name="delay_days">50</field>
+        </record>
+
+        <record id="task_template_supply_line_7" model="ics.project.task.template.line">
+            <field name="template_id" ref="task_template_supply"/>
+            <field name="sequence">70</field>
+            <field name="name">المستخلصات المالية</field>
+            <field name="description"><![CDATA[
+                <ul>
+                    <li>إعداد المستخلص المالي</li>
+                    <li>جمع المستندات المطلوبة</li>
+                    <li>تقديم المستخلص للعميل</li>
+                    <li>متابعة الموافقات</li>
+                    <li>الرد على الاستفسارات المالية</li>
+                </ul>
+            ]]></field>
+            <field name="planned_hours">16</field>
+            <field name="priority">2</field>
+            <field name="delay_days">52</field>
+        </record>
+
+        <record id="task_template_supply_line_8" model="ics.project.task.template.line">
+            <field name="template_id" ref="task_template_supply"/>
+            <field name="sequence">80</field>
+            <field name="name">المتابعة والتقارير</field>
+            <field name="description"><![CDATA[
+                <ul>
+                    <li>إعداد تقارير دورية للعميل</li>
+                    <li>متابعة طلبات التعديل</li>
+                    <li>توثيق الدروس المستفادة</li>
+                    <li>تحديث حالة المشروع</li>
+                </ul>
+            ]]></field>
+            <field name="planned_hours">40</field>
+            <field name="priority">1</field>
+            <field name="delay_days">7</field>
+        </record>
+
+        <record id="task_template_supply_line_9" model="ics.project.task.template.line">
+            <field name="template_id" ref="task_template_supply"/>
+            <field name="sequence">90</field>
+            <field name="name">التسليم والإقفال</field>
+            <field name="description"><![CDATA[
+                <ul>
+                    <li>التسليم النهائي</li>
+                    <li>إغلاق جميع المستندات</li>
+                    <li>تسوية الحسابات المالية</li>
+                    <li>أرشفة وثائق المشروع</li>
+                    <li>تقييم رضا العميل</li>
+                    <li>إعداد التقرير الختامي</li>
+                </ul>
+            ]]></field>
+            <field name="planned_hours">16</field>
+            <field name="priority">3</field>
+            <field name="delay_days">60</field>
+        </record>
+
+        <!-- ========== MAINTENANCE & OPERATION PROJECT TEMPLATE ========== -->
+        <record id="task_template_maintenance" model="ics.project.task.template">
+            <field name="name">Maintenance &amp; Operation Project Template (صيانة وتشغيل)</field>
+            <field name="tender_category">maintenance</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <!-- Maintenance Project Tasks -->
+        <record id="task_template_maintenance_line_1" model="ics.project.task.template.line">
+            <field name="template_id" ref="task_template_maintenance"/>
+            <field name="sequence">10</field>
+            <field name="name">بدء المشروع ( Kick-Off )</field>
+            <field name="description"><![CDATA[
+                <ul>
+                    <li>اجتماع بدء المشروع</li>
+                    <li>مراجعة نطاق العمل</li>
+                    <li>تحديد فريق العمل</li>
+                    <li>وضع خطة الصيانة الدورية</li>
+                </ul>
+            ]]></field>
+            <field name="planned_hours">8</field>
+            <field name="priority">3</field>
+            <field name="delay_days">0</field>
+        </record>
+
+        <record id="task_template_maintenance_line_2" model="ics.project.task.template.line">
+            <field name="template_id" ref="task_template_maintenance"/>
+            <field name="sequence">20</field>
+            <field name="name">التخطيط التشغيلي</field>
+            <field name="description"><![CDATA[
+                <ul>
+                    <li>وضع جدول الصيانة الدورية</li>
+                    <li>تحديد المواد والأدوات المطلوبة</li>
+                    <li>تخطيط الموارد البشرية</li>
+                    <li>إعداد خطة الطوارئ</li>
+                </ul>
+            ]]></field>
+            <field name="planned_hours">16</field>
+            <field name="priority">2</field>
+            <field name="delay_days">2</field>
+        </record>
+
+        <record id="task_template_maintenance_line_3" model="ics.project.task.template.line">
+            <field name="template_id" ref="task_template_maintenance"/>
+            <field name="sequence">30</field>
+            <field name="name">تنفيذ أعمال الصيانة الدورية</field>
+            <field name="description"><![CDATA[
+                <ul>
+                    <li>تنفيذ الصيانة الوقائية</li>
+                    <li>معالجة الأعطال الطارئة</li>
+                    <li>توثيق أعمال الصيانة</li>
+                    <li>إعداد تقارير الصيانة</li>
+                </ul>
+            ]]></field>
+            <field name="planned_hours">160</field>
+            <field name="priority">3</field>
+            <field name="delay_days">7</field>
+        </record>
+
+        <record id="task_template_maintenance_line_4" model="ics.project.task.template.line">
+            <field name="template_id" ref="task_template_maintenance"/>
+            <field name="sequence">40</field>
+            <field name="name">التشغيل والمراقبة</field>
+            <field name="description"><![CDATA[
+                <ul>
+                    <li>مراقبة الأداء التشغيلي</li>
+                    <li>معايرة الأجهزة</li>
+                    <li>تسجيل القراءات</li>
+                    <li>تحليل الأداء</li>
+                </ul>
+            ]]></field>
+            <field name="planned_hours">120</field>
+            <field name="priority">2</field>
+            <field name="delay_days">7</field>
+        </record>
+
+        <record id="task_template_maintenance_line_5" model="ics.project.task.template.line">
+            <field name="template_id" ref="task_template_maintenance"/>
+            <field name="sequence">50</field>
+            <field name="name">إدارة قطع الغيار</field>
+            <field name="description"><![CDATA[
+                <ul>
+                    <li>إدارة مخزون قطع الغيار</li>
+                    <li>طلب قطع الغيار المطلوبة</li>
+                    <li>تتبع استهلاك القطع</li>
+                    <li>التأكد من توفر القطع الحرجة</li>
+                </ul>
+            ]]></field>
+            <field name="planned_hours">40</field>
+            <field name="priority">2</field>
+            <field name="delay_days">14</field>
+        </record>
+
+        <record id="task_template_maintenance_line_6" model="ics.project.task.template.line">
+            <field name="template_id" ref="task_template_maintenance"/>
+            <field name="sequence">60</field>
+            <field name="name">المستخلصات المالية</field>
+            <field name="description"><![CDATA[
+                <ul>
+                    <li>إعداد المستخلصات الدورية</li>
+                    <li>توثيق الأعمال المنفذة</li>
+                    <li>تقديم المستخلصات للعميل</li>
+                    <li>متابعة الموافقات والدفعات</li>
+                </ul>
+            ]]></field>
+            <field name="planned_hours">24</field>
+            <field name="priority">2</field>
+            <field name="delay_days">30</field>
+        </record>
+
+        <record id="task_template_maintenance_line_7" model="ics.project.task.template.line">
+            <field name="template_id" ref="task_template_maintenance"/>
+            <field name="sequence">70</field>
+            <field name="name">المتابعة والتقارير</field>
+            <field name="description"><![CDATA[
+                <ul>
+                    <li>إعداد التقارير الدورية</li>
+                    <li>متابعة مؤشرات الأداء</li>
+                    <li>التواصل مع العميل</li>
+                    <li>تحديث السجلات</li>
+                </ul>
+            ]]></field>
+            <field name="planned_hours">80</field>
+            <field name="priority">1</field>
+            <field name="delay_days">7</field>
+        </record>
+
+        <record id="task_template_maintenance_line_8" model="ics.project.task.template.line">
+            <field name="template_id" ref="task_template_maintenance"/>
+            <field name="sequence">80</field>
+            <field name="name">مراجعة الأداء الدورية</field>
+            <field name="description"><![CDATA[
+                <ul>
+                    <li>مراجعة شهرية/ربع سنوية مع العميل</li>
+                    <li>تقييم جودة الخدمة</li>
+                    <li>معالجة الملاحظات</li>
+                    <li>خطط التحسين المستمر</li>
+                </ul>
+            ]]></field>
+            <field name="planned_hours">16</field>
+            <field name="priority">2</field>
+            <field name="delay_days">30</field>
+        </record>
+
+        <!-- ========== GENERAL PROJECT TEMPLATE ========== -->
+        <record id="task_template_general" model="ics.project.task.template">
+            <field name="name">General Project Template (قالب عام)</field>
+            <field name="tender_category"></field>
+            <field name="sequence">100</field>
+        </record>
+
+        <record id="task_template_general_line_1" model="ics.project.task.template.line">
+            <field name="template_id" ref="task_template_general"/>
+            <field name="sequence">10</field>
+            <field name="name">Project Initiation</field>
+            <field name="description"><![CDATA[
+                <p>Initial project setup and kickoff meeting</p>
+            ]]></field>
+            <field name="planned_hours">8</field>
+            <field name="priority">3</field>
+            <field name="delay_days">0</field>
+        </record>
+
+        <record id="task_template_general_line_2" model="ics.project.task.template.line">
+            <field name="template_id" ref="task_template_general"/>
+            <field name="sequence">20</field>
+            <field name="name">Planning &amp; Design</field>
+            <field name="description"><![CDATA[
+                <p>Project planning and design phase</p>
+            ]]></field>
+            <field name="planned_hours">40</field>
+            <field name="priority">2</field>
+            <field name="delay_days">7</field>
+        </record>
+
+        <record id="task_template_general_line_3" model="ics.project.task.template.line">
+            <field name="template_id" ref="task_template_general"/>
+            <field name="sequence">30</field>
+            <field name="name">Execution</field>
+            <field name="description"><![CDATA[
+                <p>Main execution and implementation phase</p>
+            ]]></field>
+            <field name="planned_hours">120</field>
+            <field name="priority">3</field>
+            <field name="delay_days">14</field>
+        </record>
+
+        <record id="task_template_general_line_4" model="ics.project.task.template.line">
+            <field name="template_id" ref="task_template_general"/>
+            <field name="sequence">40</field>
+            <field name="name">Monitoring &amp; Control</field>
+            <field name="description"><![CDATA[
+                <p>Ongoing monitoring and control activities</p>
+            ]]></field>
+            <field name="planned_hours">40</field>
+            <field name="priority">1</field>
+            <field name="delay_days">7</field>
+        </record>
+
+        <record id="task_template_general_line_5" model="ics.project.task.template.line">
+            <field name="template_id" ref="task_template_general"/>
+            <field name="sequence">50</field>
+            <field name="name">Closure &amp; Handover</field>
+            <field name="description"><![CDATA[
+                <p>Project closure and final handover</p>
+            ]]></field>
+            <field name="planned_hours">16</field>
+            <field name="priority">3</field>
+            <field name="delay_days">90</field>
+        </record>
+
+    </data>
+</odoo>

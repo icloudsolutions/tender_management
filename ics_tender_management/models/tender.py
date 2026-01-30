@@ -228,6 +228,92 @@ class Tender(models.Model):
         if vals.get('name', _('New')) == _('New'):
             vals['name'] = self.env['ir.sequence'].next_by_code('ics.tender') or _('New')
         return super(Tender, self).create(vals)
+    
+    def write(self, vals):
+        """Auto-create project when tender is won"""
+        res = super(Tender, self).write(vals)
+        
+        # Auto-create project when tender becomes 'won'
+        if vals.get('state') == 'won':
+            for tender in self:
+                # Check if project already exists
+                if tender.project_count > 0:
+                    continue
+                
+                # Auto-create project with task template
+                tender._auto_create_project()
+        
+        return res
+    
+    def _auto_create_project(self):
+        """Automatically create project from won tender with task template"""
+        self.ensure_one()
+        
+        # Find appropriate task template based on tender category
+        template = self.env['ics.project.task.template'].search([
+            ('tender_category', '=', self.tender_category),
+            ('active', '=', True)
+        ], limit=1)
+        
+        # If no category-specific template, get general template
+        if not template:
+            template = self.env['ics.project.task.template'].search([
+                ('tender_category', '=', False),
+                ('active', '=', True)
+            ], limit=1)
+        
+        # Create project
+        project_vals = {
+            'name': f"Project - {self.tender_title}",
+            'partner_id': self.partner_id.id,
+            'user_id': self.user_id.id,
+            'tender_id': self.id,
+            'date_start': fields.Date.today(),
+        }
+        
+        # Link to sales order if exists
+        confirmed_order = self.env['sale.order'].search([
+            ('tender_id', '=', self.id),
+            ('state', 'in', ['sale', 'done'])
+        ], limit=1)
+        if confirmed_order:
+            project_vals['sale_order_id'] = confirmed_order.id
+        
+        project = self.env['project.project'].create(project_vals)
+        
+        # Create tasks from template
+        if template and template.task_line_ids:
+            from datetime import timedelta
+            project_start = fields.Date.today()
+            
+            for line in template.task_line_ids:
+                task_vals = {
+                    'name': line.name,
+                    'project_id': project.id,
+                    'partner_id': self.partner_id.id,
+                    'description': line.description,
+                    'priority': line.priority,
+                    'tag_ids': [(6, 0, line.tag_ids.ids)] if line.tag_ids else False,
+                    'planned_hours': line.planned_hours,
+                }
+                
+                # Set task deadline based on delay
+                if line.delay_days > 0:
+                    task_vals['date_deadline'] = project_start + timedelta(days=line.delay_days)
+                
+                # Set assignee
+                if line.user_id:
+                    task_vals['user_ids'] = [(6, 0, [line.user_id.id])]
+                elif self.user_id:
+                    task_vals['user_ids'] = [(6, 0, [self.user_id.id])]
+                
+                # Set stage if specified
+                if line.stage_id:
+                    task_vals['stage_id'] = line.stage_id.id
+                
+                self.env['project.task'].create(task_vals)
+        
+        return project
 
     @api.depends('submission_deadline')
     def _compute_days_to_deadline(self):

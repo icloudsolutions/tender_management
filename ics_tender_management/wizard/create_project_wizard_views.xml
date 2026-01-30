@@ -19,17 +19,28 @@
                                 <field name="date_start"/>
                                 <field name="sale_order_id"/>
                                 <field name="create_from_sale_order"/>
-                                <field name="create_from_boq"/>
                             </group>
                         </group>
+                        <group string="Task Creation Method">
+                            <field name="use_task_template" widget="boolean_toggle"/>
+                            <field name="task_template_id" invisible="not use_task_template" 
+                                options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="create_from_boq" invisible="use_task_template" widget="boolean_toggle"/>
+                        </group>
                         <group string="Project Configuration">
-                            <p class="text-muted">
-                                This will create a new project linked to this tender.
-                                <br/>
-                                If "Create Tasks from BoQ" is checked, each BoQ line will be converted into a project task.
-                                <br/>
-                                If "Link to Sales Order" is checked and a confirmed sales order is selected, the project will be linked to it.
-                            </p>
+                            <div class="alert alert-info" role="alert" invisible="not use_task_template">
+                                <strong>Task Template Mode:</strong>
+                                <p class="mb-0">
+                                    A project will be created with predefined tasks from the selected template.
+                                    These tasks are based on your documented procedures (PDF).
+                                </p>
+                            </div>
+                            <div class="alert alert-info" role="alert" invisible="use_task_template">
+                                <strong>BoQ Mode:</strong>
+                                <p class="mb-0">
+                                    Each Bill of Quantities line will be converted into a project task.
+                                </p>
+                            </div>
                         </group>
                     </sheet>
                     <footer>

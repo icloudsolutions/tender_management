@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Inherit crm.lead form view to add Projects button -->
+    <record id="crm_lead_view_form_inherit_project_templates" model="ir.ui.view">
+        <field name="name">crm.lead.view.form.inherit.project.templates</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="arch" type="xml">
+            <!-- Add button in header -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_projects" 
+                        type="object" 
+                        class="oe_stat_button" 
+                        icon="fa-tasks"
+                        invisible="project_count == 0">
+                    <field name="project_count" widget="statinfo" string="Projects"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -2945,3 +2945,119 @@ msgstr "محدد"
 #: model:ir.model.fields,selection:ics_tender_management.field_ics_tender_supplier__status
 msgid "Rejected"
 msgstr "مرفوض"
+
+#. module: ics_tender_management
+#: model:ir.model,name:ics_tender_management.model_ics_project_task_template
+msgid "Project Task Template"
+msgstr "قالب مهام المشروع"
+
+#. module: ics_tender_management
+#: model:ir.model,name:ics_tender_management.model_ics_project_task_template_line
+msgid "Project Task Template Line"
+msgstr "بند قالب مهام المشروع"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_project_task_template__name
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_project_task_template_line__name
+msgid "Template Name"
+msgstr "اسم القالب"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_project_task_template__tender_category
+msgid "Applicable to Tender Category"
+msgstr "ينطبق على فئة المنافسة"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_project_task_template__task_line_ids
+msgid "Tasks"
+msgstr "المهام"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_project_task_template__task_count
+msgid "Number of Tasks"
+msgstr "عدد المهام"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_project_task_template_line__template_id
+msgid "Template"
+msgstr "القالب"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_project_task_template_line__description
+msgid "Description"
+msgstr "الوصف"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_project_task_template_line__stage_id
+msgid "Stage"
+msgstr "المرحلة"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_project_task_template_line__user_id
+msgid "Assigned To"
+msgstr "مسند إلى"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_project_task_template_line__tag_ids
+msgid "Tags"
+msgstr "الوسوم"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_project_task_template_line__planned_hours
+msgid "Planned Hours"
+msgstr "الساعات المخططة"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_project_task_template_line__delay_days
+msgid "Start After (Days)"
+msgstr "البدء بعد (بالأيام)"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_project_wizard__task_template_id
+msgid "Task Template"
+msgstr "قالب المهام"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_project_wizard__use_task_template
+msgid "Use Task Template"
+msgstr "استخدام قالب المهام"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,help:ics_tender_management.field_ics_tender_project_wizard__use_task_template
+msgid "Create tasks from template instead of BoQ"
+msgstr "إنشاء المهام من القالب بدلاً من جدول الكميات"
+
+#. module: ics_tender_management
+#: model:ir.model.fields,help:ics_tender_management.field_ics_tender_project_wizard__task_template_id
+msgid "Select a task template to automatically create predefined project tasks"
+msgstr "حدد قالب المهام لإنشاء مهام المشروع المحددة مسبقًا تلقائيًا"
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_create_project_wizard_form
+msgid "Task Creation Method"
+msgstr "طريقة إنشاء المهام"
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_create_project_wizard_form
+msgid "Task Template Mode:"
+msgstr "وضع قالب المهام:"
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_create_project_wizard_form
+msgid "A project will be created with predefined tasks from the selected template."
+msgstr "سيتم إنشاء المشروع مع مهام محددة مسبقًا من القالب المحدد."
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_create_project_wizard_form
+msgid "These tasks are based on your documented procedures (PDF)."
+msgstr "هذه المهام مبنية على الإجراءات الموثقة الخاصة بك (PDF)."
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_create_project_wizard_form
+msgid "BoQ Mode:"
+msgstr "وضع جدول الكميات:"
+
+#. module: ics_tender_management
+#: model:ir.ui.view,arch_db:ics_tender_management.view_create_project_wizard_form
+msgid "Each Bill of Quantities line will be converted into a project task."
+msgstr "سيتم تحويل كل بند من جدول الكميات إلى مهمة مشروع."

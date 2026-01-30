@@ -27,3 +27,7 @@ access_ics_tender_team_user,ics.tender.team.user,model_ics_tender_team,group_ten
 access_ics_tender_team_manager,ics.tender.team.manager,model_ics_tender_team,group_tender_manager,1,1,1,1
 access_ics_tender_supplier_user,ics.tender.supplier.user,model_ics_tender_supplier,group_tender_user,1,1,1,0
 access_ics_tender_supplier_manager,ics.tender.supplier.manager,model_ics_tender_supplier,group_tender_manager,1,1,1,1
+access_ics_project_task_template_user,ics.project.task.template.user,model_ics_project_task_template,group_tender_user,1,0,0,0
+access_ics_project_task_template_manager,ics.project.task.template.manager,model_ics_project_task_template,group_tender_manager,1,1,1,1
+access_ics_project_task_template_line_user,ics.project.task.template.line.user,model_ics_project_task_template_line,group_tender_user,1,0,0,0
+access_ics_project_task_template_line_manager,ics.project.task.template.line.manager,model_ics_project_task_template_line,group_tender_manager,1,1,1,1
