@@ -8,6 +8,10 @@
             <field name="arch" type="xml">
                 <form string="Generate Sales Quotation">
                     <sheet>
+                        <div class="alert alert-info" role="alert">
+                            <strong>Generate Quotation:</strong> This wizard creates a sales quotation based on your tender's BoQ.
+                            Adjust the margin percentage to calculate your selling price.
+                        </div>
                         <group>
                             <group>
                                 <field name="tender_id" readonly="1"/>
@@ -15,10 +19,12 @@
                                 <field name="currency_id" invisible="1"/>
                             </group>
                             <group>
-                                <field name="margin_percentage" widget="percentage"/>
-                                <field name="use_vendor_costs"/>
-                                <field name="pricelist_id"/>
-                                <field name="payment_term_id"/>
+                                <field name="margin_percentage" widget="percentage"
+                                    help="Profit margin to add on top of costs"/>
+                                <field name="use_vendor_costs"
+                                    help="Use actual vendor prices if selected, otherwise use estimated costs"/>
+                                <field name="pricelist_id" options="{'no_create': True}"/>
+                                <field name="payment_term_id" options="{'no_create': True}"/>
                                 <field name="validity_date"/>
                             </group>
                         </group>

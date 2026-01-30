@@ -42,9 +42,8 @@ class GenerateQuotationWizard(models.TransientModel):
     @api.depends('tender_id.boq_line_ids', 'margin_percentage', 'use_vendor_costs')
     def _compute_preview_lines(self):
         for wizard in self:
-            # Delete existing lines
-            wizard.line_preview_ids.unlink()
-            # Create new lines
+            # Use command syntax for computed One2many fields
+            lines = []
             for boq_line in wizard.tender_id.boq_line_ids:
                 if wizard.use_vendor_costs and boq_line.selected_vendor_price:
                     cost = boq_line.selected_vendor_price
@@ -54,8 +53,7 @@ class GenerateQuotationWizard(models.TransientModel):
                 margin = cost * (wizard.margin_percentage / 100)
                 total = cost + margin
 
-                self.env['ics.tender.quotation.line.preview'].create({
-                    'wizard_id': wizard.id,
+                lines.append((0, 0, {
                     'product_id': boq_line.product_id.id,
                     'name': boq_line.name,
                     'quantity': boq_line.quantity,
@@ -64,7 +62,9 @@ class GenerateQuotationWizard(models.TransientModel):
                     'margin': margin,
                     'unit_price': total / boq_line.quantity if boq_line.quantity else 0,
                     'total': total,
-                })
+                }))
+            
+            wizard.line_preview_ids = lines
 
     @api.depends('line_preview_ids.cost', 'line_preview_ids.margin', 'line_preview_ids.total')
     def _compute_totals(self):
@@ -78,29 +78,61 @@ class GenerateQuotationWizard(models.TransientModel):
 
         if not self.tender_id.boq_line_ids:
             raise UserError(_('No BoQ lines found in the tender.'))
+        
+        if not self.partner_id:
+            raise UserError(_('Please set a customer on the tender before generating quotation.'))
+        
+        if self.margin_percentage < 0:
+            raise UserError(_('Margin percentage cannot be negative.'))
 
+        # Build quotation vals with only available fields
+        so_model = self.env['sale.order']
+        so_fields = so_model._fields.keys()
+        
         quotation_vals = {
             'partner_id': self.partner_id.id,
-            'tender_id': self.tender_id.id,
-            'validity_date': self.validity_date,
-            'payment_term_id': self.payment_term_id.id if self.payment_term_id else False,
-            'pricelist_id': self.pricelist_id.id if self.pricelist_id else False,
-            'note': self.notes,
-            'user_id': self.tender_id.user_id.id,
-            'team_id': self.tender_id.team_id.id if self.tender_id.team_id else False,
         }
+        
+        # Add optional fields if they exist
+        if 'tender_id' in so_fields:
+            quotation_vals['tender_id'] = self.tender_id.id
+        if 'validity_date' in so_fields:
+            quotation_vals['validity_date'] = self.validity_date
+        if 'payment_term_id' in so_fields and self.payment_term_id:
+            quotation_vals['payment_term_id'] = self.payment_term_id.id
+        if 'pricelist_id' in so_fields and self.pricelist_id:
+            quotation_vals['pricelist_id'] = self.pricelist_id.id
+        if 'note' in so_fields and self.notes:
+            quotation_vals['note'] = self.notes
+        if 'user_id' in so_fields and self.tender_id.user_id:
+            quotation_vals['user_id'] = self.tender_id.user_id.id
+        if 'team_id' in so_fields and self.tender_id.team_id:
+            quotation_vals['team_id'] = self.tender_id.team_id.id
 
-        quotation = self.env['sale.order'].create(quotation_vals)
+        quotation = so_model.create(quotation_vals)
 
+        # Create sale order lines with dynamic field checking
+        sol_model = self.env['sale.order.line']
+        sol_fields = sol_model._fields.keys()
+        
         for preview_line in self.line_preview_ids:
-            self.env['sale.order.line'].create({
+            sol_vals = {
                 'order_id': quotation.id,
-                'product_id': preview_line.product_id.id,
-                'name': preview_line.name,
-                'product_uom_qty': preview_line.quantity,
-                'product_uom': preview_line.uom_id.id,
-                'price_unit': preview_line.unit_price,
-            })
+            }
+            
+            # Add optional fields if they exist
+            if 'product_id' in sol_fields and preview_line.product_id:
+                sol_vals['product_id'] = preview_line.product_id.id
+            if 'name' in sol_fields and preview_line.name:
+                sol_vals['name'] = preview_line.name
+            if 'product_uom_qty' in sol_fields:
+                sol_vals['product_uom_qty'] = preview_line.quantity
+            if 'product_uom' in sol_fields and preview_line.uom_id:
+                sol_vals['product_uom'] = preview_line.uom_id.id
+            if 'price_unit' in sol_fields:
+                sol_vals['price_unit'] = preview_line.unit_price
+                
+            sol_model.create(sol_vals)
 
         self.tender_id.write({
             'state': 'quotation',
