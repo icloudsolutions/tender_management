@@ -757,7 +757,8 @@ class Tender(models.Model):
         self.ensure_one()
         self.write({'state': 'won'})
         if self.lead_id:
-            self.lead_id.action_set_won()
+            # Mark CRM opportunity as won with context to bypass lock
+            self.lead_id.with_context(from_tender_sync=True).action_set_won()
 
     def action_mark_lost(self):
         self.ensure_one()
