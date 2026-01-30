@@ -2,7 +2,7 @@
 
 **Module Version**: 18.0.2.0.0
 **Last Updated**: January 29, 2026
-**Total Documentation**: 12,000+ lines across 16+ documents
+**Total Documentation**: 5,000+ lines across 10+ documents
 
 ---
 
@@ -156,63 +156,9 @@
 
 ---
 
-### 🔄 BPMN Process Models (NEW!)
-
-12. **[TENDER_MANAGEMENT_BPMN.xml](TENDER_MANAGEMENT_BPMN.xml)** - BPMN 2.0 Process Definition
-    - **Format**: XML (BPMN 2.0 Standard)
-    - **Audience**: Process analysts, workflow engineers, developers
-    - **Content**:
-      - Complete executable BPMN 2.0 process model
-      - All 35 activities defined
-      - 3 decision gateways
-      - 4 end events (won/lost/cancelled outcomes)
-      - Supply projects workflow (6 phases)
-      - O&M services workflow (6 phases with loop)
-      - Message flows between 4 participants
-      - Data objects and documentation
-    - **Use Cases**:
-      - Import to Camunda Modeler for visualization
-      - Deploy to workflow engines (Camunda, Flowable, Activiti)
-      - Process documentation and analysis
-      - Training and presentations
-    - 🔧 **EXECUTABLE** - Ready for workflow automation
-
-13. **[BPMN_GUIDE.md](BPMN_GUIDE.md)** - BPMN Usage Guide
-    - **Length**: 800 lines
-    - **Audience**: All users, process managers
-    - **Content**:
-      - BPMN standard explanation
-      - How to use the BPMN file
-      - Tool recommendations (Camunda, bpmn.io)
-      - Workflow engine deployment guide
-      - Documentation generation
-      - Process metrics and analytics
-      - Customization instructions
-      - Odoo integration mapping
-    - **Read Time**: 45 minutes
-    - 📘 **BPMN MANUAL** - Everything about BPMN
-
-14. **[BPMN_VISUAL_DIAGRAM.md](BPMN_VISUAL_DIAGRAM.md)** - Visual Process Diagrams
-    - **Length**: 600 lines
-    - **Audience**: All users, no special tools needed
-    - **Content**:
-      - ASCII art process diagrams
-      - Complete flow visualization
-      - Supply projects visual workflow
-      - O&M services visual workflow
-      - Process summary and metrics
-      - Integration points diagram
-      - Symbol legend
-      - Step-by-step walkthrough
-    - **Read Time**: 30 minutes
-    - 👁️ **VISUAL** - No special software required
-    - 📌 **PRINT FRIENDLY** - Great for presentations
-
----
-
 ### 📝 Release Information
 
-15. **[CHANGELOG.md](CHANGELOG.md)** - Version History
+12. **[CHANGELOG.md](CHANGELOG.md)** - Version History
     - **Length**: 200 lines
     - **Audience**: All users, developers
     - **Content**:

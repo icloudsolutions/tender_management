@@ -7,11 +7,11 @@
         ICS Tender Management - Complete Saudi Tender Solution
         =======================================================
 
-        ✅ 100% COMPLIANT with ICS Project Management Procedures
+        100% COMPLIANT with ICS Project Management Procedures
 
         Professional tender management system for Saudi Arabia with:
 
-        🎯 COMPREHENSIVE DASHBOARD (NEW in v18.0.2.0.0)
+        COMPREHENSIVE DASHBOARD (NEW in v18.0.2.0.0)
         - 14 Real-time statistics cards
         - 4 Interactive charts (Chart.js)
         - Project execution tracking
@@ -22,7 +22,7 @@
         - Vendor offer tracking
         - Bilingual interface (English/Arabic)
 
-        📊 PRE-AWARD PHASE (Tender Lifecycle)
+        PRE-AWARD PHASE (Tender Lifecycle)
         Phase 1: Draft
         - Integration with Etimad tender scraper
         - Automatic lead creation from portal.etimad.sa
@@ -57,7 +57,7 @@
         - Loss reason documentation
         - Lessons learned tracking
 
-        🚚 POST-AWARD PHASE - SUPPLY PROJECTS (مشاريع التوريد)
+        POST-AWARD PHASE - SUPPLY PROJECTS (مشاريع التوريد)
         Fully aligned with ICS Supply Projects Procedure:
 
         1. استلام المشروع بعد الترسية (Project Receipt)
@@ -67,7 +67,7 @@
         5. الاستلام النهائي (Final Handover)
         6. المستخلصات والإقفال (Invoicing & Closure)
 
-        🔧 POST-AWARD PHASE - O&M SERVICES (مشاريع الصيانة والتشغيل)
+        POST-AWARD PHASE - O&M SERVICES (مشاريع الصيانة والتشغيل)
         Fully aligned with ICS O&M Services Procedure:
 
         1. بدء المشروع (Project Kick-off)
@@ -77,7 +77,7 @@
         5. المستخلصات المالية (Financial Invoicing)
         6. التسليم والإقفال (Handover & Closure)
 
-        🏆 KEY FEATURES
+        KEY FEATURES
         - Professional dashboard with 14 metrics + 4 charts
         - Complete Etimad platform integration
         - CRM opportunity to tender conversion
@@ -91,7 +91,7 @@
         - Complete audit trail
         - Bilingual support (English/Arabic)
 
-        📚 COMPREHENSIVE DOCUMENTATION (7,000+ lines)
+        COMPREHENSIVE DOCUMENTATION (7,000+ lines)
         - Complete workflow guide (2,500 lines)
         - Dashboard user guide (320 lines)
         - Quick reference card (350 lines)
@@ -101,14 +101,14 @@
         - Competitive analysis (450 lines)
         - Complete documentation index
 
-        🎓 TRAINING MATERIALS INCLUDED
+        TRAINING MATERIALS INCLUDED
         - Learning paths for all roles
         - Step-by-step workflows
         - Real-world scenarios
         - Troubleshooting guides
         - Best practices
 
-        ✅ CERTIFIED 100% COMPLIANT
+        CERTIFIED 100% COMPLIANT
         - Supply Projects: All 6 phases tracked
         - O&M Services: All 6 phases tracked
         - ICS Procedures: Full alignment
@@ -168,6 +168,7 @@
             'ics_tender_management/static/src/xml/tender_dashboard.xml',
         ],
     },
+    'post_init_hook': 'post_init_hook',
     'images': ['static/description/banner.png'],
     'installable': True,
     'application': True,

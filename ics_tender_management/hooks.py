@@ -1,31 +1,31 @@
 # -*- coding: utf-8 -*-
-from odoo import api
+from odoo import api, SUPERUSER_ID
 
-def post_init_hook(env):
+
+def post_init_hook(cr, registry):
     """
-    Odoo 18: Normalize any remaining 'tree' occurrences to 'list' safely.
+    Odoo 18: 'tree' is no longer a valid view type in act_window actions.
+    Some databases may still have stale actions created in earlier installs/upgrades.
+
+    This hook normalizes any remaining 'tree' occurrences to 'list' so menus/actions
+    don't crash the web client.
     """
+    env = api.Environment(cr, SUPERUSER_ID, {})
 
-    # Fonction utilitaire pour vérifier l'existence d'une table
-    def table_exists(table_name):
-        env.cr.execute("""
-            SELECT EXISTS (
-                SELECT FROM information_schema.tables 
-                 WHERE table_name = %s
-            )
-        """, (table_name,))
-        return env.cr.fetchone()[0]
+    # Normalize ir.actions.act_window.view_mode (table name: ir_act_window)
+    env.cr.execute(
+        """
+        UPDATE ir_act_window
+           SET view_mode = REPLACE(view_mode, 'tree', 'list')
+         WHERE view_mode ILIKE '%tree%';
+        """
+    )
 
-    if table_exists('ir.actions.act_window'):
-        env.cr.execute("""
-            UPDATE "ir.actions.act_window"
-               SET view_mode = REPLACE(view_mode, 'tree', 'list')
-             WHERE view_mode ILIKE '%tree%';
-        """)
-
-    if table_exists('ir.actions.act_window.view'):
-        env.cr.execute("""
-            UPDATE "ir.actions.act_window.view"
-               SET view_mode = 'list'
-             WHERE view_mode = 'tree';
-        """)
+    # Normalize ir.act_window.view (per-view mode)
+    env.cr.execute(
+        """
+        UPDATE ir_act_window_view
+           SET view_mode = 'list'
+         WHERE view_mode = 'tree';
+        """
+    )

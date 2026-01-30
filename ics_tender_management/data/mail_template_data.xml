@@ -142,7 +142,7 @@
                                 <tr>
                                     <td style="padding: 5px 0;"><strong>Quotation Amount:</strong></td>
                                     <td style="padding: 5px 0; font-size: 18px; color: #28a745; font-weight: bold;">
-                                        ${'{:,.2f}'.format(object.total_quotation_amount)} ${object.currency_id.symbol}
+                                        ${'%.2f' % object.total_quotation_amount} ${object.currency_id.symbol}
                                     </td>
                                 </tr>
                                 % if object.winning_reason:
@@ -165,68 +165,6 @@
                                style="background-color: #28a745; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
                                 View Tender and Create Project
                             </a>
-                        </p>
-
-                        <p style="color: #666; font-size: 12px; margin-top: 30px; border-top: 1px solid #ddd; padding-top: 20px;">
-                            This is an automated notification from ${object.company_id.name}
-                        </p>
-                    </div>
-                </div>
-            </field>
-        </record>
-
-        <!-- Vendor RFQ Notification -->
-        <record id="email_template_vendor_rfq" model="mail.template">
-            <field name="name">Vendor: RFQ Request</field>
-            <field name="model_id" ref="purchase.model_purchase_requisition"/>
-            <field name="subject">RFQ Request - ${object.name}</field>
-            <field name="email_from">${(object.company_id.email or user.email_formatted) | safe}</field>
-            <field name="body_html" type="html">
-                <div style="font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5;">
-                    <div style="background-color: white; padding: 30px; border-radius: 10px; max-width: 600px; margin: 0 auto;">
-                        <h2 style="color: #667eea; margin-top: 0;">Request for Quotation</h2>
-                        <p>Dear Vendor,</p>
-                        <p>You are invited to submit a quotation for the following tender:</p>
-
-                        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 5px; margin: 20px 0;">
-                            <h3 style="margin-top: 0; color: #333;">${object.name}</h3>
-                            % if object.tender_id:
-                            <p><strong>Related Tender:</strong> ${object.tender_id.tender_title}</p>
-                            % endif
-                            <table style="width: 100%;">
-                                <tr>
-                                    <td style="padding: 5px 0;"><strong>Ordering Date:</strong></td>
-                                    <td style="padding: 5px 0;">${format_date(object.ordering_date)}</td>
-                                </tr>
-                                % if object.schedule_date:
-                                <tr>
-                                    <td style="padding: 5px 0;"><strong>Delivery Date:</strong></td>
-                                    <td style="padding: 5px 0;">${format_date(object.schedule_date)}</td>
-                                </tr>
-                                % endif
-                            </table>
-                        </div>
-
-                        <h4 style="color: #333;">Products Required:</h4>
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <thead>
-                                <tr style="background-color: #667eea; color: white;">
-                                    <th style="padding: 10px; text-align: left;">Product</th>
-                                    <th style="padding: 10px; text-align: right;">Quantity</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                % for line in object.line_ids:
-                                <tr style="border-bottom: 1px solid #ddd;">
-                                    <td style="padding: 10px;">${line.product_id.name}</td>
-                                    <td style="padding: 10px; text-align: right;">${line.product_qty} ${line.product_uom_id.name}</td>
-                                </tr>
-                                % endfor
-                            </tbody>
-                        </table>
-
-                        <p style="margin-top: 30px; background-color: #fff3cd; padding: 15px; border-radius: 5px; color: #856404;">
-                            <strong>Important:</strong> Please submit your quotation as soon as possible.
                         </p>
 
                         <p style="color: #666; font-size: 12px; margin-top: 30px; border-top: 1px solid #ddd; padding-top: 20px;">

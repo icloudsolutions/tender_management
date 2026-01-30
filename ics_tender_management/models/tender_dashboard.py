@@ -33,6 +33,9 @@ class IcsTenderDashboard(models.Model):
         etimad_stats = self._get_etimad_statistics()
         stage_distribution = self._get_stage_distribution()
         financial_summary = self._get_financial_summary()
+        project_execution = self._get_project_execution_stats()
+        procedure_compliance = self._get_procedure_compliance()
+        win_loss_ratio = self._get_win_loss_ratio()
 
         return {
             'total_tenders': total_tenders,
@@ -49,6 +52,9 @@ class IcsTenderDashboard(models.Model):
             'etimad_stats': etimad_stats,
             'stage_distribution': stage_distribution,
             'financial_summary': financial_summary,
+            'project_execution': project_execution,
+            'procedure_compliance': procedure_compliance,
+            'win_loss_ratio': win_loss_ratio,
         }
 
     def _get_vendor_offer_stats(self):
@@ -205,7 +211,6 @@ class IcsTenderDashboard(models.Model):
             'won_budget': won_budget,
             'currency_symbol': self.env.company.currency_id.symbol or 'SAR',
         }
-
 
     def _get_project_execution_stats(self):
         """Get project execution statistics for won tenders"""

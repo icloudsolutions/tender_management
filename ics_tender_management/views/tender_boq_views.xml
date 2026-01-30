@@ -2,7 +2,7 @@
 <odoo>
     <data>
 
-        <record id="view_tender_boq_line_list" model="ir.ui.view">
+        <record id="view_tender_boq_line_tree" model="ir.ui.view">
             <field name="name">ics.tender.boq.line.list</field>
             <field name="model">ics.tender.boq.line</field>
             <field name="type">list</field>
