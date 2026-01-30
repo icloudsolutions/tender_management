@@ -309,11 +309,22 @@ class Tender(models.Model):
                     break
         
         if crm_stage:
-            # Update CRM opportunity with context to bypass lock
-            self.lead_id.with_context(from_tender_sync=True).write({
+            # Prepare update values
+            update_vals = {
                 'stage_id': crm_stage.id,
                 'probability': self._get_crm_probability(),
-            })
+            }
+            
+            # For lost tenders, also sync the lost reason
+            if self.state == 'lost' and self.lost_reason:
+                update_vals['lost_reason'] = self.lost_reason
+            
+            # For won tenders, also sync actual revenue
+            if self.state == 'won' and self.actual_revenue:
+                update_vals['expected_revenue'] = self.actual_revenue
+            
+            # Update CRM opportunity with context to bypass lock
+            self.lead_id.with_context(from_tender_sync=True).write(update_vals)
             
             # Log the sync in CRM
             self.lead_id.message_post(
