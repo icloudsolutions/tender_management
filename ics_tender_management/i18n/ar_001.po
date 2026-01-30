@@ -3285,12 +3285,12 @@ msgstr "سير عمل الإعتراض"
 #. module: ics_tender_management
 #: model:ir.ui.view,arch_db:ics_tender_management.view_tender_form
 msgid "💡 حق الإعتراض متاح"
-msgstr ""
+msgstr "💡 حق الإعتراض متاح"
 
 #. module: ics_tender_management
 #: model:ir.ui.view,arch_db:ics_tender_management.view_tender_form
 msgid "لديك الحق في تقديم إعتراض على نتيجة المنافسة. قد يتم قبول الإعتراض إذا كانت الأسباب وجيهة."
-msgstr ""
+msgstr "لديك الحق في تقديم إعتراض على نتيجة المنافسة. قد يتم قبول الإعتراض إذا كانت الأسباب وجيهة."
 
 #. module: ics_tender_management
 #: model:ir.ui.view,arch_db:ics_tender_management.view_tender_form
