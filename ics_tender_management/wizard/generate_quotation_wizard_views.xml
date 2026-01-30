@@ -19,8 +19,12 @@
                                 <field name="currency_id" invisible="1"/>
                             </group>
                             <group>
-                                <field name="margin_percentage" widget="percentage"
-                                    help="Profit margin to add on top of costs"/>
+                                <label for="margin_percentage" string="Margin %"/>
+                                <div class="o_row">
+                                    <field name="margin_percentage" class="oe_inline"
+                                        help="Profit margin to add on top of costs (e.g., enter 20 for 20% margin)"/>
+                                    <span>%</span>
+                                </div>
                                 <field name="use_vendor_costs"
                                     help="Use actual vendor prices if selected, otherwise use estimated costs"/>
                                 <field name="pricelist_id" options="{'no_create': True}"/>
