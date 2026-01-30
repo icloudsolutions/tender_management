@@ -401,11 +401,36 @@ class Tender(models.Model):
                 task_vals = {
                     'name': line.name,
                     'project_id': project.id,
-                    'partner_id': self.partner_id.id,
-                    'description': line.description,
-                    'priority': line.priority,
-                    'tag_ids': [(6, 0, line.tag_ids.ids)] if line.tag_ids else False,
                 }
+                
+                # Add optional fields if they exist in project.task
+                if 'partner_id' in available_task_fields and self.partner_id:
+                    task_vals['partner_id'] = self.partner_id.id
+                
+                if 'description' in available_task_fields and line.description:
+                    task_vals['description'] = line.description
+                
+                if 'tag_ids' in available_task_fields and line.tag_ids:
+                    task_vals['tag_ids'] = [(6, 0, line.tag_ids.ids)]
+                
+                # Handle priority field (may have different valid values in different versions)
+                if 'priority' in available_task_fields and line.priority:
+                    # Get the priority field definition to check valid values
+                    priority_field = task_model._fields.get('priority')
+                    if priority_field and hasattr(priority_field, 'selection'):
+                        # It's a Selection field - get valid values
+                        valid_priorities = [val[0] for val in priority_field.selection]
+                        if line.priority in valid_priorities:
+                            task_vals['priority'] = line.priority
+                        elif '1' in valid_priorities:
+                            # Default to '1' (normal priority) if template priority not valid
+                            task_vals['priority'] = '1'
+                        elif '0' in valid_priorities:
+                            # Default to '0' if '1' not available
+                            task_vals['priority'] = '0'
+                    else:
+                        # Not a selection field or no selection - try to set it anyway
+                        task_vals['priority'] = line.priority
                 
                 # Add planned_hours field if available (field name may vary by Odoo version)
                 if 'planned_hours' in available_task_fields:
