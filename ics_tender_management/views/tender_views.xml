@@ -217,7 +217,11 @@
                                 <field name="expected_revenue"/>
                                 <field name="total_estimated_cost" widget="monetary"/>
                                 <field name="total_vendor_cost" widget="monetary"/>
-                                <field name="margin_percentage" widget="percentage"/>
+                                <label for="margin_percentage" string="Margin %"/>
+                                <div class="o_row">
+                                    <field name="margin_percentage" class="oe_inline"/>
+                                    <span>%</span>
+                                </div>
                                 <field name="margin_amount" widget="monetary"/>
                                 <field name="total_quotation_amount" widget="monetary" class="oe_subtotal_footer_separator"/>
                             </group>

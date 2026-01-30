@@ -851,7 +851,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:ics_tender_management.selection__ics_tender__state__financial
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_search
 msgid "Financial Study"
-msgstr ""
+msgstr "الدراسة المالية"
 
 #. module: ics_tender_management
 #. odoo-javascript
@@ -1553,7 +1553,7 @@ msgstr ""
 #: model:ics.tender.stage,name:ics_tender_management.stage_quotation
 #: model:ir.model.fields.selection,name:ics_tender_management.selection__ics_tender__state__quotation
 msgid "Quotation Prepared"
-msgstr ""
+msgstr "تم إعداد عرض السعر"
 
 #. module: ics_tender_management
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_generate_quotation_wizard_form
@@ -1758,7 +1758,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender__stage_id
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_search
 msgid "Stage"
-msgstr ""
+msgstr "المرحلة"
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_stage__name
@@ -1833,7 +1833,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:ics_tender_management.selection__ics_tender__state__submitted
 #: model_terms:ir.ui.view,arch_db:ics_tender_management.view_tender_search
 msgid "Submitted"
-msgstr ""
+msgstr "تم التقديم"
 
 #. module: ics_tender_management
 #. odoo-python
@@ -2141,7 +2141,7 @@ msgstr ""
 #: model:ics.tender.stage,name:ics_tender_management.stage_evaluation
 #: model:ir.model.fields.selection,name:ics_tender_management.selection__ics_tender__state__evaluation
 msgid "Under Evaluation"
-msgstr ""
+msgstr "قيد التقييم"
 
 #. module: ics_tender_management
 #: model:ir.model.fields,field_description:ics_tender_management.field_ics_tender_boq_line__unit_price
