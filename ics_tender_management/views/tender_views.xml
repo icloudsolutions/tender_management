@@ -296,7 +296,6 @@
                                         <field name="required_inquiries"/>
                                     </group>
                                 </group>
-                            </page>
                                 <group>
                                     <group string="Evaluation">
                                         <field name="presales_employee" widget="many2one_avatar_user"/>
