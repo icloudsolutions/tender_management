@@ -5,6 +5,7 @@ import json
 import time
 import logging
 import re
+import html as html_module
 from datetime import datetime
 
 try:
@@ -600,12 +601,14 @@ class EtimadTender(models.Model):
                 # Extract classification field
                 classification_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "مجال التصنيف")]/following-sibling::div[1]//span/text()')
                 if classification_elements:
-                    parsed_data['classification_field'] = classification_elements[0].strip()
+                    classification_text = classification_elements[0].strip()
+                    # Decode HTML entities
+                    parsed_data['classification_field'] = html_module.unescape(classification_text)
                 
                 # Extract execution location type
                 location_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "مكان التنفيذ")]/following-sibling::div[1]//span/text()')
                 if location_elements:
-                    location_text = location_elements[0].strip()
+                    location_text = html_module.unescape(location_elements[0].strip())
                     if 'داخل المملكة' in location_text:
                         parsed_data['execution_location_type'] = 'inside_kingdom'
                     elif 'خارج المملكة' in location_text:
@@ -618,41 +621,41 @@ class EtimadTender(models.Model):
                 city_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "مكان التنفيذ")]/following-sibling::div[1]//ul/li/text()')
                 
                 if region_elements:
-                    regions = [r.strip() for r in region_elements if r.strip()]
+                    regions = [html_module.unescape(r.strip()) for r in region_elements if r.strip()]
                     parsed_data['execution_regions'] = '\n'.join(regions)
                 
                 if city_elements:
-                    cities = [c.strip() for c in city_elements if c.strip()]
+                    cities = [html_module.unescape(c.strip()) for c in city_elements if c.strip()]
                     parsed_data['execution_cities'] = '\n'.join(cities)
                 
                 # Extract details
                 details_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "التفاصيل")]/following-sibling::div[1]//span/text()')
                 if details_elements:
-                    parsed_data['details'] = details_elements[0].strip()
+                    parsed_data['details'] = html_module.unescape(details_elements[0].strip())
                 
                 # Extract activity details
                 activity_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "نشاط المنافسة")]/following-sibling::div[1]//ol/li/text()')
                 if activity_elements:
-                    activities = [a.strip() for a in activity_elements if a.strip()]
+                    activities = [html_module.unescape(a.strip()) for a in activity_elements if a.strip()]
                     parsed_data['activity_details'] = '\n'.join(activities)
                 
                 # Extract supply items
                 supply_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "تشمل المنافسة على بنود توريد")]/following-sibling::div[1]//span/text()')
                 if supply_elements:
-                    supply_text = supply_elements[0].strip()
-                    parsed_data['includes_supply_items'] = 'لا' not in supply_text and 'نعم' in supply_text
+                    supply_text = html_module.unescape(supply_elements[0].strip())
+                    parsed_data['includes_supply_items'] = 'لا' not in supply_text and ('نعم' in supply_text or 'yes' in supply_text.lower())
                 
                 # Extract construction works
                 construction_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "أعمال الإنشاء")]/following-sibling::div[1]//ol/li/text()')
                 if construction_elements:
-                    construction_items = [c.strip() for c in construction_elements if c.strip()]
+                    construction_items = [html_module.unescape(c.strip()) for c in construction_elements if c.strip()]
                     if construction_items:
                         parsed_data['construction_works'] = '\n'.join(construction_items)
                 
                 # Extract maintenance works
                 maintenance_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "أعمال الصيانة والتشغيل")]/following-sibling::div[1]//ol/li/text()')
                 if maintenance_elements:
-                    maintenance_items = [m.strip() for m in maintenance_elements if m.strip()]
+                    maintenance_items = [html_module.unescape(m.strip()) for m in maintenance_elements if m.strip()]
                     if maintenance_items:
                         parsed_data['maintenance_works'] = '\n'.join(maintenance_items)
             else:
@@ -674,12 +677,13 @@ class EtimadTender(models.Model):
             # Extract classification field
             classification_match = re.search(r'مجال التصنيف.*?<span>\s*(.*?)\s*</span>', html_content, re.DOTALL)
             if classification_match:
-                parsed_data['classification_field'] = re.sub(r'<[^>]+>', '', classification_match.group(1)).strip()
+                classification_text = re.sub(r'<[^>]+>', '', classification_match.group(1)).strip()
+                parsed_data['classification_field'] = html_module.unescape(classification_text)
             
             # Extract execution location
             location_match = re.search(r'مكان التنفيذ.*?<span>\s*(.*?)\s*</span>', html_content, re.DOTALL)
             if location_match:
-                location_text = re.sub(r'<[^>]+>', '', location_match.group(1)).strip()
+                location_text = html_module.unescape(re.sub(r'<[^>]+>', '', location_match.group(1)).strip())
                 if 'داخل المملكة' in location_text:
                     parsed_data['execution_location_type'] = 'inside_kingdom'
                 elif 'خارج المملكة' in location_text:
@@ -688,27 +692,49 @@ class EtimadTender(models.Model):
             # Extract regions (simplified)
             region_matches = re.findall(r'<li>\s*([^<]+?)\s*</li>', html_content)
             if region_matches:
-                regions = [r.strip() for r in region_matches if r.strip() and len(r.strip()) < 50]
+                regions = [html_module.unescape(r.strip()) for r in region_matches if r.strip() and len(r.strip()) < 50]
                 if regions:
                     parsed_data['execution_regions'] = '\n'.join(regions[:10])  # Limit to 10
+            
+            # Extract cities
+            city_matches = re.findall(r'<ul>.*?<li>\s*([^<]+?)\s*</li>', html_content, re.DOTALL)
+            if city_matches:
+                cities = [html_module.unescape(c.strip()) for c in city_matches if c.strip() and len(c.strip()) < 50]
+                if cities:
+                    parsed_data['execution_cities'] = '\n'.join(cities[:20])  # Limit to 20
             
             # Extract details
             details_match = re.search(r'التفاصيل.*?<span>\s*(.*?)\s*</span>', html_content, re.DOTALL)
             if details_match:
-                parsed_data['details'] = re.sub(r'<[^>]+>', '', details_match.group(1)).strip()
+                details_text = re.sub(r'<[^>]+>', '', details_match.group(1)).strip()
+                parsed_data['details'] = html_module.unescape(details_text)
             
             # Extract activity details
             activity_matches = re.findall(r'نشاط المنافسة.*?<ol>(.*?)</ol>', html_content, re.DOTALL)
             if activity_matches:
                 activity_items = re.findall(r'<li>([^<]+)</li>', activity_matches[0])
                 if activity_items:
-                    parsed_data['activity_details'] = '\n'.join([a.strip() for a in activity_items])
+                    parsed_data['activity_details'] = '\n'.join([html_module.unescape(a.strip()) for a in activity_items])
             
             # Extract supply items
             supply_match = re.search(r'تشمل المنافسة على بنود توريد.*?<span>\s*(.*?)\s*</span>', html_content, re.DOTALL)
             if supply_match:
-                supply_text = re.sub(r'<[^>]+>', '', supply_match.group(1)).strip()
-                parsed_data['includes_supply_items'] = 'لا' not in supply_text
+                supply_text = html_module.unescape(re.sub(r'<[^>]+>', '', supply_match.group(1)).strip())
+                parsed_data['includes_supply_items'] = 'لا' not in supply_text and ('نعم' in supply_text or 'yes' in supply_text.lower())
+            
+            # Extract construction works
+            construction_match = re.search(r'أعمال\s+الإنشاء.*?<ol>(.*?)</ol>', html_content, re.DOTALL)
+            if construction_match:
+                construction_items = re.findall(r'<li>([^<]+)</li>', construction_match.group(1))
+                if construction_items:
+                    parsed_data['construction_works'] = '\n'.join([html_module.unescape(c.strip()) for c in construction_items])
+            
+            # Extract maintenance works
+            maintenance_match = re.search(r'أعمال\s+الصيانة.*?<ol>(.*?)</ol>', html_content, re.DOTALL)
+            if maintenance_match:
+                maintenance_items = re.findall(r'<li>([^<]+)</li>', maintenance_match.group(1))
+                if maintenance_items:
+                    parsed_data['maintenance_works'] = '\n'.join([html_module.unescape(m.strip()) for m in maintenance_items])
             
         except Exception as e:
             _logger.error(f"Error in regex parsing: {e}")
