@@ -56,6 +56,8 @@ class EtimadTender(models.Model):
     financial_fees = fields.Monetary("Financial Fees", currency_field='currency_id')
     total_fees = fields.Monetary("Total Fees", compute='_compute_total_fees', 
                                   store=True, currency_field='currency_id')
+    estimated_amount = fields.Monetary("Estimated Amount", currency_field='currency_id',
+                                        help="Estimated value of the tender contract")
     
     # URLs and External References
     tender_url = fields.Char("Etimad URL", compute='_compute_tender_url', store=True)
