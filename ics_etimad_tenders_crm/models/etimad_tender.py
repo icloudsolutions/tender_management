@@ -1514,45 +1514,6 @@ class EtimadTender(models.Model):
                 return self.with_context(_cleaning_tender_refs=True).web_read(specification)
             else:
                 raise
-                        SELECT EXISTS (
-                            SELECT FROM information_schema.tables 
-                            WHERE table_schema = 'public' 
-                            AND table_name = 'ics_tender'
-                        )
-                    """)
-                    table_exists = self.env.cr.fetchone()[0]
-                    
-                    record_ids = [r.id for r in self]
-                    if record_ids:
-                        if table_exists:
-                            # Use SQL to directly fix these records
-                            self.env.cr.execute("""
-                                UPDATE ics_etimad_tender 
-                                SET tender_id_ics = NULL 
-                                WHERE id = ANY(%s)
-                                AND tender_id_ics IS NOT NULL
-                                AND NOT EXISTS (
-                                    SELECT 1 FROM ics_tender WHERE id = ics_etimad_tender.tender_id_ics
-                                )
-                            """, (record_ids,))
-                        else:
-                            # Table doesn't exist, just set all to NULL
-                            self.env.cr.execute("""
-                                UPDATE ics_etimad_tender 
-                                SET tender_id_ics = NULL 
-                                WHERE id = ANY(%s)
-                                AND tender_id_ics IS NOT NULL
-                            """, (record_ids,))
-                        self.env.cr.commit()
-                except Exception as cleanup_error:
-                    _logger.warning("Error cleaning up tender reference during read: %s", cleanup_error)
-                    pass
-                
-                # Retry reading with cleanup context (will exclude tender_id_ics if needed)
-                return self.with_context(_cleaning_tender_refs=True).read(fields=fields, load=load)
-            else:
-                # Different error, re-raise
-                raise
     
     @api.model
     def _cleanup_invalid_tender_references(self):
