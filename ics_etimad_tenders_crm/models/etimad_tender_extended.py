@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 class EtimadTenderExtended(models.Model):
@@ -10,30 +13,122 @@ class EtimadTenderExtended(models.Model):
         help='Direct link to ICS Tender (bypasses CRM)',
         ondelete='set null')  # Set to null if tender is deleted
     
+    def read(self, fields=None, load='_classic_read'):
+        """Override read to handle invalid tender_id_ics references gracefully"""
+        # Check if we're already in cleanup mode to prevent infinite recursion
+        if self.env.context.get('_cleaning_tender_refs'):
+            return super(EtimadTenderExtended, self).read(fields=fields, load=load)
+        
+        try:
+            return super(EtimadTenderExtended, self).read(fields=fields, load=load)
+        except (AttributeError, ValueError) as e:
+            # Check if error is related to tender_id_ics field
+            error_str = str(e).lower()
+            if 'tender_id_ics' in error_str or '_unknown' in error_str or "'id'" in error_str:
+                # Clean up invalid references first (only for this record)
+                try:
+                    # Check if ics_tender table exists
+                    self.env.cr.execute("""
+                        SELECT EXISTS (
+                            SELECT FROM information_schema.tables 
+                            WHERE table_schema = 'public' 
+                            AND table_name = 'ics_tender'
+                        )
+                    """)
+                    table_exists = self.env.cr.fetchone()[0]
+                    
+                    if table_exists:
+                        for record in self:
+                            record_id = record.id
+                            # Use SQL to directly fix this record
+                            self.env.cr.execute("""
+                                UPDATE ics_etimad_tender 
+                                SET tender_id_ics = NULL 
+                                WHERE id = %s 
+                                AND tender_id_ics IS NOT NULL
+                                AND NOT EXISTS (
+                                    SELECT 1 FROM ics_tender WHERE id = ics_etimad_tender.tender_id_ics
+                                )
+                            """, (record_id,))
+                            self.env.cr.commit()
+                    else:
+                        # Table doesn't exist, just set all to NULL
+                        for record in self:
+                            record_id = record.id
+                            self.env.cr.execute("""
+                                UPDATE ics_etimad_tender 
+                                SET tender_id_ics = NULL 
+                                WHERE id = %s
+                            """, (record_id,))
+                            self.env.cr.commit()
+                except Exception as cleanup_error:
+                    _logger.warning("Error cleaning up tender reference during read: %s", cleanup_error)
+                    pass
+                
+                # Retry reading with cleanup context
+                return self.with_context(_cleaning_tender_refs=True).read(fields=fields, load=load)
+            else:
+                # Different error, re-raise
+                raise
+    
     @api.model
     def _cleanup_invalid_tender_references(self):
         """Clean up invalid tender_id_ics references (for migration)"""
         if 'ics.tender' not in self.env:
-            return
-        
-        # Find records with invalid tender_id_ics
-        invalid_records = self.search([
-            ('tender_id_ics', '!=', False)
-        ])
-        
-        cleaned = 0
-        for record in invalid_records:
+            # Use SQL to clean up invalid references
             try:
-                # Try to access the related record
-                if not record.tender_id_ics.exists():
-                    record.tender_id_ics = False
-                    cleaned += 1
+                self.env.cr.execute("""
+                    UPDATE ics_etimad_tender e
+                    SET tender_id_ics = NULL
+                    WHERE e.tender_id_ics IS NOT NULL
+                    AND NOT EXISTS (
+                        SELECT 1 FROM ics_tender t 
+                        WHERE t.id = e.tender_id_ics
+                    )
+                """)
+                self.env.cr.commit()
+                return self.env.cr.rowcount
             except Exception:
-                # If access fails, set to null
-                record.write({'tender_id_ics': False})
-                cleaned += 1
+                return 0
         
-        return cleaned
+        # Use ORM to clean up
+        try:
+            # Get all records with tender_id_ics set
+            self.env.cr.execute("""
+                SELECT id, tender_id_ics 
+                FROM ics_etimad_tender 
+                WHERE tender_id_ics IS NOT NULL
+            """)
+            records_data = self.env.cr.fetchall()
+            
+            cleaned = 0
+            tender_model = self.env['ics.tender']
+            
+            for record_id, tender_id in records_data:
+                try:
+                    # Check if tender exists
+                    if not tender_model.browse(tender_id).exists():
+                        # Tender doesn't exist, set to NULL
+                        self.env.cr.execute(
+                            "UPDATE ics_etimad_tender SET tender_id_ics = NULL WHERE id = %s",
+                            (record_id,)
+                        )
+                        cleaned += 1
+                except Exception:
+                    # If check fails, assume invalid and set to NULL
+                    self.env.cr.execute(
+                        "UPDATE ics_etimad_tender SET tender_id_ics = NULL WHERE id = %s",
+                        (record_id,)
+                    )
+                    cleaned += 1
+            
+            if cleaned > 0:
+                self.env.cr.commit()
+            
+            return cleaned
+        except Exception as e:
+            _logger.warning("Error cleaning up invalid tender references: %s", e)
+            return 0
     
     def action_create_tender_direct(self):
         """Create ICS Tender directly from Etimad (skip CRM)"""

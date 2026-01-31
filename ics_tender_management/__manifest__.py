@@ -184,7 +184,6 @@
             'ics_tender_management/static/src/xml/tender_dashboard.xml',
         ],
     },
-    'post_init_hook': 'post_init_hook',
     'images': ['static/description/banner.png'],
     'installable': True,
     'application': True,
