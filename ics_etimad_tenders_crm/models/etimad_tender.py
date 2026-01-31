@@ -500,90 +500,147 @@ class EtimadTender(models.Model):
             record.state = state
     
     def action_fetch_detailed_info(self):
-        """Fetch detailed tender information from Etimad relations/details API"""
+        """Fetch detailed tender information from all Etimad API endpoints"""
         self.ensure_one()
         
         if not self.tender_id_string:
             raise UserError(_('Tender ID String is required to fetch detailed information.'))
         
         try:
-            # Fetch relations/details from Etimad API
             session = self._setup_scraper_session()
-            url = "https://tenders.etimad.sa/Tender/GetRelationsDetailsViewComponenet"
-            params = {'tenderIdStr': self.tender_id_string}
+            update_vals = {}
+            fetched_count = 0
             
-            response = session.get(url, params=params, timeout=30)
-            
-            if response.status_code == 200 and response.text:
-                # Parse HTML response
-                parsed_data = self._parse_relations_details_html(response.text)
+            # 1. Fetch Relations/Details
+            try:
+                url = "https://tenders.etimad.sa/Tender/GetRelationsDetailsViewComponenet"
+                params = {'tenderIdStr': self.tender_id_string}
+                response = session.get(url, params=params, timeout=30)
                 
-                # Update tender with parsed data
-                update_vals = {}
-                
-                # Classification
-                if parsed_data.get('classification_field'):
-                    update_vals['classification_field'] = parsed_data['classification_field']
-                    update_vals['classification_required'] = 'غير مطلوب' not in parsed_data['classification_field']
-                
-                # Execution location
-                if parsed_data.get('execution_location_type'):
-                    update_vals['execution_location_type'] = parsed_data['execution_location_type']
-                if parsed_data.get('execution_regions'):
-                    update_vals['execution_regions'] = parsed_data['execution_regions']
-                if parsed_data.get('execution_cities'):
-                    update_vals['execution_cities'] = parsed_data['execution_cities']
-                
-                # Details
-                if parsed_data.get('details'):
-                    update_vals['tender_purpose'] = parsed_data['details']
-                
-                # Activity details
-                if parsed_data.get('activity_details'):
-                    update_vals['activity_details'] = parsed_data['activity_details']
-                
-                # Supply items
-                if parsed_data.get('includes_supply_items') is not None:
-                    update_vals['includes_supply_items'] = parsed_data['includes_supply_items']
-                
-                # Construction works
-                if parsed_data.get('construction_works'):
-                    update_vals['construction_works'] = parsed_data['construction_works']
-                
-                # Maintenance works
-                if parsed_data.get('maintenance_works'):
-                    update_vals['maintenance_works'] = parsed_data['maintenance_works']
-                
-                if update_vals:
-                    self.write(update_vals)
-                    self.message_post(
-                        body=_('Detailed information fetched and updated from Etimad relations API.'),
-                        subject=_('Details Updated')
-                    )
+                if response.status_code == 200 and response.text:
+                    parsed_data = self._parse_relations_details_html(response.text)
                     
-                    return {
-                        'type': 'ir.actions.client',
-                        'tag': 'display_notification',
-                        'params': {
-                            'title': _('Success'),
-                            'message': _('Detailed information has been fetched and updated successfully.'),
-                            'type': 'success',
-                            'sticky': False,
-                        }
+                    # Classification
+                    if parsed_data.get('classification_field'):
+                        update_vals['classification_field'] = parsed_data['classification_field']
+                        update_vals['classification_required'] = 'غير مطلوب' not in parsed_data['classification_field']
+                    
+                    # Execution location
+                    if parsed_data.get('execution_location_type'):
+                        update_vals['execution_location_type'] = parsed_data['execution_location_type']
+                    if parsed_data.get('execution_regions'):
+                        update_vals['execution_regions'] = parsed_data['execution_regions']
+                    if parsed_data.get('execution_cities'):
+                        update_vals['execution_cities'] = parsed_data['execution_cities']
+                    
+                    # Details
+                    if parsed_data.get('details'):
+                        update_vals['tender_purpose'] = parsed_data['details']
+                    
+                    # Activity details
+                    if parsed_data.get('activity_details'):
+                        update_vals['activity_details'] = parsed_data['activity_details']
+                    
+                    # Supply items
+                    if parsed_data.get('includes_supply_items') is not None:
+                        update_vals['includes_supply_items'] = parsed_data['includes_supply_items']
+                    
+                    # Construction works
+                    if parsed_data.get('construction_works'):
+                        update_vals['construction_works'] = parsed_data['construction_works']
+                    
+                    # Maintenance works
+                    if parsed_data.get('maintenance_works'):
+                        update_vals['maintenance_works'] = parsed_data['maintenance_works']
+                    
+                    fetched_count += 1
+            except Exception as e:
+                _logger.warning(f"Error fetching relations details: {e}")
+            
+            # 2. Fetch Dates
+            try:
+                url = "https://tenders.etimad.sa/Tender/GetTenderDatesViewComponenet"
+                params = {'tenderIdStr': self.tender_id_string}
+                response = session.get(url, params=params, timeout=30)
+                
+                if response.status_code == 200 and response.text:
+                    dates_data = self._parse_dates_html(response.text)
+                    
+                    # Parse dates
+                    if dates_data.get('last_enquiry_date'):
+                        update_vals['last_enquiry_date'] = dates_data['last_enquiry_date']
+                    if dates_data.get('offers_deadline'):
+                        update_vals['offers_deadline'] = dates_data['offers_deadline']
+                    if dates_data.get('offer_opening_date'):
+                        update_vals['offer_opening_date'] = dates_data['offer_opening_date']
+                    if dates_data.get('offer_examination_date'):
+                        update_vals['offer_examination_date'] = dates_data['offer_examination_date']
+                    if dates_data.get('expected_award_date'):
+                        update_vals['expected_award_date'] = dates_data['expected_award_date']
+                    if dates_data.get('work_start_date'):
+                        update_vals['work_start_date'] = dates_data['work_start_date']
+                    if dates_data.get('inquiry_start_date'):
+                        update_vals['inquiry_start_date'] = dates_data['inquiry_start_date']
+                    if dates_data.get('max_inquiry_response_days'):
+                        update_vals['max_inquiry_response_days'] = dates_data['max_inquiry_response_days']
+                    if dates_data.get('opening_location'):
+                        update_vals['opening_location'] = dates_data['opening_location']
+                    
+                    fetched_count += 1
+            except Exception as e:
+                _logger.warning(f"Error fetching dates: {e}")
+            
+            # 3. Fetch Award Results
+            try:
+                url = "https://tenders.etimad.sa/Tender/GetAwardingResultsForVisitorViewComponenet"
+                params = {'tenderIdStr': self.tender_id_string}
+                response = session.get(url, params=params, timeout=30)
+                
+                if response.status_code == 200 and response.text:
+                    award_data = self._parse_award_results_html(response.text)
+                    
+                    if award_data.get('award_announced') is not None:
+                        update_vals['award_announced'] = award_data['award_announced']
+                    if award_data.get('award_announcement_date'):
+                        update_vals['award_announcement_date'] = award_data['award_announcement_date']
+                    if award_data.get('awarded_company_name'):
+                        update_vals['awarded_company_name'] = award_data['awarded_company_name']
+                    if award_data.get('awarded_amount'):
+                        update_vals['awarded_amount'] = award_data['awarded_amount']
+                    
+                    fetched_count += 1
+            except Exception as e:
+                _logger.warning(f"Error fetching award results: {e}")
+            
+            # Update tender with all fetched data
+            if update_vals:
+                self.write(update_vals)
+                self.message_post(
+                    body=_('Detailed information fetched from %d Etimad API endpoint(s).') % fetched_count,
+                    subject=_('Details Updated')
+                )
+                
+                return {
+                    'type': 'ir.actions.client',
+                    'tag': 'display_notification',
+                    'params': {
+                        'title': _('Success'),
+                        'message': _('Detailed information has been fetched and updated from %d endpoint(s).') % fetched_count,
+                        'type': 'success',
+                        'sticky': False,
                     }
-                else:
-                    return {
-                        'type': 'ir.actions.client',
-                        'tag': 'display_notification',
-                        'params': {
-                            'title': _('No Updates'),
-                            'message': _('No new information found to update.'),
-                            'type': 'info',
-                            'sticky': False,
-                        }
-                    }
+                }
             else:
-                raise UserError(_('Failed to fetch detailed information. Response code: %s') % response.status_code)
+                return {
+                    'type': 'ir.actions.client',
+                    'tag': 'display_notification',
+                    'params': {
+                        'title': _('No Updates'),
+                        'message': _('No new information found to update.'),
+                        'type': 'info',
+                        'sticky': False,
+                    }
+                }
                 
         except Exception as e:
             _logger.error(f"Error fetching detailed info: {e}")
@@ -740,6 +797,246 @@ class EtimadTender(models.Model):
             _logger.error(f"Error in regex parsing: {e}")
         
         return parsed_data
+    
+    def _parse_dates_html(self, html_content):
+        """Parse HTML content from GetTenderDatesViewComponenet API"""
+        parsed_data = {}
+        
+        try:
+            if LXML_AVAILABLE:
+                tree = html.fromstring(html_content)
+                
+                # Extract last enquiry date
+                enquiry_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "آخر موعد لإستلام الإستفسارات")]/following-sibling::div[1]//span/text()')
+                if enquiry_elements and len(enquiry_elements) > 0:
+                    date_str = html_module.unescape(enquiry_elements[0].strip())
+                    parsed_data['last_enquiry_date'] = self._parse_date_from_string(date_str)
+                
+                # Extract offers deadline
+                deadline_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "آخر موعد لتقديم العروض")]/following-sibling::div[1]//span/text()')
+                if deadline_elements and len(deadline_elements) > 0:
+                    date_str = html_module.unescape(deadline_elements[0].strip())
+                    time_str = ''
+                    if len(deadline_elements) > 2:
+                        time_str = html_module.unescape(deadline_elements[2].strip())
+                    parsed_data['offers_deadline'] = self._parse_datetime_from_strings(date_str, time_str)
+                
+                # Extract offer opening date
+                opening_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "تاريخ فتح العروض")]/following-sibling::div[1]//span/text()')
+                if opening_elements:
+                    opening_text = html_module.unescape(opening_elements[0].strip())
+                    if 'لا يوجد' not in opening_text and opening_text.strip():
+                        parsed_data['offer_opening_date'] = self._parse_date_from_string(opening_text)
+                
+                # Extract offer examination date
+                examination_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "تاريخ فحص العروض")]/following-sibling::div[1]//span/text()')
+                if examination_elements and len(examination_elements) > 0:
+                    date_str = html_module.unescape(examination_elements[0].strip())
+                    time_str = ''
+                    if len(examination_elements) > 2:
+                        time_str = html_module.unescape(examination_elements[2].strip())
+                    parsed_data['offer_examination_date'] = self._parse_datetime_from_strings(date_str, time_str)
+                
+                # Extract expected award date
+                award_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "التاريخ المتوقع للترسية")]/following-sibling::div[1]//span/text()')
+                if award_elements and len(award_elements) > 0:
+                    date_str = html_module.unescape(award_elements[0].strip())
+                    parsed_data['expected_award_date'] = self._parse_date_from_string(date_str)
+                
+                # Extract work start date
+                work_start_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "تاريخ بدء الأعمال")]/following-sibling::div[1]//span/text()')
+                if work_start_elements and len(work_start_elements) > 0:
+                    date_str = html_module.unescape(work_start_elements[0].strip())
+                    parsed_data['work_start_date'] = self._parse_date_from_string(date_str)
+                
+                # Extract inquiry start date
+                inquiry_start_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "بداية إرسال الأسئلة")]/following-sibling::div[1]//span/text()')
+                if inquiry_start_elements and len(inquiry_start_elements) > 0:
+                    date_str = html_module.unescape(inquiry_start_elements[0].strip())
+                    parsed_data['inquiry_start_date'] = self._parse_date_from_string(date_str)
+                
+                # Extract max inquiry response days
+                max_days_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "اقصى مدة للاجابة")]/following-sibling::div[1]//span/text()')
+                if max_days_elements:
+                    days_str = html_module.unescape(max_days_elements[0].strip())
+                    try:
+                        parsed_data['max_inquiry_response_days'] = int(days_str)
+                    except ValueError:
+                        pass
+                
+                # Extract opening location
+                location_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "مكان فتح العرض")]/following-sibling::div[1]//span/text()')
+                if location_elements:
+                    parsed_data['opening_location'] = html_module.unescape(location_elements[0].strip())
+            else:
+                # Fallback to regex
+                parsed_data = self._parse_dates_regex(html_content)
+                
+        except Exception as e:
+            _logger.error(f"Error parsing dates HTML: {e}")
+            parsed_data = self._parse_dates_regex(html_content)
+        
+        return parsed_data
+    
+    def _parse_dates_regex(self, html_content):
+        """Fallback regex parsing for dates"""
+        parsed_data = {}
+        
+        try:
+            # Last enquiry date
+            enquiry_match = re.search(r'آخر موعد لإستلام الإستفسارات.*?<span>\s*(\d{2}/\d{2}/\d{4})', html_content, re.DOTALL)
+            if enquiry_match:
+                parsed_data['last_enquiry_date'] = self._parse_date_from_string(enquiry_match.group(1))
+            
+            # Offers deadline
+            deadline_match = re.search(r'آخر موعد لتقديم العروض.*?<span>\s*(\d{2}/\d{2}/\d{4})', html_content, re.DOTALL)
+            time_match = re.search(r'(\d{1,2}:\d{2}\s*(?:AM|PM))', html_content)
+            if deadline_match:
+                time_str = time_match.group(1) if time_match else ''
+                parsed_data['offers_deadline'] = self._parse_datetime_from_strings(deadline_match.group(1), time_str)
+            
+            # Offer opening date
+            opening_match = re.search(r'تاريخ فتح العروض.*?<span>\s*([^<]+?)\s*</span>', html_content, re.DOTALL)
+            if opening_match:
+                opening_text = html_module.unescape(re.sub(r'<[^>]+>', '', opening_match.group(1)).strip())
+                if 'لا يوجد' not in opening_text and opening_text.strip():
+                    parsed_data['offer_opening_date'] = self._parse_date_from_string(opening_text)
+            
+            # Examination date
+            exam_match = re.search(r'تاريخ فحص العروض.*?<span>\s*(\d{2}/\d{2}/\d{4})', html_content, re.DOTALL)
+            exam_time_match = re.search(r'تاريخ فحص العروض.*?(\d{1,2}:\d{2}\s*(?:AM|PM))', html_content, re.DOTALL)
+            if exam_match:
+                time_str = exam_time_match.group(1) if exam_time_match else ''
+                parsed_data['offer_examination_date'] = self._parse_datetime_from_strings(exam_match.group(1), time_str)
+            
+            # Expected award date
+            award_match = re.search(r'التاريخ المتوقع للترسية.*?<span>\s*(\d{2}/\d{2}/\d{4})', html_content, re.DOTALL)
+            if award_match:
+                parsed_data['expected_award_date'] = self._parse_date_from_string(award_match.group(1))
+            
+            # Work start date
+            work_match = re.search(r'تاريخ بدء الأعمال.*?<span>\s*(\d{2}/\d{2}/\d{4})', html_content, re.DOTALL)
+            if work_match:
+                parsed_data['work_start_date'] = self._parse_date_from_string(work_match.group(1))
+            
+            # Inquiry start date
+            inquiry_match = re.search(r'بداية إرسال الأسئلة.*?<span>\s*(\d{2}/\d{2}/\d{4})', html_content, re.DOTALL)
+            if inquiry_match:
+                parsed_data['inquiry_start_date'] = self._parse_date_from_string(inquiry_match.group(1))
+            
+            # Max inquiry response days
+            days_match = re.search(r'اقصى مدة للاجابة.*?<span>\s*(\d+)', html_content, re.DOTALL)
+            if days_match:
+                try:
+                    parsed_data['max_inquiry_response_days'] = int(days_match.group(1))
+                except ValueError:
+                    pass
+            
+            # Opening location
+            location_match = re.search(r'مكان فتح العرض.*?<span>\s*([^<]+?)\s*</span>', html_content, re.DOTALL)
+            if location_match:
+                parsed_data['opening_location'] = html_module.unescape(re.sub(r'<[^>]+>', '', location_match.group(1)).strip())
+                
+        except Exception as e:
+            _logger.error(f"Error in regex dates parsing: {e}")
+        
+        return parsed_data
+    
+    def _parse_award_results_html(self, html_content):
+        """Parse HTML content from GetAwardingResultsForVisitorViewComponenet API"""
+        parsed_data = {}
+        
+        try:
+            # Check if award has been announced
+            if 'لم يتم اعلان نتائج الترسية بعد' in html_content or 'لم يتم' in html_content:
+                parsed_data['award_announced'] = False
+            else:
+                # Try to extract award information if available
+                parsed_data['award_announced'] = True
+                
+                if LXML_AVAILABLE:
+                    tree = html.fromstring(html_content)
+                    
+                    # Extract award date, company, amount if available in the HTML
+                    # (Structure may vary when award is announced)
+                    award_date_elements = tree.xpath('//text()[contains(., "تاريخ")]/following::text()[1]')
+                    company_elements = tree.xpath('//text()[contains(., "الشركة")]/following::text()[1]')
+                    amount_elements = tree.xpath('//text()[contains(., "المبلغ")]/following::text()[1]')
+                    
+                    # This is a placeholder - actual structure may vary
+                    # when award results are available
+                    
+        except Exception as e:
+            _logger.error(f"Error parsing award results HTML: {e}")
+            # Default to not announced if parsing fails
+            parsed_data['award_announced'] = False
+        
+        return parsed_data
+    
+    def _parse_date_from_string(self, date_str):
+        """Parse date string in DD/MM/YYYY format (Etimad format) to date object"""
+        if not date_str or 'لا يوجد' in date_str or not date_str.strip():
+            return False
+        
+        date_str = date_str.strip()
+        
+        try:
+            # Try DD/MM/YYYY format (Etimad format)
+            date_obj = datetime.strptime(date_str, '%d/%m/%Y')
+            return date_obj.date()
+        except ValueError:
+            try:
+                # Try other common formats
+                for fmt in ['%Y-%m-%d', '%d-%m-%Y', '%m/%d/%Y', '%d.%m.%Y']:
+                    try:
+                        return datetime.strptime(date_str, fmt).date()
+                    except ValueError:
+                        continue
+            except Exception:
+                pass
+        
+        # Fallback to existing _parse_date method for ISO formats
+        parsed_datetime = self._parse_date(date_str)
+        if parsed_datetime:
+            return parsed_datetime.date()
+        
+        return False
+    
+    def _parse_datetime_from_strings(self, date_str, time_str=''):
+        """Parse date and time strings to datetime object"""
+        if not date_str or 'لا يوجد' in date_str:
+            return False
+        
+        try:
+            # Parse date
+            date_obj = self._parse_date_from_string(date_str)
+            if not date_obj:
+                return False
+            
+            # Parse time if provided
+            hour = 0
+            minute = 0
+            if time_str:
+                time_str = time_str.strip().upper()
+                # Handle AM/PM format
+                if 'AM' in time_str or 'PM' in time_str:
+                    time_part = time_str.replace('AM', '').replace('PM', '').strip()
+                    if ':' in time_part:
+                        hour, minute = map(int, time_part.split(':'))
+                        if 'PM' in time_str and hour != 12:
+                            hour += 12
+                        elif 'AM' in time_str and hour == 12:
+                            hour = 0
+                else:
+                    # Try HH:MM format
+                    if ':' in time_str:
+                        hour, minute = map(int, time_str.split(':'))
+            
+            return datetime.combine(date_obj, datetime.min.time().replace(hour=hour, minute=minute))
+        except Exception as e:
+            _logger.warning(f"Error parsing datetime: {date_str} {time_str}, error: {e}")
+            # Return just the date if time parsing fails
+            return datetime.combine(self._parse_date_from_string(date_str), datetime.min.time()) if date_str else False
     
     def action_open_detailed_report(self):
         """Open detailed tender report on Etimad portal"""
