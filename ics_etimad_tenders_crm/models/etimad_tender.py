@@ -211,6 +211,120 @@ class EtimadTender(models.Model):
         for record in self:
             record.opportunity_count = 1 if record.opportunity_id else 0
 
+    # ========== COMPUTED FIELDS ==========
+    
+    is_urgent = fields.Boolean("Urgent", compute='_compute_is_urgent', store=True,
+                                help="Auto-set when remaining days < 3")
+    is_hot_tender = fields.Boolean("Hot Tender", compute='_compute_is_hot_tender', store=True,
+                                    help="High-value tender with approaching deadline")
+    estimated_value_category = fields.Selection([
+        ('small', 'Small (< 100K SAR)'),
+        ('medium', 'Medium (100K-1M SAR)'),
+        ('large', 'Large (1M-10M SAR)'),
+        ('mega', 'Mega (> 10M SAR)'),
+    ], string="Value Category", compute='_compute_estimated_value_category', store=True)
+    
+    # Scraping metadata
+    last_scraped_at = fields.Datetime("Last Scraped At", readonly=True)
+    scraping_error_count = fields.Integer("Scraping Errors", default=0, readonly=True)
+    last_scraping_error = fields.Text("Last Scraping Error", readonly=True)
+    scraping_status = fields.Selection([
+        ('success', 'Success'),
+        ('partial', 'Partial'),
+        ('failed', 'Failed'),
+        ('pending', 'Pending'),
+    ], string="Scraping Status", default='pending', readonly=True)
+    
+    # Matching and scoring
+    matching_score = fields.Float("Matching Score", 
+                                   help="Auto-calculated based on company profile (0-100)",
+                                   compute='_compute_matching_score', store=True)
+    matching_reasons = fields.Text("Matching Reasons", compute='_compute_matching_score', store=True)
+    
+    @api.depends('remaining_days')
+    def _compute_is_urgent(self):
+        """Mark tender as urgent if deadline is very close"""
+        for record in self:
+            record.is_urgent = record.remaining_days > 0 and record.remaining_days <= 3
+    
+    @api.depends('estimated_amount', 'remaining_days')
+    def _compute_is_hot_tender(self):
+        """Identify high-value tenders with approaching deadline"""
+        for record in self:
+            is_high_value = record.estimated_amount and record.estimated_amount >= 500000
+            is_deadline_soon = record.remaining_days > 0 and record.remaining_days <= 7
+            record.is_hot_tender = is_high_value and is_deadline_soon
+    
+    @api.depends('estimated_amount')
+    def _compute_estimated_value_category(self):
+        """Categorize tender by estimated value"""
+        for record in self:
+            if not record.estimated_amount or record.estimated_amount == 0:
+                record.estimated_value_category = False
+            elif record.estimated_amount < 100000:
+                record.estimated_value_category = 'small'
+            elif record.estimated_amount < 1000000:
+                record.estimated_value_category = 'medium'
+            elif record.estimated_amount < 10000000:
+                record.estimated_value_category = 'large'
+            else:
+                record.estimated_value_category = 'mega'
+    
+    @api.depends('activity_name', 'tender_type', 'agency_name', 'estimated_amount')
+    def _compute_matching_score(self):
+        """Calculate matching score based on company profile and preferences"""
+        for record in self:
+            score = 0
+            reasons = []
+            
+            # Get company settings (placeholder - can be enhanced with actual company profile)
+            ICP = self.env.company
+            
+            # Activity matching (30 points)
+            # TODO: Implement company activity preferences in res.config.settings
+            if record.activity_name:
+                # Placeholder: check if activity matches company capabilities
+                score += 15
+                reasons.append('Activity matches company profile')
+            
+            # Tender type matching (20 points)
+            if record.tender_type:
+                # Placeholder: check preferred tender types
+                score += 10
+                reasons.append('Tender type is preferred')
+            
+            # Value range matching (20 points)
+            if record.estimated_amount:
+                if record.estimated_value_category in ['medium', 'large']:
+                    score += 20
+                    reasons.append('Tender value within target range')
+                elif record.estimated_value_category == 'small':
+                    score += 10
+                elif record.estimated_value_category == 'mega':
+                    score += 15
+            
+            # Agency experience (15 points)
+            # Check if we've won tenders from this agency before
+            if record.agency_name:
+                won_count = self.search_count([
+                    ('agency_name', '=', record.agency_name),
+                    ('state', '=', 'won')
+                ])
+                if won_count > 0:
+                    score += 15
+                    reasons.append(f'Previous wins with {record.agency_name}')
+            
+            # Deadline availability (15 points)
+            if record.remaining_days >= 7:
+                score += 15
+                reasons.append('Sufficient time to prepare')
+            elif record.remaining_days >= 3:
+                score += 8
+                reasons.append('Limited time to prepare')
+            
+            record.matching_score = min(100, score)  # Cap at 100
+            record.matching_reasons = '\n'.join(reasons) if reasons else False
+    
     @api.model
     def _setup_scraper_session(self):
         """Setup session with proper headers to mimic browser"""
@@ -231,10 +345,23 @@ class EtimadTender(models.Model):
         return session
 
     @api.model
-    def fetch_etimad_tenders(self, page_size=20, page_number=1):
-        """Fetch tenders from Etimad platform with retry mechanism"""
+    def fetch_etimad_tenders(self, page_size=20, page_number=1, max_pages=None):
+        """Fetch tenders from Etimad platform with retry mechanism and pagination support
+        
+        Args:
+            page_size: Number of tenders per page (default: 20, max: 50)
+            page_number: Starting page number (default: 1)
+            max_pages: Maximum number of pages to fetch (default: None = single page)
+        
+        Returns:
+            Notification action dict with fetch results
+        """
         session = self._setup_scraper_session()
         max_retries = 3
+        total_created = 0
+        total_updated = 0
+        total_errors = 0
+        pages_fetched = 0
         
         # First, visit the main portal to get cookies
         try:
@@ -243,121 +370,182 @@ class EtimadTender(models.Model):
         except Exception as e:
             _logger.warning(f"Could not access portal homepage: {e}")
         
-        for attempt in range(max_retries):
-            try:
-                _logger.info(f"Attempt {attempt + 1} to fetch tenders...")
-                
-                timestamp = int(time.time() * 1000)
-                url = "https://tenders.etimad.sa/Tender/AllSupplierTendersForVisitorAsync"
-                
-                params = {
-                    'PublishDateId': 5,  # Recent tenders
-                    'PageSize': page_size,
-                    'PageNumber': page_number,
-                    '_': timestamp
-                }
-                
-                response = session.get(url, params=params, timeout=30)
-                
-                _logger.info(f"Response status: {response.status_code}")
-                
-                if response.status_code == 200 and response.text.strip():
-                    try:
-                        data = response.json()
-                        
-                        if not data or 'data' not in data:
-                            _logger.warning("No data in response")
-                            time.sleep(3)
-                            continue
-                        
-                        tenders = data.get('data', [])
-                        _logger.info(f"Successfully fetched {len(tenders)} tenders")
-                        
-                        created_count = 0
-                        updated_count = 0
-                        
-                        for tender_data in tenders:
-                            is_new = self._process_tender_data(tender_data)
-                            if is_new:
-                                created_count += 1
-                            else:
-                                updated_count += 1
-                        
-                        return {
-                            'type': 'ir.actions.client',
-                            'tag': 'display_notification',
-                            'params': {
-                                'title': _('Tenders Synchronized'),
-                                'message': _('%d tenders created, %d updated') % (created_count, updated_count),
-                                'type': 'success',
-                                'sticky': False,
-                            }
-                        }
-                    
-                    except json.JSONDecodeError as e:
-                        _logger.error(f"JSON decode error: {e}")
-                        if '<html' in response.text.lower():
-                            raise UserError(_("Etimad portal is blocking requests. Please try again later."))
-                
-                time.sleep(3)
-                
-            except requests.RequestException as e:
-                _logger.error(f"Request error (attempt {attempt + 1}): {e}")
-                time.sleep(3)
+        # Determine if we're fetching multiple pages
+        pages_to_fetch = [page_number] if not max_pages else list(range(page_number, page_number + max_pages))
         
-        raise UserError(_("Failed to fetch tenders after %d attempts. The site may have anti-bot protection.") % max_retries)
+        for current_page in pages_to_fetch:
+            fetch_success = False
+            
+            for attempt in range(max_retries):
+                try:
+                    _logger.info(f"Fetching page {current_page}, attempt {attempt + 1}/{max_retries}...")
+                    
+                    timestamp = int(time.time() * 1000)
+                    url = "https://tenders.etimad.sa/Tender/AllSupplierTendersForVisitorAsync"
+                    
+                    params = {
+                        'PublishDateId': 5,  # Recent tenders
+                        'PageSize': min(page_size, 50),  # Cap at 50
+                        'PageNumber': current_page,
+                        '_': timestamp
+                    }
+                    
+                    response = session.get(url, params=params, timeout=30)
+                    
+                    _logger.info(f"Response status: {response.status_code}")
+                    
+                    if response.status_code == 200 and response.text.strip():
+                        try:
+                            data = response.json()
+                            
+                            if not data or 'data' not in data:
+                                _logger.warning("No data in response")
+                                time.sleep(3)
+                                continue
+                            
+                            tenders = data.get('data', [])
+                            _logger.info(f"Successfully fetched {len(tenders)} tenders from page {current_page}")
+                            
+                            # Process tenders with error handling per tender
+                            for tender_data in tenders:
+                                try:
+                                    is_new = self._process_tender_data(tender_data)
+                                    if is_new:
+                                        total_created += 1
+                                    else:
+                                        total_updated += 1
+                                except Exception as e:
+                                    total_errors += 1
+                                    _logger.error(f"Error processing tender {tender_data.get('tenderIdString', 'unknown')}: {e}")
+                            
+                            pages_fetched += 1
+                            fetch_success = True
+                            
+                            # Check if we got fewer results than page size (last page)
+                            if max_pages and len(tenders) < page_size:
+                                _logger.info("Reached last page with data")
+                                break  # Exit pages_to_fetch loop
+                            
+                            break  # Exit retry loop
+                        
+                        except json.JSONDecodeError as e:
+                            _logger.error(f"JSON decode error on page {current_page}: {e}")
+                            if '<html' in response.text.lower():
+                                raise UserError(_("Etimad portal is blocking requests. Please try again later."))
+                    
+                    time.sleep(3)
+                    
+                except requests.RequestException as e:
+                    _logger.error(f"Request error for page {current_page} (attempt {attempt + 1}): {e}")
+                    time.sleep(3)
+            
+            # If page fetch failed after all retries, log and continue
+            if not fetch_success:
+                _logger.error(f"Failed to fetch page {current_page} after {max_retries} attempts")
+                total_errors += 1
+            
+            # Delay between pages to avoid rate limiting
+            if current_page != pages_to_fetch[-1]:
+                time.sleep(2)
+        
+        # Prepare result message
+        if pages_fetched == 0:
+            raise UserError(_("Failed to fetch any tenders. The site may have anti-bot protection."))
+        
+        message = _('%d created, %d updated') % (total_created, total_updated)
+        if pages_fetched > 1:
+            message += _(' from %d pages') % pages_fetched
+        if total_errors > 0:
+            message += _(' (%d errors)') % total_errors
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Tenders Synchronized'),
+                'message': message,
+                'type': 'success' if total_errors == 0 else 'warning',
+                'sticky': False,
+            }
+        }
+    
+    @api.model
+    def action_fetch_batch(self):
+        """Fetch multiple pages of tenders (batch operation)"""
+        return self.fetch_etimad_tenders(page_size=50, page_number=1, max_pages=3)
 
     def _process_tender_data(self, raw_data):
-        """Process and create/update tender record"""
+        """Process and create/update tender record with improved error tracking"""
         
-        # Map the raw data to Odoo fields
-        vals = {
-            'name': raw_data.get('tenderName', 'Unnamed Tender'),
-            'reference_number': raw_data.get('referenceNumber'),
-            'tender_number': raw_data.get('tenderNumber'),
-            'tender_id': raw_data.get('tenderId'),
-            'tender_id_string': raw_data.get('tenderIdString'),
-            'agency_name': raw_data.get('agencyName'),
-            'branch_name': raw_data.get('branchName'),
-            'tender_type': raw_data.get('tenderTypeName'),
-            'activity_name': raw_data.get('tenderActivityName'),
-            'activity_id': raw_data.get('tenderActivityId'),
-            'last_enquiry_date': self._parse_date(raw_data.get('lastEnqueriesDate')),
-            'offers_deadline': self._parse_date(raw_data.get('lastOfferPresentationDate')),
-            'submission_date': self._parse_date(raw_data.get('submitionDate')),
-            'invitation_cost': float(raw_data.get('invitationCost', 0) or 0),
-            'financial_fees': float(raw_data.get('financialFees', 0) or 0),
-            'tender_status_id': raw_data.get('tenderStatusId'),
-            'last_enquiry_date_hijri': raw_data.get('lastEnqueriesDateHijri'),
-            'last_offer_date_hijri': raw_data.get('lastOfferPresentationDateHijri'),
-            'description': self._generate_description(raw_data),
-            'agency_code': raw_data.get('agencyCode'),
-            'tender_type_id': raw_data.get('tenderTypeId'),
-        }
-        
-        # Map status
-        status_map = {
-            4: 'qualification',
-            5: 'won',
-            6: 'lost'
-        }
-        vals['state'] = status_map.get(raw_data.get('tenderStatusId'), 'new')
-        
-        # Check if tender already exists
-        existing = self.search([
-            '|',
-            ('reference_number', '=', vals['reference_number']),
-            ('tender_id', '=', vals['tender_id'])
-        ], limit=1)
-        
-        if existing:
-            existing.write(vals)
-            _logger.info(f"Updated tender: {vals['name'][:50]}")
-            return False
-        else:
-            self.create(vals)
-            _logger.info(f"Created tender: {vals['name'][:50]}")
-            return True
+        try:
+            # Map the raw data to Odoo fields
+            vals = {
+                'name': raw_data.get('tenderName', 'Unnamed Tender'),
+                'reference_number': raw_data.get('referenceNumber'),
+                'tender_number': raw_data.get('tenderNumber'),
+                'tender_id': raw_data.get('tenderId'),
+                'tender_id_string': raw_data.get('tenderIdString'),
+                'agency_name': raw_data.get('agencyName'),
+                'branch_name': raw_data.get('branchName'),
+                'tender_type': raw_data.get('tenderTypeName'),
+                'activity_name': raw_data.get('tenderActivityName'),
+                'activity_id': raw_data.get('tenderActivityId'),
+                'last_enquiry_date': self._parse_date(raw_data.get('lastEnqueriesDate')),
+                'offers_deadline': self._parse_date(raw_data.get('lastOfferPresentationDate')),
+                'submission_date': self._parse_date(raw_data.get('submitionDate')),
+                'invitation_cost': float(raw_data.get('invitationCost', 0) or 0),
+                'financial_fees': float(raw_data.get('financialFees', 0) or 0),
+                'tender_status_id': raw_data.get('tenderStatusId'),
+                'last_enquiry_date_hijri': raw_data.get('lastEnqueriesDateHijri'),
+                'last_offer_date_hijri': raw_data.get('lastOfferPresentationDateHijri'),
+                'description': self._generate_description(raw_data),
+                'agency_code': raw_data.get('agencyCode'),
+                'tender_type_id': raw_data.get('tenderTypeId'),
+                # Scraping metadata
+                'last_scraped_at': fields.Datetime.now(),
+                'scraping_status': 'success',
+                'scraping_error_count': 0,
+                'last_scraping_error': False,
+            }
+            
+            # Map status
+            status_map = {
+                4: 'qualification',
+                5: 'won',
+                6: 'lost'
+            }
+            vals['state'] = status_map.get(raw_data.get('tenderStatusId'), 'new')
+            
+            # Check if tender already exists
+            existing = self.search([
+                '|',
+                ('reference_number', '=', vals['reference_number']),
+                ('tender_id', '=', vals['tender_id'])
+            ], limit=1)
+            
+            if existing:
+                existing.write(vals)
+                _logger.info(f"Updated tender: {vals['name'][:50]}")
+                return False
+            else:
+                self.create(vals)
+                _logger.info(f"Created tender: {vals['name'][:50]}")
+                return True
+                
+        except Exception as e:
+            # Log error and update scraping status if tender exists
+            _logger.error(f"Error processing tender data: {e}")
+            tender_id = raw_data.get('tenderId')
+            if tender_id:
+                existing = self.search([('tender_id', '=', tender_id)], limit=1)
+                if existing:
+                    existing.write({
+                        'scraping_status': 'failed',
+                        'scraping_error_count': existing.scraping_error_count + 1,
+                        'last_scraping_error': str(e),
+                        'last_scraped_at': fields.Datetime.now(),
+                    })
+            raise
     
     def _parse_contract_duration(self, duration_text):
         """Parse contract duration text to extract days (e.g., '10 يوم' -> 10)"""
@@ -470,6 +658,74 @@ class EtimadTender(models.Model):
         """Toggle favorite status"""
         for record in self:
             record.is_favorite = not record.is_favorite
+    
+    def action_bulk_create_opportunities(self):
+        """Bulk create opportunities for selected tenders"""
+        created_count = 0
+        existing_count = 0
+        
+        for record in self:
+            if not record.opportunity_id:
+                try:
+                    record.action_create_opportunity()
+                    created_count += 1
+                except Exception as e:
+                    _logger.error(f"Error creating opportunity for {record.name}: {e}")
+            else:
+                existing_count += 1
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Bulk Operation Complete'),
+                'message': _('%d opportunities created, %d already existed') % (created_count, existing_count),
+                'type': 'success',
+                'sticky': False,
+            }
+        }
+    
+    def action_bulk_mark_as_progress(self):
+        """Bulk mark selected tenders as in progress"""
+        self.write({'state': 'in_progress'})
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Status Updated'),
+                'message': _('%d tenders marked as in progress') % len(self),
+                'type': 'success',
+                'sticky': False,
+            }
+        }
+    
+    def action_bulk_mark_as_lost(self):
+        """Bulk mark selected tenders as lost"""
+        self.write({'state': 'lost'})
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Status Updated'),
+                'message': _('%d tenders marked as lost') % len(self),
+                'type': 'info',
+                'sticky': False,
+            }
+        }
+    
+    def action_bulk_add_to_favorites(self):
+        """Bulk add to favorites"""
+        self.write({'is_favorite': True})
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Favorites Updated'),
+                'message': _('%d tenders added to favorites') % len(self),
+                'type': 'success',
+                'sticky': False,
+            }
+        }
 
     def action_view_opportunities(self):
         """View related opportunities"""

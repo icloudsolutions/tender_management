@@ -1,7 +1,7 @@
 # __manifest__.py
 {
     "name": "ICS Etimad Tenders CRM",
-    "version": "18.0.2.2.0",
+    "version": "18.0.3.0.0",
     "category": "Sales/CRM",
     "author": "iCloud Solutions",
     "website": "https://icloud-solutions.net",
