@@ -344,62 +344,121 @@
                             </group>
                         </page>
                         
-                        <page string="📋 Enhanced Details" name="enhanced_details">
+                        <!-- Tab 1: Basic Information (المعلومات الأساسية) -->
+                        <page string="1. Basic Information" name="enhanced_basic_info">
                             <group>
-                                <group string="Contract &amp; Duration">
+                                <group string="Contract &amp; Purpose">
                                     <field name="contract_duration"/>
                                     <field name="contract_duration_days"/>
-                                    <field name="tender_purpose" widget="text"/>
+                                    <field name="tender_purpose" widget="text" nolabel="1" placeholder="الغرض من المنافسة"/>
                                 </group>
-                                <group string="Insurance &amp; Guarantees">
-                                    <field name="insurance_required"/>
-                                    <field name="initial_guarantee_required"/>
-                                    <field name="initial_guarantee_type"/>
+                                <group string="Status &amp; Approval">
+                                    <field name="tender_status_text"/>
+                                    <field name="tender_status_approved" readonly="1"/>
                                 </group>
                             </group>
                             <group>
                                 <group string="Document Cost">
                                     <field name="document_cost_type"/>
-                                    <field name="document_cost_amount" invisible="document_cost_type != 'paid'"/>
+                                    <field name="document_cost_amount" invisible="document_cost_type != 'paid'" widget="monetary"/>
                                 </group>
                                 <group string="Submission Method">
                                     <field name="submission_method"/>
                                 </group>
                             </group>
                             <group>
-                                <group string="Additional Dates">
+                                <group string="Insurance &amp; Guarantees">
+                                    <field name="insurance_required"/>
+                                    <field name="initial_guarantee_required"/>
+                                    <field name="initial_guarantee_type" invisible="not initial_guarantee_required"/>
+                                </group>
+                            </group>
+                        </page>
+                        
+                        <!-- Tab 2: Dates &amp; Deadlines (العناوين والمواعيد المتعلقة بالمنافسة) -->
+                        <page string="2. Dates &amp; Deadlines" name="enhanced_dates">
+                            <group>
+                                <group string="Offer Dates">
+                                    <field name="offers_deadline" widget="datetime"/>
                                     <field name="offer_opening_date" widget="datetime"/>
                                     <field name="offer_examination_date" widget="datetime"/>
-                                    <field name="expected_award_date"/>
-                                    <field name="work_start_date"/>
+                                </group>
+                                <group string="Inquiry Dates">
+                                    <field name="last_enquiry_date" widget="datetime"/>
                                     <field name="inquiry_start_date"/>
                                     <field name="max_inquiry_response_days"/>
                                 </group>
-                                <group string="Location Information">
-                                    <field name="opening_location"/>
-                                    <field name="execution_location_type"/>
-                                    <field name="execution_regions" widget="text"/>
-                                    <field name="execution_cities" widget="text"/>
-                                </group>
                             </group>
                             <group>
-                                <group string="Classification &amp; Activities">
+                                <group string="Award &amp; Work Dates">
+                                    <field name="expected_award_date"/>
+                                    <field name="work_start_date"/>
+                                </group>
+                                <group string="Opening Location">
+                                    <field name="opening_location"/>
+                                </group>
+                            </group>
+                        </page>
+                        
+                        <!-- Tab 3: Location &amp; Classification (مجال التصنيف وموقع التنفيذ) -->
+                        <page string="3. Location &amp; Classification" name="enhanced_location">
+                            <group>
+                                <group string="Execution Location">
+                                    <field name="execution_location_type"/>
+                                    <field name="execution_regions" widget="text" placeholder="مناطق التنفيذ (Regions)"/>
+                                    <field name="execution_cities" widget="text" placeholder="مدن التنفيذ (Cities)"/>
+                                </group>
+                                <group string="Classification">
                                     <field name="classification_field"/>
                                     <field name="classification_required"/>
-                                    <field name="activity_details" widget="text"/>
-                                </group>
-                                <group string="Work Types">
-                                    <field name="includes_supply_items"/>
-                                    <field name="construction_works" widget="text"/>
-                                    <field name="maintenance_works" widget="text"/>
                                 </group>
                             </group>
                             <group>
-                                <group string="Award Information">
+                                <group string="Activity Details">
+                                    <field name="activity_details" widget="text" nolabel="1" placeholder="نشاط المنافسة (Tender Activity Details)"/>
+                                </group>
+                            </group>
+                        </page>
+                        
+                        <!-- Tab 4: Work Types (أنواع الأعمال) -->
+                        <page string="4. Work Types" name="enhanced_work_types">
+                            <group>
+                                <group string="Supply Items">
+                                    <field name="includes_supply_items"/>
+                                </group>
+                                <group string="Construction Works">
+                                    <field name="construction_works" widget="text" nolabel="1" 
+                                           placeholder="أعمال الإنشاء (Construction Works)"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Maintenance &amp; Operation">
+                                    <field name="maintenance_works" widget="text" nolabel="1" 
+                                           placeholder="أعمال الصيانة والتشغيل (Maintenance &amp; Operation Works)"/>
+                                </group>
+                            </group>
+                        </page>
+                        
+                        <!-- Tab 5: Award Results (إعلان نتائج الترسية) -->
+                        <page string="5. Award Results" name="enhanced_award">
+                            <group>
+                                <group string="Award Status">
                                     <field name="award_announced"/>
-                                    <field name="award_announcement_date" invisible="not award_announced"/>
-                                    <field name="awarded_company_name" invisible="not award_announced"/>
-                                    <field name="awarded_amount" invisible="not award_announced" widget="monetary"/>
+                                </group>
+                            </group>
+                            <div invisible="not award_announced" class="alert alert-success">
+                                <i class="fa fa-check-circle"/> Award results have been announced
+                            </div>
+                            <div invisible="award_announced" class="alert alert-info text-center">
+                                <i class="fa fa-info-circle" style="font-size:3rem"/> 
+                                <br/>لم يتم اعلان نتائج الترسية بعد
+                                <br/><small>Award results have not been announced yet</small>
+                            </div>
+                            <group invisible="not award_announced">
+                                <group string="Award Details">
+                                    <field name="award_announcement_date"/>
+                                    <field name="awarded_company_name"/>
+                                    <field name="awarded_amount" widget="monetary"/>
                                 </group>
                             </group>
                         </page>
@@ -542,4 +601,5 @@ else:
         </field>
     </record>
 
+</odoo>
 </odoo>
