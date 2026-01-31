@@ -82,5 +82,11 @@
             action="action_tender_stage"
             sequence="10"/>
 
+        <menuitem id="menu_tender_approval_rule"
+            name="Approval Rules"
+            parent="menu_tender_config"
+            action="action_tender_approval_rule"
+            sequence="20"/>
+
     </data>
 </odoo>

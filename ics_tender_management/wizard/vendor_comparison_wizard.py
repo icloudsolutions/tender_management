@@ -139,10 +139,10 @@ class VendorComparisonWizard(models.TransientModel):
                 ], limit=1)
                 
                 if vendor_offer:
-                    line.boq_line_id.write({
-                        'selected_vendor_id': line.best_vendor_id.id,
+                line.boq_line_id.write({
+                    'selected_vendor_id': line.best_vendor_id.id,
                         'selected_vendor_price': vendor_offer.total_price,
-                    })
+                })
 
         return {'type': 'ir.actions.act_window_close'}
 

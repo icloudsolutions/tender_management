@@ -87,7 +87,7 @@ class GenerateQuotationWizard(models.TransientModel):
 
         if not self.tender_id.boq_line_ids:
             raise UserError(_('No BoQ lines found in the tender.'))
-        
+
         if not self.partner_id:
             raise UserError(_('Please set a customer on the tender before generating quotation.'))
         
@@ -123,7 +123,7 @@ class GenerateQuotationWizard(models.TransientModel):
         # Create sale order lines with dynamic field checking
         sol_model = self.env['sale.order.line']
         sol_fields = sol_model._fields.keys()
-        
+
         for preview_line in self.line_preview_ids:
             sol_vals = {
                 'order_id': quotation.id,

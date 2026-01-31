@@ -268,7 +268,8 @@
                             </page>
 
                             <!-- Phase 2: Qualification (Draft/Technical) -->
-                            <page string="2. Qualification &amp; Decision" name="qualification">
+                            <page string="2. Qualification &amp; Decision" name="qualification"
+                                invisible="state in ['won', 'lost', 'cancelled']">
                                 <group>
                                     <group string="Tender Information">
                                         <field name="etimad_link" widget="url"/>
@@ -318,7 +319,8 @@
                             </page>
 
                             <!-- Phase 3: Team & Suppliers Setup (Technical) -->
-                            <page string="3. Team &amp; Suppliers" name="team_suppliers">
+                            <page string="3. Team &amp; Suppliers" name="team_suppliers"
+                                invisible="state in ['draft', 'won', 'lost', 'cancelled']">
                                 <group>
                                     <group string="Responsible Team">
                                         <field name="tender_employee" widget="many2one_avatar_user"/>
@@ -356,7 +358,8 @@
                             </page>
 
                             <!-- Phase 4: Bill of Quantities (Technical/Financial) -->
-                            <page string="4. Bill of Quantities" name="boq">
+                            <page string="4. Bill of Quantities" name="boq"
+                                invisible="state in ['draft', 'won', 'lost', 'cancelled']">
                                 <field name="boq_line_ids">
                                     <list editable="bottom">
                                         <field name="sequence" widget="handle"/>
@@ -373,13 +376,34 @@
                             </page>
 
                             <!-- Phase 5: Approvals & Documents (Quotation) -->
-                            <page string="5. Approvals &amp; Documents" name="approvals">
+                            <page string="5. Approvals &amp; Documents" name="approvals"
+                                invisible="state in ['draft', 'technical', 'won', 'lost', 'cancelled']">
+                                <div class="alert alert-info" role="alert" invisible="not require_direct_manager and not require_department_manager and not require_financial_manager and not require_ceo">
+                                    <strong>ℹ️ Approval Requirements:</strong>
+                                    <p class="mb-0">
+                                        Based on tender category and amount, the following approvals are required:
+                                    </p>
+                                    <ul class="mb-0">
+                                        <li invisible="not require_direct_manager">✓ Direct Manager Approval Required</li>
+                                        <li invisible="not require_department_manager">✓ Department Manager Approval Required</li>
+                                        <li invisible="not require_financial_manager">✓ Financial Manager Approval Required</li>
+                                        <li invisible="not require_ceo">✓ CEO Approval Required</li>
+                                    </ul>
+                                </div>
                                 <group>
                                     <group string="Management Approvals">
-                                        <field name="approval_direct_manager" widget="boolean_toggle"/>
-                                        <field name="approval_department_manager" widget="boolean_toggle"/>
-                                        <field name="approval_financial_manager" widget="boolean_toggle"/>
-                                        <field name="approval_ceo" widget="boolean_toggle"/>
+                                        <field name="approval_direct_manager" widget="boolean_toggle" 
+                                            invisible="not require_direct_manager"
+                                            required="require_direct_manager"/>
+                                        <field name="approval_department_manager" widget="boolean_toggle"
+                                            invisible="not require_department_manager"
+                                            required="require_department_manager"/>
+                                        <field name="approval_financial_manager" widget="boolean_toggle"
+                                            invisible="not require_financial_manager"
+                                            required="require_financial_manager"/>
+                                        <field name="approval_ceo" widget="boolean_toggle"
+                                            invisible="not require_ceo"
+                                            required="require_ceo"/>
                                     </group>
                                     <group string="Document Submission">
                                         <field name="tender_documents_uploaded" widget="boolean_toggle"/>
@@ -392,7 +416,8 @@
                             </page>
 
                             <!-- Phase 6: Offer Results & Evaluation (Submitted/Evaluation) -->
-                            <page string="6. Offer Results &amp; Evaluation" name="offer_results">
+                            <page string="6. Offer Results &amp; Evaluation" name="offer_results"
+                                invisible="state in ['draft', 'technical', 'financial', 'quotation', 'won', 'lost', 'cancelled']">
                                 <group>
                                     <group string="Offer Opening Dates">
                                         <field name="offer_opening_date" widget="datetime"/>

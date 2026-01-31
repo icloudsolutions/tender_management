@@ -193,6 +193,28 @@ class Tender(models.Model):
     approval_financial_manager = fields.Boolean('Approval from Financial Manager', default=False)
     approval_ceo = fields.Boolean('CEO Approval', default=False)
     
+    # Computed: Required approvals based on rules
+    require_direct_manager = fields.Boolean('Requires Direct Manager', compute='_compute_required_approvals', store=False)
+    require_department_manager = fields.Boolean('Requires Department Manager', compute='_compute_required_approvals', store=False)
+    require_financial_manager = fields.Boolean('Requires Financial Manager', compute='_compute_required_approvals', store=False)
+    require_ceo = fields.Boolean('Requires CEO', compute='_compute_required_approvals', store=False)
+    
+    @api.depends('tender_category', 'total_quotation_amount', 'expected_revenue', 'state')
+    def _compute_required_approvals(self):
+        """Compute required approvals based on approval rules"""
+        for tender in self:
+            if 'ics.tender.approval.rule' in self.env:
+                approvals = self.env['ics.tender.approval.rule'].get_required_approvals_for_tender(tender)
+                tender.require_direct_manager = approvals['direct_manager']
+                tender.require_department_manager = approvals['department_manager']
+                tender.require_financial_manager = approvals['financial_manager']
+                tender.require_ceo = approvals['ceo']
+            else:
+                tender.require_direct_manager = False
+                tender.require_department_manager = False
+                tender.require_financial_manager = False
+                tender.require_ceo = False
+    
     # Qualification Phase
     presales_employee = fields.Many2one('res.users', string='Presales Employee')
     evaluation_criteria_file = fields.Binary('Evaluation Criteria')
@@ -267,6 +289,9 @@ class Tender(models.Model):
                 
                 # Auto-create project with task template
                 tender._auto_create_project()
+                
+                # Auto-generate purchase orders for vendors
+                tender._auto_generate_purchase_orders()
         
         # Trigger appeal workflow when tender is lost
         if vals.get('state') == 'lost':
@@ -364,21 +389,37 @@ class Tender(models.Model):
         return probability_mapping.get(self.state, 20)
     
     def _auto_create_project(self):
-        """Automatically create project from won tender with task template"""
+        """Automatically create project from won tender with task template
+        
+        Template selection priority:
+        1. Exact category match (supply/maintenance/etc.)
+        2. General template (no category)
+        3. Use project_tasks_from_templates module if available
+        """
         self.ensure_one()
         
-        # Find appropriate task template based on tender category
+        # Priority 1: Find exact category match
         template = self.env['ics.project.task.template'].search([
             ('tender_category', '=', self.tender_category),
             ('active', '=', True)
         ], limit=1)
         
-        # If no category-specific template, get general template
+        # Priority 2: If no category-specific template, get general template
         if not template:
             template = self.env['ics.project.task.template'].search([
                 ('tender_category', '=', False),
                 ('active', '=', True)
             ], limit=1)
+        
+        # Priority 3: Try project_tasks_from_templates module if available
+        if not template and 'project.task.template' in self.env:
+            # Check if project_tasks_from_templates module is installed
+            project_template = self.env['project.task.template'].search([
+                ('name', 'ilike', self.tender_category)
+            ], limit=1)
+            if project_template:
+                # Use project_tasks_from_templates module
+                return self._create_project_with_template_module(project_template)
         
         # Create project
         project_vals = {
@@ -472,6 +513,51 @@ class Tender(models.Model):
                 self.env['project.task'].create(task_vals)
         
         return project
+    
+    def _create_project_with_template_module(self, template):
+        """Create project using project_tasks_from_templates module"""
+        self.ensure_one()
+        
+        # Create project
+        project_vals = {
+            'name': f"Project - {self.tender_title}",
+            'partner_id': self.partner_id.id,
+            'user_id': self.user_id.id,
+            'tender_id': self.id,
+            'date_start': fields.Date.today(),
+        }
+        
+        # Link to sales order if exists
+        confirmed_order = self.env['sale.order'].search([
+            ('tender_id', '=', self.id),
+            ('state', 'in', ['sale', 'done'])
+        ], limit=1)
+        if confirmed_order:
+            project_vals['sale_order_id'] = confirmed_order.id
+        
+        project = self.env['project.project'].create(project_vals)
+        
+        # Use project_tasks_from_templates module to create tasks
+        if 'project.task.template' in self.env and template:
+            # Create tasks from template using the module's method
+            template.with_context(default_project_id=project.id).create_tasks()
+        
+        return project
+    
+    def _auto_generate_purchase_orders(self):
+        """Automatically generate purchase orders for vendors when tender is won"""
+        self.ensure_one()
+        
+        if not self.boq_line_ids:
+            return  # No BoQ lines, nothing to purchase
+        
+        # Check tender type
+        if self.tender_type == 'single_vendor':
+            # Single vendor for all products
+            self._create_single_purchase_order()
+        elif self.tender_type == 'product_wise':
+            # Multiple vendors (one per product)
+            self._create_multiple_purchase_orders()
     
     def _trigger_state_activities(self, old_state, new_state):
         """Trigger automated activities when tender state changes"""
@@ -848,7 +934,7 @@ class Tender(models.Model):
         # Create requisition lines from BoQ
         line_model = self.env['purchase.requisition.line']
         line_fields = line_model._fields.keys()
-        
+
         for boq_line in self.boq_line_ids:
             line_vals = {
                 'requisition_id': requisition.id,
@@ -1002,7 +1088,7 @@ class Tender(models.Model):
         # Build purchase order line vals with only available fields
         pol_model = self.env['purchase.order.line']
         pol_fields = pol_model._fields.keys()
-        
+
         for boq_line in self.boq_line_ids:
             pol_vals = {
                 'order_id': purchase_order.id,

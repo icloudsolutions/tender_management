@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <record id="view_tender_approval_rule_tree" model="ir.ui.view">
+            <field name="name">ics.tender.approval.rule.tree</field>
+            <field name="model">ics.tender.approval.rule</field>
+            <field name="arch" type="xml">
+                <list string="Approval Rules">
+                    <field name="sequence" widget="handle"/>
+                    <field name="name"/>
+                    <field name="tender_category"/>
+                    <field name="amount_threshold" widget="monetary"/>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="require_direct_manager" widget="boolean_toggle"/>
+                    <field name="require_department_manager" widget="boolean_toggle"/>
+                    <field name="require_financial_manager" widget="boolean_toggle"/>
+                    <field name="require_ceo" widget="boolean_toggle"/>
+                    <field name="active" widget="boolean_toggle"/>
+                </list>
+            </field>
+        </record>
+        
+        <record id="view_tender_approval_rule_form" model="ir.ui.view">
+            <field name="name">ics.tender.approval.rule.form</field>
+            <field name="model">ics.tender.approval.rule</field>
+            <field name="arch" type="xml">
+                <form string="Approval Rule">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="sequence"/>
+                                <field name="active" widget="boolean_toggle"/>
+                            </group>
+                            <group>
+                                <field name="tender_category" 
+                                    options="{'no_create': True}"/>
+                                <field name="amount_threshold" widget="monetary"/>
+                                <field name="currency_id" invisible="1"/>
+                            </group>
+                        </group>
+                        
+                        <separator string="Conditions"/>
+                        <group>
+                            <group>
+                                <field name="apply_to_all_states" widget="boolean_toggle"/>
+                                <field name="applicable_states" 
+                                    invisible="apply_to_all_states"/>
+                            </group>
+                        </group>
+                        
+                        <separator string="Required Approvals"/>
+                        <group>
+                            <group>
+                                <field name="require_direct_manager" widget="boolean_toggle"/>
+                                <field name="require_department_manager" widget="boolean_toggle"/>
+                                <field name="require_financial_manager" widget="boolean_toggle"/>
+                                <field name="require_ceo" widget="boolean_toggle"/>
+                            </group>
+                        </group>
+                        
+                        <div class="alert alert-info" role="alert">
+                            <strong>Rule Priority:</strong>
+                            <p class="mb-0">
+                                Rules are evaluated in order of sequence (lower = higher priority).
+                                The first matching rule will be applied.
+                            </p>
+                            <p class="mb-0 mt-2">
+                                <strong>Conditions:</strong>
+                                <ul>
+                                    <li>If category is set, rule applies only to that category</li>
+                                    <li>If amount threshold is set, rule applies only to tenders >= threshold</li>
+                                    <li>If state is specified, rule applies only in that state</li>
+                                </ul>
+                            </p>
+                        </div>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <record id="view_tender_approval_rule_search" model="ir.ui.view">
+            <field name="name">ics.tender.approval.rule.search</field>
+            <field name="model">ics.tender.approval.rule</field>
+            <field name="arch" type="xml">
+                <search string="Search Approval Rules">
+                    <field name="name"/>
+                    <field name="tender_category"/>
+                    <filter string="Active" name="active" domain="[('active','=',True)]"/>
+                    <filter string="Inactive" name="inactive" domain="[('active','=',False)]"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Category" name="group_category" context="{'group_by':'tender_category'}"/>
+                        <filter string="State" name="group_state" context="{'group_by':'applicable_states'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+        
+        <record id="action_tender_approval_rule" model="ir.actions.act_window">
+            <field name="name">Approval Rules</field>
+            <field name="res_model">ics.tender.approval.rule</field>
+            <field name="view_mode">list,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create your first approval rule!
+                </p>
+                <p>
+                    Approval rules define which approvals are required for tenders
+                    based on category and amount thresholds.
+                </p>
+            </field>
+        </record>
+        
+    </data>
+</odoo>

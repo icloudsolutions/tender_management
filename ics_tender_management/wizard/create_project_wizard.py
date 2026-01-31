@@ -152,7 +152,7 @@ class CreateProjectWizard(models.TransientModel):
             'res_id': project.id,
             'target': 'current',
         }
-    
+
     def _create_tasks_from_template(self, project):
         """Create project tasks from selected template"""
         self.ensure_one()

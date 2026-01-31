@@ -5,6 +5,7 @@ from . import tender_dashboard
 from . import tender_team
 from . import tender_supplier
 from . import project_task_template
+from . import tender_approval_rule
 from . import crm_lead
 from . import purchase_requisition
 from . import sale_order
