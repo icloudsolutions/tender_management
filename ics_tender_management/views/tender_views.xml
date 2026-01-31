@@ -8,6 +8,7 @@
             <field name="type">list</field>
             <field name="arch" type="xml">
                 <list string="Tenders" decoration-danger="is_urgent" decoration-success="state=='won'" decoration-muted="state in ['lost','cancelled']">
+                    <field name="is_favorite" widget="boolean_toggle" optional="show"/>
                     <field name="name"/>
                     <field name="tender_number"/>
                     <field name="tender_title"/>
@@ -150,6 +151,20 @@
                     </header>
                     <sheet>
                         <div class="oe_button_box" name="button_box">
+                            <button name="toggle_favorite" type="object"
+                                class="oe_stat_button" 
+                                icon="fa-star-o"
+                                invisible="is_favorite"
+                                title="Mark as Favorite">
+                                <span>Favorite</span>
+                            </button>
+                            <button name="toggle_favorite" type="object"
+                                class="oe_stat_button" 
+                                icon="fa-star"
+                                invisible="not is_favorite"
+                                title="Remove from Favorites">
+                                <span>Favorite</span>
+                            </button>
                             <button name="action_view_boq_lines" type="object"
                                 class="oe_stat_button" icon="fa-list-ol">
                                 <field name="boq_count" widget="statinfo" string="BoQ Lines"/>
@@ -242,15 +257,42 @@
                                 <group>
                                     <group string="Source &amp; Method">
                                         <field name="etimad_link" widget="url"/>
+                                        <field name="external_source" invisible="not etimad_tender_id"/>
                                         <field name="tender_completion_time"/>
                                         <field name="tender_submission_method"/>
                                     </group>
                                     <group string="Booklet Purchase">
                                         <field name="tender_booklet_price"/>
+                                        <field name="etimad_financial_fees" invisible="not etimad_tender_id"/>
+                                        <field name="etimad_total_fees" invisible="not etimad_tender_id"/>
                                         <field name="booklet_purchased"/>
                                         <field name="booklet_purchase_receipt" invisible="not booklet_purchased"/>
                                         <field name="booklet_purchase_request_date" invisible="not booklet_purchased"/>
                                         <field name="booklet_purchase_date" invisible="not booklet_purchased"/>
+                                    </group>
+                                </group>
+                                <separator string="Etimad Portal Information" invisible="not etimad_tender_id"/>
+                                <group invisible="not etimad_tender_id">
+                                    <group string="Etimad Identifiers">
+                                        <field name="etimad_tender_id_integer" readonly="1"/>
+                                        <field name="etimad_tender_id_string" readonly="1"/>
+                                        <field name="etimad_reference_number" readonly="1"/>
+                                        <field name="etimad_tender_status_id" readonly="1"/>
+                                    </group>
+                                    <group string="Agency Information (from Etimad)">
+                                        <field name="etimad_agency_name" readonly="1"/>
+                                        <field name="etimad_branch_name" readonly="1"/>
+                                    </group>
+                                </group>
+                                <group invisible="not etimad_tender_id">
+                                    <group string="Tender Activity (from Etimad)">
+                                        <field name="etimad_activity_name" readonly="1"/>
+                                        <field name="etimad_activity_id" readonly="1"/>
+                                    </group>
+                                    <group string="Dates (from Etimad)">
+                                        <field name="etimad_published_at" widget="datetime" readonly="1"/>
+                                        <field name="etimad_last_enquiry_date_hijri" readonly="1"/>
+                                        <field name="etimad_last_offer_date_hijri" readonly="1"/>
                                     </group>
                                 </group>
                                 <group>

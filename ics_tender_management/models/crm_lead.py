@@ -136,15 +136,43 @@ class CrmLead(models.Model):
                 'tender_category': self._map_tender_category_from_etimad(etimad),
                 'etimad_link': etimad.tender_url,
                 
+                # Etimad Identifiers
+                'etimad_tender_id_integer': etimad.tender_id,
+                'etimad_tender_id_string': etimad.tender_id_string,
+                'etimad_reference_number': etimad.reference_number,
+                
+                # Agency Information (from Etimad)
+                'etimad_agency_name': etimad.agency_name,
+                'etimad_branch_name': etimad.branch_name,
+                
+                # Tender Activity (from Etimad)
+                'etimad_activity_name': etimad.activity_name,
+                'etimad_activity_id': etimad.activity_id,
+                
                 # Dates from Etimad
                 'announcement_date': etimad.published_at.date() if etimad.published_at else False,
+                'etimad_published_at': etimad.published_at,
                 'submission_deadline': etimad.offers_deadline or etimad.submission_date,
                 'opening_date': etimad.submission_date,
                 'last_inquiry_date': etimad.last_enquiry_date.date() if etimad.last_enquiry_date else False,
                 
                 # Financial from Etimad
                 'tender_booklet_price': etimad.invitation_cost or 0.0,
+                'etimad_financial_fees': etimad.financial_fees or 0.0,
                 'estimated_project_value': etimad.total_fees or 0.0,
+                
+                # External Source
+                'external_source': etimad.external_source or 'Etimad Portal',
+                
+                # Etimad Status
+                'etimad_tender_status_id': etimad.tender_status_id,
+                
+                # Hijri Dates (as text from Etimad)
+                'etimad_last_enquiry_date_hijri': etimad.last_enquiry_date_hijri,
+                'etimad_last_offer_date_hijri': etimad.last_offer_date_hijri,
+                
+                # Favorite Flag
+                'is_favorite': etimad.is_favorite,
                 
                 # Submission method
                 'tender_submission_method': 'electronic',  # Etimad is electronic

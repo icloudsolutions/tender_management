@@ -136,6 +136,57 @@ class Tender(models.Model):
     ], string='Submission Method', default='electronic')
     tender_booklet_price = fields.Monetary('Tender Booklet Price', currency_field='currency_id')
     
+    # ========== ETIMAD-SPECIFIC FIELDS ==========
+    # Etimad Identifiers
+    etimad_tender_id_integer = fields.Integer('Etimad Tender ID (Integer)', 
+        help='Internal Etimad tender ID', tracking=True)
+    etimad_tender_id_string = fields.Char('Etimad Tender ID (String)', 
+        help='Etimad tender ID string used in URLs', tracking=True)
+    etimad_reference_number = fields.Char('Etimad Reference Number', 
+        help='Official reference number from Etimad portal', tracking=True, index=True)
+    
+    # Agency Information (from Etimad)
+    etimad_agency_name = fields.Char('Agency Name (from Etimad)', 
+        help='Original agency name as scraped from Etimad', tracking=True)
+    etimad_branch_name = fields.Char('Branch Name (from Etimad)', 
+        help='Branch name from Etimad portal')
+    
+    # Tender Activity (from Etimad)
+    etimad_activity_name = fields.Char('Tender Activity (from Etimad)', 
+        help='Activity name from Etimad portal', tracking=True)
+    etimad_activity_id = fields.Integer('Etimad Activity ID', 
+        help='Activity ID from Etimad portal')
+    
+    # Dates (from Etimad)
+    etimad_published_at = fields.Datetime('Published At (Etimad)', 
+        help='Publication date from Etimad portal', tracking=True)
+    
+    # Financial (from Etimad)
+    etimad_financial_fees = fields.Monetary('Financial Fees (from Etimad)', 
+        currency_field='currency_id', 
+        help='Financial fees separate from invitation cost')
+    etimad_total_fees = fields.Monetary('Total Fees (from Etimad)', 
+        compute='_compute_etimad_total_fees', store=True, currency_field='currency_id',
+        help='Total fees: invitation cost + financial fees')
+    
+    # External Source
+    external_source = fields.Char('External Source', default='Etimad Portal', readonly=True,
+        help='Source of the tender (e.g., Etimad Portal, Manual Entry)')
+    
+    # Etimad Status
+    etimad_tender_status_id = fields.Integer('Etimad Status ID', 
+        help='Status ID from Etimad portal for reference')
+    
+    # Hijri Dates (as text from Etimad)
+    etimad_last_enquiry_date_hijri = fields.Char('Last Enquiry Date (Hijri)', 
+        help='Last enquiry date in Hijri calendar as text from Etimad')
+    etimad_last_offer_date_hijri = fields.Char('Last Offer Date (Hijri)', 
+        help='Last offer date in Hijri calendar as text from Etimad')
+    
+    # Favorite Flag
+    is_favorite = fields.Boolean('Favorite', default=False,
+        help='Mark this tender as favorite for quick access')
+    
     # Booklet Purchase Details
     booklet_purchased = fields.Boolean('Booklet Purchased?', default=False)
     booklet_purchase_receipt = fields.Char('Purchase Receipt Number')
@@ -214,6 +265,12 @@ class Tender(models.Model):
                 tender.require_department_manager = False
                 tender.require_financial_manager = False
                 tender.require_ceo = False
+    
+    @api.depends('tender_booklet_price', 'etimad_financial_fees')
+    def _compute_etimad_total_fees(self):
+        """Calculate total Etimad fees (invitation cost + financial fees)"""
+        for tender in self:
+            tender.etimad_total_fees = (tender.tender_booklet_price or 0.0) + (tender.etimad_financial_fees or 0.0)
     
     # Qualification Phase
     presales_employee = fields.Many2one('res.users', string='Presales Employee')
@@ -857,6 +914,11 @@ class Tender(models.Model):
             # Mark CRM opportunity as won with context to bypass lock
             self.lead_id.with_context(from_tender_sync=True).action_set_won()
 
+    def toggle_favorite(self):
+        """Toggle favorite status"""
+        for tender in self:
+            tender.is_favorite = not tender.is_favorite
+    
     def action_mark_lost(self):
         """Open wizard to mark tender as lost with reason"""
         self.ensure_one()

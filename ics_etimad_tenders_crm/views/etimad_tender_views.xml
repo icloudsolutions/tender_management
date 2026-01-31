@@ -253,10 +253,11 @@
                             </div>
                         </group>
                         
-                        <group string="🎯 Direct Tender Integration" name="tender_info">
+                        <group string="🎯 Direct Tender Integration" name="tender_info" invisible="not context.get('show_tender_integration', True)">
                             <field name="tender_id_ics" 
                                    string="Linked ICS Tender"
-                                   options="{'no_create': True}"/>
+                                   options="{'no_create': True}"
+                                   readonly="1"/>
                             <div invisible="not tender_id_ics" class="alert alert-success mt-2">
                                 <i class="fa fa-check-circle"/> This tender is linked directly to ICS Tender Management
                             </div>
