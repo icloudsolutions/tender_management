@@ -70,15 +70,14 @@
                             </div>
                         </setting>
                         
-                        <setting id="etimad_value_range" string="Target Value Range" help="Your typical tender value range">
+                        <setting id="etimad_value_range" string="Target Value Range" help="Your typical tender value range (in SAR)">
                             <div class="row">
-                                <label for="etimad_min_value_target" class="col-lg-3 o_light_label" string="Minimum"/>
-                                <field name="etimad_min_value_target" class="oe_inline" widget="monetary"/>
-                                <field name="company_currency_id" invisible="1"/>
+                                <label for="etimad_min_value_target" class="col-lg-3 o_light_label" string="Minimum (SAR)"/>
+                                <field name="etimad_min_value_target" class="oe_inline"/>
                             </div>
                             <div class="row mt8">
-                                <label for="etimad_max_value_target" class="col-lg-3 o_light_label" string="Maximum"/>
-                                <field name="etimad_max_value_target" class="oe_inline" widget="monetary"/>
+                                <label for="etimad_max_value_target" class="col-lg-3 o_light_label" string="Maximum (SAR)"/>
+                                <field name="etimad_max_value_target" class="oe_inline"/>
                             </div>
                         </setting>
                         
@@ -101,8 +100,8 @@
                             <field name="etimad_auto_create_opportunity"/>
                             <div class="content-group" invisible="not etimad_auto_create_opportunity">
                                 <div class="row mt16">
-                                    <label for="etimad_min_tender_value" class="col-lg-3 o_light_label" string="Min Value"/>
-                                    <field name="etimad_min_tender_value" class="oe_inline" widget="monetary"/>
+                                    <label for="etimad_min_tender_value" class="col-lg-3 o_light_label" string="Min Value (SAR)"/>
+                                    <field name="etimad_min_tender_value" class="oe_inline"/>
                                 </div>
                                 <div class="row mt8">
                                     <label for="etimad_min_match_score" class="col-lg-3 o_light_label" string="Min Match Score"/>

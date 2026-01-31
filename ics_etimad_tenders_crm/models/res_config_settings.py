@@ -50,11 +50,10 @@ class ResConfigSettings(models.TransientModel):
         help="Automatically create CRM opportunities for new tenders"
     )
     
-    etimad_min_tender_value = fields.Monetary(
-        string="Minimum Tender Value",
+    etimad_min_tender_value = fields.Float(
+        string="Minimum Tender Value (SAR)",
         config_parameter="ics_etimad_tenders_crm.etimad_min_tender_value",
         default=10000.0,
-        currency_field='company_currency_id',
         help="Minimum tender value (SAR) to auto-create opportunity"
     )
     
@@ -103,19 +102,17 @@ class ResConfigSettings(models.TransientModel):
        config_parameter="ics_etimad_tenders_crm.etimad_preferred_categories",
        help="Your company's primary business category for tender matching")
     
-    etimad_min_value_target = fields.Monetary(
-        string="Minimum Target Value",
+    etimad_min_value_target = fields.Float(
+        string="Minimum Target Value (SAR)",
         config_parameter="ics_etimad_tenders_crm.etimad_min_value_target",
         default=50000.0,
-        currency_field='company_currency_id',
         help="Minimum tender value your company typically pursues"
     )
     
-    etimad_max_value_target = fields.Monetary(
-        string="Maximum Target Value",
+    etimad_max_value_target = fields.Float(
+        string="Maximum Target Value (SAR)",
         config_parameter="ics_etimad_tenders_crm.etimad_max_value_target",
         default=5000000.0,
-        currency_field='company_currency_id',
         help="Maximum tender value your company can handle"
     )
     
@@ -202,15 +199,6 @@ class ResConfigSettings(models.TransientModel):
         config_parameter="ics_etimad_tenders_crm.etimad_archive_lost_only",
         default=True,
         help="Only archive tenders in lost or cancelled state"
-    )
-    
-    # ==================== CURRENCY ====================
-    
-    company_currency_id = fields.Many2one(
-        'res.currency',
-        related='company_id.currency_id',
-        string="Company Currency",
-        readonly=True
     )
     
     # ==================== ACTIONS ====================
