@@ -58,12 +58,14 @@
                                 <div class="row mt16">
                                     <label for="etimad_preferred_agencies" class="col-lg-3 o_light_label" string="Preferred Agencies"/>
                                     <field name="etimad_preferred_agencies" 
-                                           placeholder="Ministry of Health&#10;General Authority for Transport&#10;Saudi Aramco"/>
+                                           placeholder="Ministry of Health, General Authority for Transport, Saudi Aramco"
+                                           class="o_field_char"/>
                                 </div>
                                 <div class="row mt8">
                                     <label for="etimad_preferred_activities" class="col-lg-3 o_light_label" string="Preferred Activities"/>
                                     <field name="etimad_preferred_activities" 
-                                           placeholder="Construction Works&#10;IT Services&#10;Maintenance Services"/>
+                                           placeholder="Construction Works, IT Services, Maintenance Services"
+                                           class="o_field_char"/>
                                 </div>
                             </div>
                         </setting>

@@ -81,16 +81,16 @@ class ResConfigSettings(models.TransientModel):
         help="Calculate matching scores for tenders based on company profile"
     )
     
-    etimad_preferred_agencies = fields.Text(
+    etimad_preferred_agencies = fields.Char(
         string="Preferred Agencies",
         config_parameter="ics_etimad_tenders_crm.etimad_preferred_agencies",
-        help="List of preferred agency names (one per line). Tenders from these agencies get higher match scores."
+        help="List of preferred agency names (comma-separated). Tenders from these agencies get higher match scores."
     )
     
-    etimad_preferred_activities = fields.Text(
+    etimad_preferred_activities = fields.Char(
         string="Preferred Activities",
         config_parameter="ics_etimad_tenders_crm.etimad_preferred_activities",
-        help="List of preferred tender activities (one per line). Matching activities get higher scores."
+        help="List of preferred tender activities (comma-separated). Matching activities get higher scores."
     )
     
     etimad_preferred_categories = fields.Selection([
