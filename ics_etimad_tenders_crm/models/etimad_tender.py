@@ -291,7 +291,7 @@ class EtimadTender(models.Model):
             # Get configuration parameters
             preferred_agencies = params.get_param('ics_etimad_tenders_crm.etimad_preferred_agencies', '')
             preferred_activities = params.get_param('ics_etimad_tenders_crm.etimad_preferred_activities', '')
-            preferred_category = params.get_param('ics_etimad_tenders_crm.etimad_preferred_categories', '')
+            preferred_categories_str = params.get_param('ics_etimad_tenders_crm.etimad_preferred_categories', '')
             min_value = float(params.get_param('ics_etimad_tenders_crm.etimad_min_value_target', '50000') or 0)
             max_value = float(params.get_param('ics_etimad_tenders_crm.etimad_max_value_target', '5000000') or 0)
             min_prep_days = int(params.get_param('ics_etimad_tenders_crm.etimad_min_preparation_days', '7') or 7)
@@ -299,6 +299,7 @@ class EtimadTender(models.Model):
             # Parse comma-separated lists
             agencies_list = [a.strip().lower() for a in preferred_agencies.split(',') if a.strip()] if preferred_agencies else []
             activities_list = [a.strip().lower() for a in preferred_activities.split(',') if a.strip()] if preferred_activities else []
+            categories_list = [c.strip().lower() for c in preferred_categories_str.split(',') if c.strip()] if preferred_categories_str else []
             
             # Activity matching (30 points)
             if record.activity_name and activities_list:
@@ -312,24 +313,38 @@ class EtimadTender(models.Model):
                     reasons.append(f'Activity "{record.activity_name}" partially matches preferences')
             
             # Tender type / Category matching (20 points)
-            if preferred_category:
-                # Map tender type to category (flexible matching)
+            # Check if tender matches any of the preferred categories
+            if categories_list:
                 type_lower = (record.tender_type or '').lower()
-                if preferred_category == 'supply' and any(word in type_lower for word in ['توريد', 'supply', 'purchase']):
+                matched_categories = []
+                
+                # Category keywords mapping
+                category_keywords = {
+                    'supply': ['توريد', 'supply', 'purchase', 'procurement'],
+                    'services': ['خدمات', 'service', 'services'],
+                    'construction': ['إنشاءات', 'construction', 'build', 'building', 'infrastructure'],
+                    'maintenance': ['صيانة', 'تشغيل', 'maintenance', 'operation', 'operations'],
+                    'consulting': ['استشارات', 'consulting', 'advisory', 'consultancy']
+                }
+                
+                # Check each preferred category
+                for category in categories_list:
+                    if category in category_keywords:
+                        keywords = category_keywords[category]
+                        if any(keyword in type_lower for keyword in keywords):
+                            matched_categories.append(category)
+                
+                if matched_categories:
                     score += 20
-                    reasons.append('Tender type matches Supply category')
-                elif preferred_category == 'services' and any(word in type_lower for word in ['خدمات', 'service']):
-                    score += 20
-                    reasons.append('Tender type matches Services category')
-                elif preferred_category == 'construction' and any(word in type_lower for word in ['إنشاءات', 'construction', 'build']):
-                    score += 20
-                    reasons.append('Tender type matches Construction category')
-                elif preferred_category == 'maintenance' and any(word in type_lower for word in ['صيانة', 'تشغيل', 'maintenance', 'operation']):
-                    score += 20
-                    reasons.append('Tender type matches Maintenance category')
-                elif preferred_category == 'consulting' and any(word in type_lower for word in ['استشارات', 'consulting', 'advisory']):
-                    score += 20
-                    reasons.append('Tender type matches Consulting category')
+                    category_names = {
+                        'supply': 'Supply',
+                        'services': 'Services',
+                        'construction': 'Construction',
+                        'maintenance': 'Maintenance & Operation',
+                        'consulting': 'Consulting'
+                    }
+                    matched_names = [category_names.get(c, c) for c in matched_categories]
+                    reasons.append(f'Tender type matches category: {", ".join(matched_names)}')
             
             # Value range matching (20 points)
             if record.estimated_amount:

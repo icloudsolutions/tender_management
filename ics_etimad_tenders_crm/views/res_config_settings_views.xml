@@ -53,7 +53,12 @@
                             <div class="content-group" invisible="not etimad_enable_matching">
                                 <div class="row mt16">
                                     <label for="etimad_preferred_categories" class="col-lg-3 o_light_label" string="Primary Business"/>
-                                    <field name="etimad_preferred_categories" class="oe_inline"/>
+                                    <field name="etimad_preferred_categories" 
+                                           placeholder="supply, maintenance, services"
+                                           class="o_field_char"/>
+                                    <div class="text-muted ml-2">
+                                        Options: supply, services, construction, maintenance, consulting
+                                    </div>
                                 </div>
                                 <div class="row mt16">
                                     <label for="etimad_preferred_agencies" class="col-lg-3 o_light_label" string="Preferred Agencies"/>

@@ -92,15 +92,11 @@ class ResConfigSettings(models.TransientModel):
         help="List of preferred tender activities (comma-separated). Matching activities get higher scores."
     )
     
-    etimad_preferred_categories = fields.Selection([
-        ('supply', 'Supply / توريد'),
-        ('services', 'Services / خدمات'),
-        ('construction', 'Construction / إنشاءات'),
-        ('maintenance', 'Maintenance & Operation / صيانة وتشغيل'),
-        ('consulting', 'Consulting / استشارات'),
-    ], string="Primary Business Category",
-       config_parameter="ics_etimad_tenders_crm.etimad_preferred_categories",
-       help="Your company's primary business category for tender matching")
+    etimad_preferred_categories = fields.Char(
+        string="Primary Business Categories",
+        config_parameter="ics_etimad_tenders_crm.etimad_preferred_categories",
+        help="Your company's business categories (comma-separated). Options: supply, services, construction, maintenance, consulting. Example: 'supply, maintenance'"
+    )
     
     etimad_min_value_target = fields.Float(
         string="Minimum Target Value (SAR)",
