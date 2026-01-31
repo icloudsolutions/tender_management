@@ -4,7 +4,15 @@ import requests
 import json
 import time
 import logging
+import re
 from datetime import datetime
+
+try:
+    from lxml import html
+    LXML_AVAILABLE = True
+except ImportError:
+    LXML_AVAILABLE = False
+    _logger.warning("lxml not available, HTML parsing will be limited")
 
 _logger = logging.getLogger(__name__)
 
@@ -491,26 +499,221 @@ class EtimadTender(models.Model):
             record.state = state
     
     def action_fetch_detailed_info(self):
-        """Fetch detailed tender information from Etimad detail page"""
+        """Fetch detailed tender information from Etimad relations/details API"""
         self.ensure_one()
         
         if not self.tender_id_string:
             raise UserError(_('Tender ID String is required to fetch detailed information.'))
         
-        # Note: This would require API access or manual parsing
-        # Since Etimad uses CAPTCHA, this is a placeholder for future enhancement
-        # or manual data entry
+        try:
+            # Fetch relations/details from Etimad API
+            session = self._setup_scraper_session()
+            url = "https://tenders.etimad.sa/Tender/GetRelationsDetailsViewComponenet"
+            params = {'tenderIdStr': self.tender_id_string}
+            
+            response = session.get(url, params=params, timeout=30)
+            
+            if response.status_code == 200 and response.text:
+                # Parse HTML response
+                parsed_data = self._parse_relations_details_html(response.text)
+                
+                # Update tender with parsed data
+                update_vals = {}
+                
+                # Classification
+                if parsed_data.get('classification_field'):
+                    update_vals['classification_field'] = parsed_data['classification_field']
+                    update_vals['classification_required'] = 'غير مطلوب' not in parsed_data['classification_field']
+                
+                # Execution location
+                if parsed_data.get('execution_location_type'):
+                    update_vals['execution_location_type'] = parsed_data['execution_location_type']
+                if parsed_data.get('execution_regions'):
+                    update_vals['execution_regions'] = parsed_data['execution_regions']
+                if parsed_data.get('execution_cities'):
+                    update_vals['execution_cities'] = parsed_data['execution_cities']
+                
+                # Details
+                if parsed_data.get('details'):
+                    update_vals['tender_purpose'] = parsed_data['details']
+                
+                # Activity details
+                if parsed_data.get('activity_details'):
+                    update_vals['activity_details'] = parsed_data['activity_details']
+                
+                # Supply items
+                if parsed_data.get('includes_supply_items') is not None:
+                    update_vals['includes_supply_items'] = parsed_data['includes_supply_items']
+                
+                # Construction works
+                if parsed_data.get('construction_works'):
+                    update_vals['construction_works'] = parsed_data['construction_works']
+                
+                # Maintenance works
+                if parsed_data.get('maintenance_works'):
+                    update_vals['maintenance_works'] = parsed_data['maintenance_works']
+                
+                if update_vals:
+                    self.write(update_vals)
+                    self.message_post(
+                        body=_('Detailed information fetched and updated from Etimad relations API.'),
+                        subject=_('Details Updated')
+                    )
+                    
+                    return {
+                        'type': 'ir.actions.client',
+                        'tag': 'display_notification',
+                        'params': {
+                            'title': _('Success'),
+                            'message': _('Detailed information has been fetched and updated successfully.'),
+                            'type': 'success',
+                            'sticky': False,
+                        }
+                    }
+                else:
+                    return {
+                        'type': 'ir.actions.client',
+                        'tag': 'display_notification',
+                        'params': {
+                            'title': _('No Updates'),
+                            'message': _('No new information found to update.'),
+                            'type': 'info',
+                            'sticky': False,
+                        }
+                    }
+            else:
+                raise UserError(_('Failed to fetch detailed information. Response code: %s') % response.status_code)
+                
+        except Exception as e:
+            _logger.error(f"Error fetching detailed info: {e}")
+            raise UserError(_('Error fetching detailed information: %s') % str(e))
+    
+    def _parse_relations_details_html(self, html_content):
+        """Parse HTML content from GetRelationsDetailsViewComponenet API"""
+        parsed_data = {}
         
-        return {
-            'type': 'ir.actions.client',
-            'tag': 'display_notification',
-            'params': {
-                'title': _('Fetch Detailed Info'),
-                'message': _('Detailed information fetching requires API access or manual entry. Please use the Etimad portal to view full details.'),
-                'type': 'info',
-                'sticky': False,
-            }
-        }
+        try:
+            if LXML_AVAILABLE:
+                # Use lxml for proper HTML parsing
+                tree = html.fromstring(html_content)
+                
+                # Extract classification field
+                classification_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "مجال التصنيف")]/following-sibling::div[1]//span/text()')
+                if classification_elements:
+                    parsed_data['classification_field'] = classification_elements[0].strip()
+                
+                # Extract execution location type
+                location_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "مكان التنفيذ")]/following-sibling::div[1]//span/text()')
+                if location_elements:
+                    location_text = location_elements[0].strip()
+                    if 'داخل المملكة' in location_text:
+                        parsed_data['execution_location_type'] = 'inside_kingdom'
+                    elif 'خارج المملكة' in location_text:
+                        parsed_data['execution_location_type'] = 'outside_kingdom'
+                    else:
+                        parsed_data['execution_location_type'] = 'both'
+                
+                # Extract regions and cities
+                region_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "مكان التنفيذ")]/following-sibling::div[1]//ol/li/text()')
+                city_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "مكان التنفيذ")]/following-sibling::div[1]//ul/li/text()')
+                
+                if region_elements:
+                    regions = [r.strip() for r in region_elements if r.strip()]
+                    parsed_data['execution_regions'] = '\n'.join(regions)
+                
+                if city_elements:
+                    cities = [c.strip() for c in city_elements if c.strip()]
+                    parsed_data['execution_cities'] = '\n'.join(cities)
+                
+                # Extract details
+                details_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "التفاصيل")]/following-sibling::div[1]//span/text()')
+                if details_elements:
+                    parsed_data['details'] = details_elements[0].strip()
+                
+                # Extract activity details
+                activity_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "نشاط المنافسة")]/following-sibling::div[1]//ol/li/text()')
+                if activity_elements:
+                    activities = [a.strip() for a in activity_elements if a.strip()]
+                    parsed_data['activity_details'] = '\n'.join(activities)
+                
+                # Extract supply items
+                supply_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "تشمل المنافسة على بنود توريد")]/following-sibling::div[1]//span/text()')
+                if supply_elements:
+                    supply_text = supply_elements[0].strip()
+                    parsed_data['includes_supply_items'] = 'لا' not in supply_text and 'نعم' in supply_text
+                
+                # Extract construction works
+                construction_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "أعمال الإنشاء")]/following-sibling::div[1]//ol/li/text()')
+                if construction_elements:
+                    construction_items = [c.strip() for c in construction_elements if c.strip()]
+                    if construction_items:
+                        parsed_data['construction_works'] = '\n'.join(construction_items)
+                
+                # Extract maintenance works
+                maintenance_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "أعمال الصيانة والتشغيل")]/following-sibling::div[1]//ol/li/text()')
+                if maintenance_elements:
+                    maintenance_items = [m.strip() for m in maintenance_elements if m.strip()]
+                    if maintenance_items:
+                        parsed_data['maintenance_works'] = '\n'.join(maintenance_items)
+            else:
+                # Fallback to regex parsing if lxml not available
+                parsed_data = self._parse_relations_details_regex(html_content)
+                
+        except Exception as e:
+            _logger.error(f"Error parsing relations details HTML: {e}")
+            # Fallback to regex parsing
+            parsed_data = self._parse_relations_details_regex(html_content)
+        
+        return parsed_data
+    
+    def _parse_relations_details_regex(self, html_content):
+        """Fallback regex-based parsing if lxml is not available"""
+        parsed_data = {}
+        
+        try:
+            # Extract classification field
+            classification_match = re.search(r'مجال التصنيف.*?<span>\s*(.*?)\s*</span>', html_content, re.DOTALL)
+            if classification_match:
+                parsed_data['classification_field'] = re.sub(r'<[^>]+>', '', classification_match.group(1)).strip()
+            
+            # Extract execution location
+            location_match = re.search(r'مكان التنفيذ.*?<span>\s*(.*?)\s*</span>', html_content, re.DOTALL)
+            if location_match:
+                location_text = re.sub(r'<[^>]+>', '', location_match.group(1)).strip()
+                if 'داخل المملكة' in location_text:
+                    parsed_data['execution_location_type'] = 'inside_kingdom'
+                elif 'خارج المملكة' in location_text:
+                    parsed_data['execution_location_type'] = 'outside_kingdom'
+            
+            # Extract regions (simplified)
+            region_matches = re.findall(r'<li>\s*([^<]+?)\s*</li>', html_content)
+            if region_matches:
+                regions = [r.strip() for r in region_matches if r.strip() and len(r.strip()) < 50]
+                if regions:
+                    parsed_data['execution_regions'] = '\n'.join(regions[:10])  # Limit to 10
+            
+            # Extract details
+            details_match = re.search(r'التفاصيل.*?<span>\s*(.*?)\s*</span>', html_content, re.DOTALL)
+            if details_match:
+                parsed_data['details'] = re.sub(r'<[^>]+>', '', details_match.group(1)).strip()
+            
+            # Extract activity details
+            activity_matches = re.findall(r'نشاط المنافسة.*?<ol>(.*?)</ol>', html_content, re.DOTALL)
+            if activity_matches:
+                activity_items = re.findall(r'<li>([^<]+)</li>', activity_matches[0])
+                if activity_items:
+                    parsed_data['activity_details'] = '\n'.join([a.strip() for a in activity_items])
+            
+            # Extract supply items
+            supply_match = re.search(r'تشمل المنافسة على بنود توريد.*?<span>\s*(.*?)\s*</span>', html_content, re.DOTALL)
+            if supply_match:
+                supply_text = re.sub(r'<[^>]+>', '', supply_match.group(1)).strip()
+                parsed_data['includes_supply_items'] = 'لا' not in supply_text
+            
+        except Exception as e:
+            _logger.error(f"Error in regex parsing: {e}")
+        
+        return parsed_data
     
     def action_open_detailed_report(self):
         """Open detailed tender report on Etimad portal"""

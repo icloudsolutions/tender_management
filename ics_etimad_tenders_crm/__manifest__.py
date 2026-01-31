@@ -62,7 +62,7 @@
         "views/res_config_settings_views.xml",
     ],
     "external_dependencies": {
-        "python": ["requests"],
+        "python": ["requests", "lxml"],
     },
     "assets": {
         "web.assets_backend": [

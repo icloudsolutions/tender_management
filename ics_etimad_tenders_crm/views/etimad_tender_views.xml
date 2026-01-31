@@ -290,6 +290,13 @@
                                     icon="fa-bar-chart"
                                     invisible="not tender_id_string"
                                     title="Open detailed tender report"/>
+                            <button name="action_fetch_detailed_info" 
+                                    string="🔄 Fetch Details" 
+                                    type="object" 
+                                    class="btn btn-warning flex-grow-1" 
+                                    icon="fa-download"
+                                    invisible="not tender_id_string"
+                                    title="Fetch detailed information from Etimad API"/>
                             <button name="action_create_opportunity" 
                                     string="➕ Create Opportunity" 
                                     type="object" 
@@ -601,5 +608,4 @@ else:
         </field>
     </record>
 
-</odoo>
 </odoo>
