@@ -3078,7 +3078,7 @@ msgid "Projects already created for this tender"
 msgstr "المشاريع التي تم إنشاؤها بالفعل لهذه المنافسة"
 
 #. module: ics_tender_management
-#: code:addons/ics_tender_management/wizard/create_project_wizard.py
+#: code:addons/ics_tender_management/wizard/create_project_wizard.py:0
 msgid "A project already exists for this tender:\\n\\n%s\\n\\nPlease use the existing project instead of creating a duplicate.\\nIf you need to modify the project, use the \"View Projects\" button."
 msgstr "يوجد بالفعل مشروع لهذه المنافسة:\\n\\n%s\\n\\nالرجاء استخدام المشروع الموجود بدلاً من إنشاء نسخة مكررة.\\nإذا كنت بحاجة إلى تعديل المشروع، استخدم زر \"عرض المشاريع\"."
 
@@ -3123,17 +3123,17 @@ msgid "The primary active tender linked to this opportunity"
 msgstr "المنافسة النشطة الأساسية المرتبطة بهذه الفرصة"
 
 #. module: ics_tender_management
-#: code:addons/ics_tender_management/models/crm_lead.py
+#: code:addons/ics_tender_management/models/crm_lead.py:0
 msgid "This opportunity is controlled by Tender Management.\\n\\nLinked Tender: %s\\nCurrent State: %s\\n\\nTo modify this opportunity, please update the tender instead.\\nChanges to the tender will automatically sync to this opportunity."
 msgstr "هذه الفرصة يتم التحكم فيها من خلال إدارة المنافسات.\\n\\nالمنافسة المرتبطة: %s\\nالحالة الحالية: %s\\n\\nلتعديل هذه الفرصة، يرجى تحديث المنافسة بدلاً من ذلك.\\nسيتم مزامنة التغييرات على المنافسة تلقائيًا مع هذه الفرصة."
 
 #. module: ics_tender_management
-#: code:addons/ics_tender_management/models/tender.py
+#: code:addons/ics_tender_management/models/tender.py:0
 msgid "Stage synchronized from Tender: <a href=\"/web#id=%s&model=ics.tender\">%s</a><br/>Tender State: %s"
 msgstr "تم مزامنة المرحلة من المنافسة: <a href=\"/web#id=%s&model=ics.tender\">%s</a><br/>حالة المنافسة: %s"
 
 #. module: ics_tender_management
-#: code:addons/ics_tender_management/models/tender.py
+#: code:addons/ics_tender_management/models/tender.py:0
 msgid "Tender Stage Update"
 msgstr "تحديث مرحلة المنافسة"
 
@@ -3203,77 +3203,77 @@ msgid "Withdrawn"
 msgstr "تم السحب"
 
 #. module: ics_tender_management
-#: code:addons/ics_tender_management/models/tender.py
+#: code:addons/ics_tender_management/models/tender.py:0
 msgid "📥 Download Tender Documents from Etimad"
 msgstr "📥 تحميل مستندات المنافسة من إعتماد"
 
 #. module: ics_tender_management
-#: code:addons/ics_tender_management/models/tender.py
+#: code:addons/ics_tender_management/models/tender.py:0
 msgid "<strong>Action Required:</strong><br/><ul><li>Login to your Etimad account</li><li>Download all tender documents</li><li>Review technical specifications</li><li>Attach documents to this tender</li></ul><br/><strong>Etimad Link:</strong> %s"
 msgstr "<strong>إجراء مطلوب:</strong><br/><ul><li>تسجيل الدخول إلى حساب إعتماد الخاص بك</li><li>تحميل جميع مستندات المنافسة</li><li>مراجعة المواصفات الفنية</li><li>إرفاق المستندات بهذه المنافسة</li></ul><br/><strong>رابط إعتماد:</strong> %s"
 
 #. module: ics_tender_management
-#: code:addons/ics_tender_management/models/tender.py
+#: code:addons/ics_tender_management/models/tender.py:0
 msgid "📍 Schedule Site Visit (الزيارة الميدانية)"
 msgstr "📍 جدولة الزيارة الميدانية"
 
 #. module: ics_tender_management
-#: code:addons/ics_tender_management/models/tender.py
+#: code:addons/ics_tender_management/models/tender.py:0
 msgid "<strong>Site Visit Required</strong><br/><ul><li>Coordinate site visit date with customer</li><li>Prepare required documents for site</li><li>Assign team members for visit</li><li>Update site visit date in tender form</li></ul>"
 msgstr "<strong>الزيارة الميدانية مطلوبة</strong><br/><ul><li>تنسيق موعد الزيارة الميدانية مع العميل</li><li>تجهيز المستندات المطلوبة للزيارة</li><li>تعيين أعضاء الفريق للزيارة</li><li>تحديث تاريخ الزيارة في نموذج المنافسة</li></ul>"
 
 #. module: ics_tender_management
-#: code:addons/ics_tender_management/models/tender.py
+#: code:addons/ics_tender_management/models/tender.py:0
 msgid "📋 Complete Technical Study & BoQ"
 msgstr "📋 إكمال الدراسة الفنية وجدول الكميات"
 
 #. module: ics_tender_management
-#: code:addons/ics_tender_management/models/tender.py
+#: code:addons/ics_tender_management/models/tender.py:0
 msgid "<strong>Technical Phase Tasks:</strong><br/><ul><li>Review technical specifications</li><li>Import/create Bill of Quantities</li><li>Define product requirements</li><li>Identify potential vendors</li><li>Estimate quantities and costs</li></ul>"
 msgstr "<strong>مهام المرحلة الفنية:</strong><br/><ul><li>مراجعة المواصفات الفنية</li><li>استيراد/إنشاء جدول الكميات</li><li>تحديد متطلبات المنتجات</li><li>تحديد الموردين المحتملين</li><li>تقدير الكميات والتكاليف</li></ul>"
 
 #. module: ics_tender_management
-#: code:addons/ics_tender_management/models/tender.py
+#: code:addons/ics_tender_management/models/tender.py:0
 msgid "💰 Request Vendor Quotations"
 msgstr "💰 طلب عروض أسعار الموردين"
 
 #. module: ics_tender_management
-#: code:addons/ics_tender_management/models/tender.py
+#: code:addons/ics_tender_management/models/tender.py:0
 msgid "<strong>Financial Phase Tasks:</strong><br/><ul><li>Send RFQs to selected vendors</li><li>Collect and review vendor offers</li><li>Compare vendor prices</li><li>Select best vendors per product</li><li>Calculate final margin</li></ul>"
 msgstr "<strong>مهام المرحلة المالية:</strong><br/><ul><li>إرسال طلبات عروض الأسعار للموردين المختارين</li><li>جمع ومراجعة عروض الموردين</li><li>مقارنة أسعار الموردين</li><li>اختيار أفضل الموردين لكل منتج</li><li>حساب الهامش النهائي</li></ul>"
 
 #. module: ics_tender_management
-#: code:addons/ics_tender_management/models/tender.py
+#: code:addons/ics_tender_management/models/tender.py:0
 msgid "📄 Review & Approve Quotation"
 msgstr "📄 مراجعة واعتماد عرض السعر"
 
 #. module: ics_tender_management
-#: code:addons/ics_tender_management/models/tender.py
+#: code:addons/ics_tender_management/models/tender.py:0
 msgid "<strong>Quotation Review:</strong><br/><ul><li>Review generated quotation</li><li>Verify prices and margins</li><li>Get internal approvals</li><li>Prepare submission documents</li><li>Final quality check</li></ul>"
 msgstr "<strong>مراجعة عرض السعر:</strong><br/><ul><li>مراجعة عرض السعر المُنشأ</li><li>التحقق من الأسعار والهوامش</li><li>الحصول على الموافقات الداخلية</li><li>تجهيز مستندات التقديم</li><li>الفحص النهائي للجودة</li></ul>"
 
 #. module: ics_tender_management
-#: code:addons/ics_tender_management/models/tender.py
+#: code:addons/ics_tender_management/models/tender.py:0
 msgid "✅ Confirm Submission & Track"
 msgstr "✅ تأكيد التقديم والمتابعة"
 
 #. module: ics_tender_management
-#: code:addons/ics_tender_management/models/tender.py
+#: code:addons/ics_tender_management/models/tender.py:0
 msgid "<strong>Post-Submission:</strong><br/><ul><li>Confirm submission receipt from customer</li><li>Monitor tender evaluation timeline</li><li>Prepare for clarification questions</li><li>Track opening date</li></ul>"
 msgstr "<strong>ما بعد التقديم:</strong><br/><ul><li>تأكيد استلام التقديم من العميل</li><li>متابعة جدول التقييم</li><li>الاستعداد للأسئلة التوضيحية</li><li>تتبع تاريخ الفتح</li></ul>"
 
 #. module: ics_tender_management
-#: code:addons/ics_tender_management/models/tender.py
+#: code:addons/ics_tender_management/models/tender.py:0
 msgid "🔍 Monitor Evaluation & Prepare Response"
 msgstr "🔍 متابعة التقييم وإعداد الردود"
 
 #. module: ics_tender_management
-#: code:addons/ics_tender_management/models/tender.py
+#: code:addons/ics_tender_management/models/tender.py:0
 msgid "<strong>Evaluation Phase:</strong><br/><ul><li>Monitor customer evaluation progress</li><li>Respond to clarification requests</li><li>Prepare for negotiations if needed</li><li>Track competitor information</li><li>Stay ready for final presentations</li></ul>"
 msgstr "<strong>مرحلة التقييم:</strong><br/><ul><li>متابعة تقدم تقييم العميل</li><li>الرد على طلبات التوضيح</li><li>الاستعداد للمفاوضات عند الحاجة</li><li>تتبع معلومات المنافسين</li><li>الاستعداد للعروض النهائية</li></ul>"
 
 #. module: ics_tender_management
-#: code:addons/ics_tender_management/models/tender.py
+#: code:addons/ics_tender_management/models/tender.py:0
 msgid "⚖️ Consider Appeal (إعتراض) - You Have the Right!"
 msgstr "⚖️ النظر في الإعتراض - لديك الحق!"
 
