@@ -1,1 +1,1 @@
-from . import etimad_tender, etimad_tender_extended, res_config_settings
+from . import etimad_tender, res_config_settings
