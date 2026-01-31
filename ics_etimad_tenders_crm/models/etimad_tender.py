@@ -274,58 +274,109 @@ class EtimadTender(models.Model):
     
     @api.depends('activity_name', 'tender_type', 'agency_name', 'estimated_amount')
     def _compute_matching_score(self):
-        """Calculate matching score based on company profile and preferences"""
+        """Calculate matching score based on company profile and preferences from settings"""
         for record in self:
             score = 0
             reasons = []
             
-            # Get company settings (placeholder - can be enhanced with actual company profile)
-            ICP = self.env.company
+            # Get settings
+            params = self.env['ir.config_parameter'].sudo()
+            matching_enabled = params.get_param('ics_etimad_tenders_crm.etimad_enable_matching', 'True') == 'True'
+            
+            if not matching_enabled:
+                record.matching_score = 0
+                record.matching_reasons = False
+                continue
+            
+            # Get configuration parameters
+            preferred_agencies = params.get_param('ics_etimad_tenders_crm.etimad_preferred_agencies', '')
+            preferred_activities = params.get_param('ics_etimad_tenders_crm.etimad_preferred_activities', '')
+            preferred_category = params.get_param('ics_etimad_tenders_crm.etimad_preferred_categories', '')
+            min_value = float(params.get_param('ics_etimad_tenders_crm.etimad_min_value_target', '50000') or 0)
+            max_value = float(params.get_param('ics_etimad_tenders_crm.etimad_max_value_target', '5000000') or 0)
+            min_prep_days = int(params.get_param('ics_etimad_tenders_crm.etimad_min_preparation_days', '7') or 7)
+            
+            # Parse comma-separated lists
+            agencies_list = [a.strip().lower() for a in preferred_agencies.split(',') if a.strip()] if preferred_agencies else []
+            activities_list = [a.strip().lower() for a in preferred_activities.split(',') if a.strip()] if preferred_activities else []
             
             # Activity matching (30 points)
-            # TODO: Implement company activity preferences in res.config.settings
-            if record.activity_name:
-                # Placeholder: check if activity matches company capabilities
-                score += 15
-                reasons.append('Activity matches company profile')
+            if record.activity_name and activities_list:
+                activity_lower = record.activity_name.lower()
+                # Check for exact or partial match
+                if activity_lower in activities_list:
+                    score += 30
+                    reasons.append(f'Activity "{record.activity_name}" matches preferences')
+                elif any(pref in activity_lower or activity_lower in pref for pref in activities_list):
+                    score += 20
+                    reasons.append(f'Activity "{record.activity_name}" partially matches preferences')
             
-            # Tender type matching (20 points)
-            if record.tender_type:
-                # Placeholder: check preferred tender types
-                score += 10
-                reasons.append('Tender type is preferred')
+            # Tender type / Category matching (20 points)
+            if preferred_category:
+                # Map tender type to category (flexible matching)
+                type_lower = (record.tender_type or '').lower()
+                if preferred_category == 'supply' and any(word in type_lower for word in ['توريد', 'supply', 'purchase']):
+                    score += 20
+                    reasons.append('Tender type matches Supply category')
+                elif preferred_category == 'services' and any(word in type_lower for word in ['خدمات', 'service']):
+                    score += 20
+                    reasons.append('Tender type matches Services category')
+                elif preferred_category == 'construction' and any(word in type_lower for word in ['إنشاءات', 'construction', 'build']):
+                    score += 20
+                    reasons.append('Tender type matches Construction category')
+                elif preferred_category == 'maintenance' and any(word in type_lower for word in ['صيانة', 'تشغيل', 'maintenance', 'operation']):
+                    score += 20
+                    reasons.append('Tender type matches Maintenance category')
+                elif preferred_category == 'consulting' and any(word in type_lower for word in ['استشارات', 'consulting', 'advisory']):
+                    score += 20
+                    reasons.append('Tender type matches Consulting category')
             
             # Value range matching (20 points)
             if record.estimated_amount:
-                if record.estimated_value_category in ['medium', 'large']:
+                if min_value <= record.estimated_amount <= max_value:
                     score += 20
-                    reasons.append('Tender value within target range')
-                elif record.estimated_value_category == 'small':
+                    reasons.append(f'Tender value ({record.estimated_amount:,.0f} SAR) within target range')
+                elif record.estimated_amount < min_value:
+                    # Below minimum - partial points
+                    score += 5
+                    reasons.append('Tender value below target range')
+                elif record.estimated_amount > max_value:
+                    # Above maximum - still interested but challenging
                     score += 10
-                elif record.estimated_value_category == 'mega':
-                    score += 15
+                    reasons.append('Tender value above target range (challenging)')
             
             # Agency experience (15 points)
-            # Check if we've won tenders from this agency before
+            # Check if agency is in preferred list OR we've won tenders from them
             if record.agency_name:
-                won_count = self.search_count([
-                    ('agency_name', '=', record.agency_name),
-                    ('state', '=', 'won')
-                ])
-                if won_count > 0:
+                agency_lower = record.agency_name.lower()
+                
+                # Check preferred agencies
+                if agencies_list and any(pref in agency_lower or agency_lower in pref for pref in agencies_list):
                     score += 15
-                    reasons.append(f'Previous wins with {record.agency_name}')
+                    reasons.append(f'Agency "{record.agency_name}" is in preferred list')
+                else:
+                    # Check historical wins
+                    won_count = self.search_count([
+                        ('agency_name', '=', record.agency_name),
+                        ('state', '=', 'won')
+                    ])
+                    if won_count > 0:
+                        score += 15
+                        reasons.append(f'Previous wins with {record.agency_name}')
             
             # Deadline availability (15 points)
-            if record.remaining_days >= 7:
+            if record.remaining_days >= min_prep_days:
                 score += 15
-                reasons.append('Sufficient time to prepare')
-            elif record.remaining_days >= 3:
+                reasons.append(f'Sufficient time to prepare ({record.remaining_days} days)')
+            elif record.remaining_days >= (min_prep_days / 2):
                 score += 8
-                reasons.append('Limited time to prepare')
+                reasons.append(f'Limited time to prepare ({record.remaining_days} days)')
+            elif record.remaining_days > 0:
+                score += 3
+                reasons.append(f'Very limited time ({record.remaining_days} days)')
             
             record.matching_score = min(100, score)  # Cap at 100
-            record.matching_reasons = '\n'.join(reasons) if reasons else False
+            record.matching_reasons = '\n'.join(reasons) if reasons else 'No matching criteria met'
     
     @api.model
     def _setup_scraper_session(self):
