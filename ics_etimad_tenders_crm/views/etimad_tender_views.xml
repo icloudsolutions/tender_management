@@ -276,6 +276,20 @@
                                     class="btn btn-primary flex-grow-1" 
                                     icon="fa-external-link"
                                     title="Visit this tender on the Etimad website"/>
+                            <button name="action_open_details_page" 
+                                    string="📋 View Details Page" 
+                                    type="object" 
+                                    class="btn btn-primary flex-grow-1" 
+                                    icon="fa-file-text-o"
+                                    invisible="not tender_id_string"
+                                    title="Open detailed tender information page"/>
+                            <button name="action_open_detailed_report" 
+                                    string="📊 View Report" 
+                                    type="object" 
+                                    class="btn btn-secondary flex-grow-1" 
+                                    icon="fa-bar-chart"
+                                    invisible="not tender_id_string"
+                                    title="Open detailed tender report"/>
                             <button name="action_create_opportunity" 
                                     string="➕ Create Opportunity" 
                                     type="object" 
@@ -316,12 +330,76 @@
                                     <field name="tender_id_string" readonly="1"/>
                                     <field name="activity_id" readonly="1"/>
                                     <field name="tender_status_id" readonly="1"/>
+                                    <field name="tender_type_id" readonly="1"/>
+                                    <field name="agency_code" readonly="1"/>
                                     <field name="tender_url" readonly="1" widget="url"/>
                                 </group>
                                 <group string="Status Information">
                                     <field name="state" readonly="1"/>
+                                    <field name="tender_status_text"/>
+                                    <field name="tender_status_approved" readonly="1"/>
                                     <field name="is_favorite" readonly="1"/>
                                     <field name="remaining_days" readonly="1"/>
+                                </group>
+                            </group>
+                        </page>
+                        
+                        <page string="📋 Enhanced Details" name="enhanced_details">
+                            <group>
+                                <group string="Contract &amp; Duration">
+                                    <field name="contract_duration"/>
+                                    <field name="contract_duration_days"/>
+                                    <field name="tender_purpose" widget="text"/>
+                                </group>
+                                <group string="Insurance &amp; Guarantees">
+                                    <field name="insurance_required"/>
+                                    <field name="initial_guarantee_required"/>
+                                    <field name="initial_guarantee_type"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Document Cost">
+                                    <field name="document_cost_type"/>
+                                    <field name="document_cost_amount" invisible="document_cost_type != 'paid'"/>
+                                </group>
+                                <group string="Submission Method">
+                                    <field name="submission_method"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Additional Dates">
+                                    <field name="offer_opening_date" widget="datetime"/>
+                                    <field name="offer_examination_date" widget="datetime"/>
+                                    <field name="expected_award_date"/>
+                                    <field name="work_start_date"/>
+                                    <field name="inquiry_start_date"/>
+                                    <field name="max_inquiry_response_days"/>
+                                </group>
+                                <group string="Location Information">
+                                    <field name="opening_location"/>
+                                    <field name="execution_location_type"/>
+                                    <field name="execution_regions" widget="text"/>
+                                    <field name="execution_cities" widget="text"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Classification &amp; Activities">
+                                    <field name="classification_field"/>
+                                    <field name="classification_required"/>
+                                    <field name="activity_details" widget="text"/>
+                                </group>
+                                <group string="Work Types">
+                                    <field name="includes_supply_items"/>
+                                    <field name="construction_works" widget="text"/>
+                                    <field name="maintenance_works" widget="text"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Award Information">
+                                    <field name="award_announced"/>
+                                    <field name="award_announcement_date" invisible="not award_announced"/>
+                                    <field name="awarded_company_name" invisible="not award_announced"/>
+                                    <field name="awarded_amount" invisible="not award_announced" widget="monetary"/>
                                 </group>
                             </group>
                         </page>

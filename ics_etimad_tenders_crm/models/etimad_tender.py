@@ -72,6 +72,7 @@ class EtimadTender(models.Model):
     description = fields.Text("Description")
     notes = fields.Text("Internal Notes")
     is_favorite = fields.Boolean("Favorite", default=False)
+    tender_purpose = fields.Text("Tender Purpose", help="الغرض من المنافسة")
     
     # Hijri Dates (as text)
     last_enquiry_date_hijri = fields.Char("Last Enquiry Date (Hijri)")
@@ -81,6 +82,82 @@ class EtimadTender(models.Model):
     tender_id_ics = fields.Many2one('ics.tender', string='ICS Tender', readonly=True,
         help='Direct link to ICS Tender (bypasses CRM)',
         ondelete='set null')  # Set to null if tender is deleted
+    
+    # ========== ENHANCED FIELDS FROM ETIMAD DETAIL PAGES ==========
+    
+    # Contract & Duration
+    contract_duration = fields.Char("Contract Duration", help="مدة العقد (e.g., 10 يوم)")
+    contract_duration_days = fields.Integer("Contract Duration (Days)", help="Contract duration in days")
+    
+    # Insurance & Guarantees
+    insurance_required = fields.Boolean("Insurance Required", help="هل التأمين من متطلبات المنافسة")
+    initial_guarantee_required = fields.Boolean("Initial Guarantee Required", help="مطلوب ضمان الإبتدائي")
+    initial_guarantee_type = fields.Char("Initial Guarantee Type", help="نوع الضمان الإبتدائي (e.g., لا يوجد ضمان)")
+    
+    # Document Cost
+    document_cost_type = fields.Selection([
+        ('free', 'Free / مجانا'),
+        ('paid', 'Paid / مدفوع'),
+    ], string="Document Cost Type", help="قيمة وثائق المنافسة")
+    document_cost_amount = fields.Monetary("Document Cost Amount", currency_field='currency_id',
+        help="Amount if documents are paid")
+    
+    # Tender Status Details
+    tender_status_text = fields.Char("Tender Status Text", help="حالة المنافسة (e.g., معتمدة)")
+    tender_status_approved = fields.Boolean("Tender Approved", compute='_compute_tender_status_approved', store=True,
+        help="Whether tender is approved (معتمدة)")
+    
+    # Submission Method
+    submission_method = fields.Selection([
+        ('single_file', 'Single File (Technical & Financial) / ملف واحد للعرض الفني والمالي معا'),
+        ('separate_files', 'Separate Files / ملفات منفصلة'),
+        ('electronic', 'Electronic / إلكتروني'),
+        ('manual', 'Manual / يدوي'),
+    ], string="Submission Method", help="طريقة تقديم العروض")
+    
+    # Additional Dates
+    offer_opening_date = fields.Datetime("Offer Opening Date", help="تاريخ فتح العروض")
+    offer_examination_date = fields.Datetime("Offer Examination Date", help="تاريخ فحص العروض")
+    expected_award_date = fields.Date("Expected Award Date", help="التاريخ المتوقع للترسية")
+    work_start_date = fields.Date("Work Start Date", help="تاريخ بدء الأعمال / الخدمات")
+    inquiry_start_date = fields.Date("Inquiry Start Date", help="بداية إرسال الأسئلة و الاستفسارات")
+    max_inquiry_response_days = fields.Integer("Max Inquiry Response Days", 
+        help="اقصى مدة للاجابة على الاستفسارات (in days)")
+    
+    # Location Information
+    opening_location = fields.Char("Opening Location", help="مكان فتح العرض")
+    execution_location_type = fields.Selection([
+        ('inside_kingdom', 'Inside Kingdom / داخل المملكة'),
+        ('outside_kingdom', 'Outside Kingdom / خارج المملكة'),
+        ('both', 'Both / داخل وخارج المملكة'),
+    ], string="Execution Location Type", help="مكان التنفيذ")
+    execution_regions = fields.Text("Execution Regions", help="مناطق التنفيذ (JSON or text)")
+    execution_cities = fields.Text("Execution Cities", help="مدن التنفيذ (JSON or text)")
+    
+    # Classification & Activities
+    classification_field = fields.Char("Classification Field", help="مجال التصنيف")
+    classification_required = fields.Boolean("Classification Required", 
+        help="Whether classification is required (غير مطلوب = False)")
+    activity_details = fields.Text("Activity Details", help="نشاط المنافسة (detailed list)")
+    
+    # Work Types
+    includes_supply_items = fields.Boolean("Includes Supply Items", 
+        help="تشمل المنافسة على بنود توريد")
+    construction_works = fields.Text("Construction Works", help="أعمال الإنشاء")
+    maintenance_works = fields.Text("Maintenance & Operation Works", help="أعمال الصيانة والتشغيل")
+    
+    # Award Information
+    award_announced = fields.Boolean("Award Announced", default=False, 
+        help="Whether award results have been announced")
+    award_announcement_date = fields.Date("Award Announcement Date", 
+        help="Date when award was announced")
+    awarded_company_name = fields.Char("Awarded Company Name", help="اسم الشركة المرسية")
+    awarded_amount = fields.Monetary("Awarded Amount", currency_field='currency_id',
+        help="المبلغ المرسى عليه")
+    
+    # Agency Code (for logo)
+    agency_code = fields.Char("Agency Code", help="Agency code for logo loading")
+    tender_type_id = fields.Integer("Tender Type ID", help="Tender type ID from Etimad")
 
     @api.depends('tender_id_string')
     def _compute_tender_url(self):
@@ -106,6 +183,18 @@ class EtimadTender(models.Model):
                 record.remaining_days = max(0, delta.days)
             else:
                 record.remaining_days = 0
+    
+    @api.depends('tender_status_text')
+    def _compute_tender_status_approved(self):
+        """Check if tender status indicates approval"""
+        for record in self:
+            if record.tender_status_text:
+                status_lower = record.tender_status_text.lower()
+                record.tender_status_approved = any(word in status_lower for word in [
+                    'معتمدة', 'approved', 'موافقة', 'accepted'
+                ])
+            else:
+                record.tender_status_approved = False
 
     @api.depends('opportunity_id')
     def _compute_opportunity_count(self):
@@ -233,6 +322,8 @@ class EtimadTender(models.Model):
             'last_enquiry_date_hijri': raw_data.get('lastEnqueriesDateHijri'),
             'last_offer_date_hijri': raw_data.get('lastOfferPresentationDateHijri'),
             'description': self._generate_description(raw_data),
+            'agency_code': raw_data.get('agencyCode'),
+            'tender_type_id': raw_data.get('tenderTypeId'),
         }
         
         # Map status
@@ -258,6 +349,20 @@ class EtimadTender(models.Model):
             self.create(vals)
             _logger.info(f"Created tender: {vals['name'][:50]}")
             return True
+    
+    def _parse_contract_duration(self, duration_text):
+        """Parse contract duration text to extract days (e.g., '10 يوم' -> 10)"""
+        if not duration_text:
+            return False, 0
+        
+        import re
+        # Try to extract number from text
+        numbers = re.findall(r'\d+', duration_text)
+        if numbers:
+            days = int(numbers[0])
+            return duration_text, days
+        
+        return duration_text, 0
 
     def _parse_date(self, date_str):
         """Parse date string to datetime"""
@@ -384,6 +489,50 @@ class EtimadTender(models.Model):
         """Set tender state"""
         for record in self:
             record.state = state
+    
+    def action_fetch_detailed_info(self):
+        """Fetch detailed tender information from Etimad detail page"""
+        self.ensure_one()
+        
+        if not self.tender_id_string:
+            raise UserError(_('Tender ID String is required to fetch detailed information.'))
+        
+        # Note: This would require API access or manual parsing
+        # Since Etimad uses CAPTCHA, this is a placeholder for future enhancement
+        # or manual data entry
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Fetch Detailed Info'),
+                'message': _('Detailed information fetching requires API access or manual entry. Please use the Etimad portal to view full details.'),
+                'type': 'info',
+                'sticky': False,
+            }
+        }
+    
+    def action_open_detailed_report(self):
+        """Open detailed tender report on Etimad portal"""
+        self.ensure_one()
+        if self.tender_id_string:
+            return {
+                'type': 'ir.actions.act_url',
+                'url': f'https://tenders.etimad.sa/Tender/OpenTenderDetailsReportForVisitor?tenderIdString={self.tender_id_string}',
+                'target': 'new'
+            }
+        raise UserError(_('Tender ID String is required.'))
+    
+    def action_open_details_page(self):
+        """Open tender details page on Etimad portal"""
+        self.ensure_one()
+        if self.tender_id_string:
+            return {
+                'type': 'ir.actions.act_url',
+                'url': f'https://tenders.etimad.sa/Tender/DetailsForVisitor?STenderId={self.tender_id_string}',
+                'target': 'new'
+            }
+        raise UserError(_('Tender ID String is required.'))
     
     def read(self, fields=None, load='_classic_read'):
         """Override read to handle invalid tender_id_ics references gracefully"""
