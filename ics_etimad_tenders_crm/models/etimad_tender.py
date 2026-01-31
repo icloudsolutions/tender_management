@@ -1425,6 +1425,96 @@ class EtimadTender(models.Model):
                     # Check if ics_tender table exists
                     self.env.cr.execute("""
                         SELECT EXISTS (
+                            SELECT FROM information_schema.tables
+                            WHERE table_schema = 'public'
+                            AND table_name = 'ics_tender'
+                        )
+                    """)
+                    table_exists = self.env.cr.fetchone()[0]
+                    
+                    # Get IDs of records in this recordset
+                    record_ids = [r.id for r in self]
+                    if record_ids:
+                        if table_exists:
+                            # Clean up only invalid references
+                            self.env.cr.execute("""
+                                UPDATE ics_etimad_tender
+                                SET tender_id_ics = NULL
+                                WHERE id = ANY(%s)
+                                AND tender_id_ics IS NOT NULL
+                                AND NOT EXISTS (
+                                    SELECT 1 FROM ics_tender WHERE id = ics_etimad_tender.tender_id_ics
+                                )
+                            """, (record_ids,))
+                        else:
+                            # Table doesn't exist, clear all references
+                            self.env.cr.execute("""
+                                UPDATE ics_etimad_tender
+                                SET tender_id_ics = NULL
+                                WHERE id = ANY(%s)
+                                AND tender_id_ics IS NOT NULL
+                            """, (record_ids,))
+                        
+                        self.env.cr.commit()
+                        _logger.info("Cleaned up invalid tender_id_ics references for records: %s", record_ids)
+                except Exception as cleanup_error:
+                    _logger.warning("Error cleaning up tender reference during read: %s", cleanup_error)
+                    pass
+                
+                # Retry the read with cleaning context
+                return self.with_context(_cleaning_tender_refs=True).read(fields=fields, load=load)
+            else:
+                # Re-raise if not related to tender_id_ics
+                raise
+    
+    def web_read(self, specification):
+        """Override web_read to handle invalid tender_id_ics references in list views"""
+        try:
+            return super(EtimadTender, self).web_read(specification)
+        except (AttributeError, ValueError) as e:
+            error_str = str(e).lower()
+            if 'tender_id_ics' in error_str or '_unknown' in error_str or "display_name" in error_str:
+                # Clean up invalid references
+                try:
+                    self.env.cr.execute("""
+                        SELECT EXISTS (
+                            SELECT FROM information_schema.tables
+                            WHERE table_schema = 'public'
+                            AND table_name = 'ics_tender'
+                        )
+                    """)
+                    table_exists = self.env.cr.fetchone()[0]
+                    
+                    record_ids = [r.id for r in self]
+                    if record_ids:
+                        if table_exists:
+                            self.env.cr.execute("""
+                                UPDATE ics_etimad_tender
+                                SET tender_id_ics = NULL
+                                WHERE id = ANY(%s)
+                                AND tender_id_ics IS NOT NULL
+                                AND NOT EXISTS (
+                                    SELECT 1 FROM ics_tender WHERE id = ics_etimad_tender.tender_id_ics
+                                )
+                            """, (record_ids,))
+                        else:
+                            self.env.cr.execute("""
+                                UPDATE ics_etimad_tender
+                                SET tender_id_ics = NULL
+                                WHERE id = ANY(%s)
+                                AND tender_id_ics IS NOT NULL
+                            """, (record_ids,))
+                        
+                        self.env.cr.commit()
+                        _logger.info("Cleaned up invalid tender_id_ics references in web_read for records: %s", record_ids)
+                except Exception as cleanup_error:
+                    _logger.warning("Error cleaning up in web_read: %s", cleanup_error)
+                
+                # Retry with context to exclude tender_id_ics
+                return self.with_context(_cleaning_tender_refs=True).web_read(specification)
+            else:
+                raise
+                        SELECT EXISTS (
                             SELECT FROM information_schema.tables 
                             WHERE table_schema = 'public' 
                             AND table_name = 'ics_tender'

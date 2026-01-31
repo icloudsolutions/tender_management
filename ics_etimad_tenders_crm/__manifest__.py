@@ -59,7 +59,6 @@
         "data/ir_cron_data.xml",
         "views/etimad_menus.xml",
         "views/etimad_tender_views.xml",
-        "views/etimad_tender_views_enhanced.xml",
         "views/res_config_settings_views.xml",
     ],
     "external_dependencies": {
