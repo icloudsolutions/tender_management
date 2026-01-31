@@ -148,6 +148,11 @@
         'project',
         'ics_etimad_tenders_crm',
     ],
+    'external_dependencies': {
+        'python': [],
+    },
+    # Optional dependency - works with or without project_tasks_from_templates
+    # If installed, will use their template system as fallback
     'data': [
         'security/tender_security.xml',
         'security/ir.model.access.csv',
