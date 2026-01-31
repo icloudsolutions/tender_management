@@ -412,30 +412,11 @@ class Tender(models.Model):
             ], limit=1)
         
         # Priority 3: Try project_tasks_from_templates module if available
-        project_template = None
         if not template and 'project.task.template' in self.env:
-            # Map tender category to template name patterns
-            category_template_map = {
-                'supply': ['supply', 'توريد', 'توريدات'],
-                'maintenance': ['maintenance', 'صيانة', 'تشغيل', 'صيانة و تشغيل'],
-                'services': ['service', 'services', 'خدمات'],
-                'construction': ['construction', 'إنشاء', 'بناء'],
-                'consulting': ['consulting', 'استشار', 'استشارات'],
-            }
-            
-            # Search for matching template
-            search_terms = category_template_map.get(self.tender_category, [])
-            for term in search_terms:
-                project_template = self.env['project.task.template'].search([
-                    ('name', 'ilike', term)
-                ], limit=1)
-                if project_template:
-                    break
-            
-            # If still not found, try general search
-            if not project_template:
-                project_template = self.env['project.task.template'].search([], limit=1)
-            
+            # Check if project_tasks_from_templates module is installed
+            project_template = self.env['project.task.template'].search([
+                ('name', 'ilike', self.tender_category)
+            ], limit=1)
             if project_template:
                 # Use project_tasks_from_templates module
                 return self._create_project_with_template_module(project_template)
@@ -534,27 +515,16 @@ class Tender(models.Model):
         return project
     
     def _create_project_with_template_module(self, template):
-        """Create project using project_tasks_from_templates module
-        
-        This method integrates with the project_tasks_from_templates module
-        to create projects with tasks from their template system.
-        
-        Args:
-            template: project.task.template record from project_tasks_from_templates
-            
-        Returns:
-            project.project: Created project with tasks
-        """
+        """Create project using project_tasks_from_templates module"""
         self.ensure_one()
         
-        # Create project with template link
+        # Create project
         project_vals = {
             'name': f"Project - {self.tender_title}",
             'partner_id': self.partner_id.id,
             'user_id': self.user_id.id,
             'tender_id': self.id,
             'date_start': fields.Date.today(),
-            'project_template_id': template.id,  # Link to project_tasks_from_templates template
         }
         
         # Link to sales order if exists
@@ -565,56 +535,14 @@ class Tender(models.Model):
         if confirmed_order:
             project_vals['sale_order_id'] = confirmed_order.id
         
-        # Create project
         project = self.env['project.project'].create(project_vals)
         
-        # Use project_tasks_from_templates module's method to create tasks
-        # This method handles both simple tasks and staged tasks
-        if hasattr(project, 'action_create_project_from_template'):
-            project.action_create_project_from_template()
-        else:
-            # Fallback: Create tasks manually if method doesn't exist
-            self._create_tasks_from_project_template(project, template)
+        # Use project_tasks_from_templates module to create tasks
+        if 'project.task.template' in self.env and template:
+            # Create tasks from template using the module's method
+            template.with_context(default_project_id=project.id).create_tasks()
         
         return project
-    
-    def _create_tasks_from_project_template(self, project, template):
-        """Fallback method to create tasks from project.task.template"""
-        self.ensure_one()
-        
-        if not template or 'project.sub.task' not in self.env:
-            return
-        
-        # Create tasks from template
-        for task_template in template.task_ids:
-            self._create_task_from_sub_task(project, task_template, parent=False)
-    
-    def _create_task_from_sub_task(self, project, sub_task, parent=False):
-        """Create a project task from project.sub.task template"""
-        task_vals = {
-            'project_id': project.id,
-            'name': sub_task.name,
-            'parent_id': parent,
-            'description': sub_task.description or '',
-        }
-        
-        # Set assignees if available
-        if hasattr(sub_task, 'user_ids') and sub_task.user_ids:
-            task_vals['user_ids'] = [(6, 0, sub_task.user_ids.ids)]
-        elif self.user_id:
-            task_vals['user_ids'] = [(6, 0, [self.user_id.id])]
-        
-        # Set stage if available
-        if hasattr(sub_task, 'stage_id') and sub_task.stage_id:
-            task_vals['stage_id'] = sub_task.stage_id.id
-        
-        # Create task
-        task = self.env['project.task'].create(task_vals)
-        
-        # Create child tasks recursively
-        if hasattr(sub_task, 'child_ids') and sub_task.child_ids:
-            for child_template in sub_task.child_ids:
-                self._create_task_from_sub_task(project, child_template, parent=task.id)
     
     def _auto_generate_purchase_orders(self):
         """Automatically generate purchase orders for vendors when tender is won"""
