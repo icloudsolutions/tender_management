@@ -17,7 +17,22 @@ class EtimadTenderExtended(models.Model):
         """Override read to handle invalid tender_id_ics references gracefully"""
         # Check if we're already in cleanup mode to prevent infinite recursion
         if self.env.context.get('_cleaning_tender_refs'):
-            return super(EtimadTenderExtended, self).read(fields=fields, load=load)
+            # In cleanup mode, exclude tender_id_ics from read
+            if fields is None:
+                # Read all fields except tender_id_ics
+                all_fields = list(self._fields.keys())
+                safe_fields = [f for f in all_fields if f != 'tender_id_ics']
+                result = super(EtimadTenderExtended, self).read(fields=safe_fields, load=load)
+            elif 'tender_id_ics' in fields:
+                safe_fields = [f for f in fields if f != 'tender_id_ics']
+                result = super(EtimadTenderExtended, self).read(fields=safe_fields, load=load)
+            else:
+                result = super(EtimadTenderExtended, self).read(fields=fields, load=load)
+            
+            # Manually add tender_id_ics as False for each record
+            for record_data in result:
+                record_data['tender_id_ics'] = False
+            return result
         
         try:
             return super(EtimadTenderExtended, self).read(fields=fields, load=load)
@@ -37,35 +52,33 @@ class EtimadTenderExtended(models.Model):
                     """)
                     table_exists = self.env.cr.fetchone()[0]
                     
-                    if table_exists:
-                        for record in self:
-                            record_id = record.id
-                            # Use SQL to directly fix this record
+                    record_ids = [r.id for r in self]
+                    if record_ids:
+                        if table_exists:
+                            # Use SQL to directly fix these records
                             self.env.cr.execute("""
                                 UPDATE ics_etimad_tender 
                                 SET tender_id_ics = NULL 
-                                WHERE id = %s 
+                                WHERE id = ANY(%s)
                                 AND tender_id_ics IS NOT NULL
                                 AND NOT EXISTS (
                                     SELECT 1 FROM ics_tender WHERE id = ics_etimad_tender.tender_id_ics
                                 )
-                            """, (record_id,))
-                            self.env.cr.commit()
-                    else:
-                        # Table doesn't exist, just set all to NULL
-                        for record in self:
-                            record_id = record.id
+                            """, (record_ids,))
+                        else:
+                            # Table doesn't exist, just set all to NULL
                             self.env.cr.execute("""
                                 UPDATE ics_etimad_tender 
                                 SET tender_id_ics = NULL 
-                                WHERE id = %s
-                            """, (record_id,))
-                            self.env.cr.commit()
+                                WHERE id = ANY(%s)
+                                AND tender_id_ics IS NOT NULL
+                            """, (record_ids,))
+                        self.env.cr.commit()
                 except Exception as cleanup_error:
                     _logger.warning("Error cleaning up tender reference during read: %s", cleanup_error)
                     pass
                 
-                # Retry reading with cleanup context
+                # Retry reading with cleanup context (will exclude tender_id_ics if needed)
                 return self.with_context(_cleaning_tender_refs=True).read(fields=fields, load=load)
             else:
                 # Different error, re-raise
