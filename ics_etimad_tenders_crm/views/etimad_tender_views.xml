@@ -14,27 +14,33 @@
                   multi_edit="1">
                 
                 <field name="is_favorite" widget="boolean_favorite" nolabel="1"/>
-                <field name="reference_number"/>
-                <field name="name"/>
-                <field name="agency_name"/>
-                <field name="tender_type"/>
-                <field name="activity_name"/>
-                <field name="estimated_amount" widget="monetary" options="{'currency_field': 'currency_id'}" optional="show"/>
-                <field name="estimated_value_category" widget="badge" optional="show"/>
-                <field name="matching_score" widget="progressbar" optional="hide"/>
-                <field name="offers_deadline"/>
+                <field name="reference_number" string="المرجع | Reference"/>
+                <field name="name" string="اسم المنافسة | Tender Name"/>
+                <field name="agency_name" string="الجهة | Agency"/>
+                <field name="tender_type" string="النوع | Type"/>
+                <field name="activity_name" string="النشاط | Activity" optional="hide"/>
+                <field name="estimated_amount" widget="monetary" options="{'currency_field': 'currency_id'}" optional="show" string="القيمة التقديرية | Est. Value"/>
+                <field name="estimated_value_category" widget="badge" optional="show" string="Value Category"
+                       decoration-info="estimated_value_category == 'small'"
+                       decoration-primary="estimated_value_category == 'medium'"
+                       decoration-success="estimated_value_category == 'large'"
+                       decoration-danger="estimated_value_category == 'mega'"/>
+                <field name="matching_score" widget="progressbar" optional="show" string="Match %" />
+                <field name="offers_deadline" string="آخر موعد للتقديم | Deadline"/>
                 <field name="remaining_days" 
+                       string="الوقت المتبقي | Days Left"
                        decoration-danger="is_urgent" 
                        decoration-warning="remaining_days &lt; 7 and remaining_days &gt; 3"/>
-                <field name="total_fees" widget="monetary" options="{'currency_field': 'currency_id'}" optional="hide"/>
+                <field name="total_fees" widget="monetary" options="{'currency_field': 'currency_id'}" optional="hide" string="Total Fees"/>
                 <field name="state" widget="badge" 
+                       string="الحالة | Status"
                        decoration-success="state == 'won'" 
                        decoration-danger="state in ('lost', 'cancelled')" 
                        decoration-warning="state == 'qualification'" 
                        decoration-info="state in ('new', 'in_progress')"/>
-                <field name="opportunity_id" optional="show"/>
-                <field name="tender_id_ics" optional="hide"/>
-                <field name="scraping_status" widget="badge" optional="hide" 
+                <field name="opportunity_id" optional="show" string="Opportunity"/>
+                <field name="tender_id_ics" optional="hide" string="ICS Tender"/>
+                <field name="scraping_status" widget="badge" optional="hide" string="Data Status"
                        decoration-success="scraping_status == 'success'"
                        decoration-danger="scraping_status == 'failed'"
                        decoration-warning="scraping_status == 'partial'"/>

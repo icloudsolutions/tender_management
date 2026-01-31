@@ -1191,7 +1191,16 @@ class EtimadTender(models.Model):
                 # Extract opening location
                 location_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "مكان فتح العرض")]/following-sibling::div[1]//span/text()')
                 if location_elements:
-                    parsed_data['opening_location'] = html_module.unescape(location_elements[0].strip())
+                    location_text = html_module.unescape(location_elements[0].strip())
+                    if 'لا يوجد' not in location_text:
+                        parsed_data['opening_location'] = location_text
+                
+                # Extract offer opening date (تاريخ فحص العروض) - updated xpath
+                examination_alt_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "تاريخ فحص العروض")]/following-sibling::div[1]//span/text()')
+                if examination_alt_elements and len(examination_alt_elements) >= 3:
+                    date_str = html_module.unescape(examination_alt_elements[0].strip())
+                    time_str = html_module.unescape(examination_alt_elements[2].strip()) if len(examination_alt_elements) > 2 else ''
+                    parsed_data['offer_examination_date'] = self._parse_datetime_from_strings(date_str, time_str)
             else:
                 # Fallback to regex
                 parsed_data = self._parse_dates_regex(html_content)
