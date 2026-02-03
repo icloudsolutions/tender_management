@@ -443,6 +443,7 @@
                             <group>
                                 <group string="Award &amp; Work Dates">
                                     <field name="expected_award_date"/>
+                                    <field name="suspension_period_days" string="Suspension Period (Days)"/>
                                     <field name="work_start_date"/>
                                 </group>
                                 <group string="Opening Location">

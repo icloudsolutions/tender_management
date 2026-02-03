@@ -130,6 +130,8 @@ class EtimadTender(models.Model):
     inquiry_start_date = fields.Date("Inquiry Start Date", help="بداية إرسال الأسئلة و الاستفسارات")
     max_inquiry_response_days = fields.Integer("Max Inquiry Response Days", 
         help="اقصى مدة للاجابة على الاستفسارات (in days)")
+    suspension_period_days = fields.Integer("Suspension Period (Days)", 
+        help="فترة التوقيف - Mandatory standstill/waiting period before contract award")
     
     # Location Information
     opening_location = fields.Char("Opening Location", help="مكان فتح العرض")
@@ -1047,6 +1049,8 @@ class EtimadTender(models.Model):
                         update_vals['inquiry_start_date'] = dates_data['inquiry_start_date']
                     if dates_data.get('max_inquiry_response_days'):
                         update_vals['max_inquiry_response_days'] = dates_data['max_inquiry_response_days']
+                    if dates_data.get('suspension_period_days'):
+                        update_vals['suspension_period_days'] = dates_data['suspension_period_days']
                     if dates_data.get('opening_location'):
                         update_vals['opening_location'] = dates_data['opening_location']
                     
@@ -1377,6 +1381,16 @@ class EtimadTender(models.Model):
                     except ValueError:
                         pass
                 
+                # Extract suspension period (فترة التوقيف)
+                suspension_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "فترة التوقيف")]/following-sibling::div[1]//span/text()')
+                if suspension_elements:
+                    suspension_str = html_module.unescape(suspension_elements[0].strip())
+                    try:
+                        if 'لا يوجد' not in suspension_str:
+                            parsed_data['suspension_period_days'] = int(suspension_str)
+                    except ValueError:
+                        pass
+                
                 # Extract opening location
                 location_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "مكان فتح العرض")]/following-sibling::div[1]//span/text()')
                 if location_elements:
@@ -1451,6 +1465,14 @@ class EtimadTender(models.Model):
             if days_match:
                 try:
                     parsed_data['max_inquiry_response_days'] = int(days_match.group(1))
+                except ValueError:
+                    pass
+            
+            # Suspension period
+            suspension_match = re.search(r'فترة التوقيف.*?<span>\s*(\d+)', html_content, re.DOTALL)
+            if suspension_match:
+                try:
+                    parsed_data['suspension_period_days'] = int(suspension_match.group(1))
                 except ValueError:
                     pass
             
