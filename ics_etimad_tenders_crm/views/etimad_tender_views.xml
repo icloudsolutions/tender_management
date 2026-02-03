@@ -404,10 +404,24 @@
                                 </group>
                             </group>
                             <group>
-                                <group string="Insurance &amp; Guarantees">
+                                <group string="Insurance &amp; Guarantees (الضمانات)">
                                     <field name="insurance_required"/>
-                                    <field name="initial_guarantee_required"/>
-                                    <field name="initial_guarantee_type" invisible="not initial_guarantee_required"/>
+                                    <field name="initial_guarantee_required" string="Initial Guarantee"/>
+                                    <field name="initial_guarantee_type" 
+                                           invisible="not initial_guarantee_required"
+                                           string="Type"/>
+                                    <field name="final_guarantee_required" 
+                                           readonly="1"
+                                           string="Final Guarantee"/>
+                                    <field name="final_guarantee_percentage" 
+                                           widget="percentage"
+                                           invisible="not final_guarantee_required"
+                                           string="Final %"/>
+                                    
+                                    <div invisible="not final_guarantee_required" class="alert alert-info mt-2">
+                                        <i class="fa fa-bank"/> <strong>Final Guarantee (حسن الأداء):</strong><br/>
+                                        Bank guarantee of <field name="final_guarantee_percentage" nolabel="1" readonly="1" widget="percentage"/> required after winning
+                                    </div>
                                 </group>
                             </group>
                         </page>

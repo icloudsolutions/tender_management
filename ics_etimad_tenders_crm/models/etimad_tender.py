@@ -95,6 +95,11 @@ class EtimadTender(models.Model):
     insurance_required = fields.Boolean("Insurance Required", help="هل التأمين من متطلبات المنافسة")
     initial_guarantee_required = fields.Boolean("Initial Guarantee Required", help="مطلوب ضمان الإبتدائي")
     initial_guarantee_type = fields.Char("Initial Guarantee Type", help="نوع الضمان الإبتدائي (e.g., لا يوجد ضمان)")
+    final_guarantee_percentage = fields.Float("Final Guarantee %", 
+        help="الضمان النهائي - Performance guarantee percentage (حسن الأداء)")
+    final_guarantee_required = fields.Boolean("Final Guarantee Required",
+        compute='_compute_final_guarantee_required', store=True,
+        help="Whether final guarantee is required")
     
     # Document Cost
     document_cost_type = fields.Selection([
@@ -222,6 +227,12 @@ class EtimadTender(models.Model):
                 ])
             else:
                 record.tender_status_approved = False
+    
+    @api.depends('final_guarantee_percentage')
+    def _compute_final_guarantee_required(self):
+        """Compute if final guarantee is required based on percentage"""
+        for record in self:
+            record.final_guarantee_required = bool(record.final_guarantee_percentage and record.final_guarantee_percentage > 0)
 
     @api.depends('opportunity_id')
     def _compute_opportunity_count(self):
@@ -1002,6 +1013,10 @@ class EtimadTender(models.Model):
                     if parsed_data.get('maintenance_works'):
                         update_vals['maintenance_works'] = parsed_data['maintenance_works']
                     
+                    # Final guarantee
+                    if parsed_data.get('final_guarantee_percentage'):
+                        update_vals['final_guarantee_percentage'] = parsed_data['final_guarantee_percentage']
+                    
                     fetched_count += 1
             except Exception as e:
                 _logger.warning(f"Error fetching relations details: {e}")
@@ -1196,6 +1211,15 @@ class EtimadTender(models.Model):
                     maintenance_items = [html_module.unescape(m.strip()) for m in maintenance_elements if m.strip()]
                     if maintenance_items:
                         parsed_data['maintenance_works'] = '\n'.join(maintenance_items)
+                
+                # Extract final guarantee percentage (الضمان النهائي)
+                guarantee_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "الضمان النهائي")]/following-sibling::div[1]//span/text()')
+                if guarantee_elements:
+                    guarantee_str = html_module.unescape(guarantee_elements[0].strip())
+                    # Extract number from "5.00" or "10.00" or "5"
+                    guarantee_match = re.search(r'(\d+(?:\.\d+)?)', guarantee_str)
+                    if guarantee_match:
+                        parsed_data['final_guarantee_percentage'] = float(guarantee_match.group(1))
             else:
                 # Fallback to regex parsing if lxml not available
                 parsed_data = self._parse_relations_details_regex(html_content)
@@ -1273,6 +1297,14 @@ class EtimadTender(models.Model):
                 maintenance_items = re.findall(r'<li>([^<]+)</li>', maintenance_match.group(1))
                 if maintenance_items:
                     parsed_data['maintenance_works'] = '\n'.join([html_module.unescape(m.strip()) for m in maintenance_items])
+            
+            # Extract final guarantee percentage
+            guarantee_match = re.search(r'الضمان النهائي.*?<span>\s*(\d+(?:\.\d+)?)', html_content, re.DOTALL)
+            if guarantee_match:
+                try:
+                    parsed_data['final_guarantee_percentage'] = float(guarantee_match.group(1))
+                except ValueError:
+                    pass
             
         except Exception as e:
             _logger.error(f"Error in regex parsing: {e}")
