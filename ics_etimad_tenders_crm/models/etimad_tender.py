@@ -1048,7 +1048,7 @@ class EtimadTender(models.Model):
             if update_vals:
                 self.write(update_vals)
                 self.message_post(
-                    body=_('Detailed information fetched from %d Etimad API endpoint(s).') % fetched_count,
+                    body=_('Detailed information fetched from {} Etimad API endpoint(s).').format(fetched_count),
                     subject=_('Details Updated')
                 )
                 
@@ -1057,7 +1057,7 @@ class EtimadTender(models.Model):
                     'tag': 'display_notification',
                     'params': {
                         'title': _('Success'),
-                        'message': _('Detailed information has been fetched and updated from %d endpoint(s).') % fetched_count,
+                        'message': _('Detailed information has been fetched and updated from {} endpoint(s).').format(fetched_count),
                         'type': 'success',
                         'sticky': False,
                     }
