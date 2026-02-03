@@ -215,9 +215,6 @@ class EtimadTender(models.Model):
     # Matching and scoring
     matching_score = fields.Float("Matching Score", compute='_compute_matching_score', store=True)
     matching_reasons = fields.Text("Matching Reasons", compute='_compute_matching_score', store=True)
-    
-    # ========== CHANGE TRACKING (Etimad Updates) ==========
-    # Track previous values to detect changes from Etimad
     previous_offers_deadline = fields.Datetime("Previous Offers Deadline", readonly=True)
     previous_last_enquiry_date = fields.Datetime("Previous Enquiry Deadline", readonly=True)
     previous_estimated_amount = fields.Monetary("Previous Estimated Amount", currency_field='currency_id', readonly=True)
@@ -225,16 +222,12 @@ class EtimadTender(models.Model):
     # Deadline extension tracking
     deadline_extended = fields.Boolean("Deadline Extended", default=False, readonly=True)
     deadline_extensions_count = fields.Integer("Extension Count", default=0, readonly=True)
-    last_deadline_extension_date = fields.Datetime("Last Extension Date", readonly=True,
-        help="When the last deadline extension was detected")
+    last_deadline_extension_date = fields.Datetime("Last Extension Date", readonly=True)
     
     # Change log summary
-    has_etimad_updates = fields.Boolean("Has Etimad Updates", default=False, readonly=True,
-        help="True if tender has been updated from Etimad after initial creation")
-    last_significant_change = fields.Text("Last Significant Change", readonly=True,
-        help="Summary of last significant change from Etimad")
-    change_notification_sent = fields.Boolean("Change Notification Sent", default=False,
-        help="Whether users have been notified of the last change")
+    has_etimad_updates = fields.Boolean("Has Etimad Updates", default=False, readonly=True)
+    last_significant_change = fields.Text("Last Significant Change", readonly=True)
+    change_notification_sent = fields.Boolean("Change Notification Sent", default=False)
     
     @api.depends('remaining_days')
     def _compute_is_urgent(self):
