@@ -218,28 +218,16 @@ class EtimadTender(models.Model):
     
     is_urgent = fields.Boolean("Urgent", compute='_compute_is_urgent', store=True)
     is_hot_tender = fields.Boolean("Hot Tender", compute='_compute_is_hot_tender', store=True)
-    estimated_value_category = fields.Selection([
-        ('small', 'Small (< 100K SAR)'),
-        ('medium', 'Medium (100K-1M SAR)'),
-        ('large', 'Large (1M-10M SAR)'),
-        ('mega', 'Mega (> 10M SAR)'),
-    ], string="Value Category", compute='_compute_estimated_value_category', store=True)
+    estimated_value_category = fields.Selection([('small', 'Small'), ('medium', 'Medium'), ('large', 'Large'), ('mega', 'Mega')], string="Value Category", compute='_compute_estimated_value_category', store=True)
     
     # Scraping metadata
     last_scraped_at = fields.Datetime("Last Scraped At", readonly=True)
     scraping_error_count = fields.Integer("Scraping Errors", default=0, readonly=True)
     last_scraping_error = fields.Text("Last Scraping Error", readonly=True)
-    scraping_status = fields.Selection([
-        ('success', 'Success'),
-        ('partial', 'Partial'),
-        ('failed', 'Failed'),
-        ('pending', 'Pending'),
-    ], string="Scraping Status", default='pending', readonly=True)
+    scraping_status = fields.Selection([('success', 'Success'), ('partial', 'Partial'), ('failed', 'Failed'), ('pending', 'Pending')], string="Scraping Status", default='pending', readonly=True)
     
     # Matching and scoring
-    matching_score = fields.Float("Matching Score", 
-                                   help="Auto-calculated based on company profile (0-100)",
-                                   compute='_compute_matching_score', store=True)
+    matching_score = fields.Float("Matching Score", compute='_compute_matching_score', store=True)
     matching_reasons = fields.Text("Matching Reasons", compute='_compute_matching_score', store=True)
     
     # ========== CHANGE TRACKING (Etimad Updates) ==========
