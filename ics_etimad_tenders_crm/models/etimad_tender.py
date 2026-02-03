@@ -57,15 +57,14 @@ class EtimadTender(models.Model):
     financial_fees = fields.Monetary("Financial Fees", currency_field='currency_id')
     total_fees = fields.Monetary("Total Fees", compute='_compute_total_fees', 
                                   store=True, currency_field='currency_id')
-    estimated_amount = fields.Monetary("Estimated Amount", currency_field='currency_id',
-                                        help="Estimated value of the tender contract")
+    estimated_amount = fields.Monetary("Estimated Amount", currency_field='currency_id')
     
     # URLs and External References
     tender_url = fields.Char("Etimad URL", compute='_compute_tender_url', store=True)
     external_source = fields.Char("External Source", default="Etimad Portal", readonly=True)
     
     # Status and Classification (from Etimad Portal)
-    tender_status_id = fields.Integer("Tender Status ID", help="Status ID from Etimad portal")
+    tender_status_id = fields.Integer("Tender Status ID")
     
     # CRM Integration
     opportunity_id = fields.Many2one('crm.lead', string="Opportunity", tracking=True)
@@ -77,9 +76,8 @@ class EtimadTender(models.Model):
     is_favorite = fields.Boolean("Favorite", default=False)
     
     # Internal Tracking (not related to Etimad portal status)
-    is_participating = fields.Boolean("Participating", default=False,
-        help="Mark this if your company is preparing a quotation for this tender")
-    tender_purpose = fields.Text("Tender Purpose", help="Purpose of the tender")
+    is_participating = fields.Boolean("Participating", default=False)
+    tender_purpose = fields.Text("Tender Purpose")
     
     # Hijri Dates (as text)
     last_enquiry_date_hijri = fields.Char("Last Enquiry Date (Hijri)")
@@ -88,63 +86,51 @@ class EtimadTender(models.Model):
     # ========== ENHANCED FIELDS FROM ETIMAD DETAIL PAGES ==========
     
     # Contract & Duration
-    contract_duration = fields.Char("Contract Duration", help="Contract duration (e.g. 10 days)")
-    contract_duration_days = fields.Integer("Contract Duration (Days)", help="Contract duration in days")
+    contract_duration = fields.Char("Contract Duration")
+    contract_duration_days = fields.Integer("Contract Duration (Days)")
     
     # Insurance & Guarantees
-    insurance_required = fields.Boolean("Insurance Required", help="Insurance required for tender")
-    initial_guarantee_required = fields.Boolean("Initial Guarantee Required", help="Initial guarantee required")
-    initial_guarantee_type = fields.Char("Initial Guarantee Type", help="Type of initial guarantee")
-    final_guarantee_percentage = fields.Float("Final Guarantee Pct", help="Performance guarantee percentage")
-    final_guarantee_required = fields.Boolean("Final Guarantee Required", compute='_compute_final_guarantee_required', store=True, help="Whether final guarantee is required")
+    insurance_required = fields.Boolean("Insurance Required")
+    initial_guarantee_required = fields.Boolean("Initial Guarantee Required")
+    initial_guarantee_type = fields.Char("Initial Guarantee Type")
+    final_guarantee_percentage = fields.Float("Final Guarantee Pct")
+    final_guarantee_required = fields.Boolean("Final Guarantee Required", compute='_compute_final_guarantee_required', store=True)
     
     # Document Cost
-    document_cost_type = fields.Selection([
-        ('free', 'Free'),
-        ('paid', 'Paid'),
-    ], string="Document Cost Type", help="Document cost type")
-    document_cost_amount = fields.Monetary("Document Cost Amount", currency_field='currency_id', help="Amount if documents are paid")
+    document_cost_type = fields.Selection([('free', 'Free'), ('paid', 'Paid')], string="Document Cost Type")
+    document_cost_amount = fields.Monetary("Document Cost Amount", currency_field='currency_id')
     
     # Tender Status Details
-    tender_status_text = fields.Char("Tender Status Text", help="Tender status from Etimad")
-    tender_status_approved = fields.Boolean("Tender Approved", compute='_compute_tender_status_approved', store=True, help="Whether tender is approved")
+    tender_status_text = fields.Char("Tender Status Text")
+    tender_status_approved = fields.Boolean("Tender Approved", compute='_compute_tender_status_approved', store=True)
     
     # Submission Method
-    submission_method = fields.Selection([
-        ('single_file', 'Single File (Technical and Financial)'),
-        ('separate_files', 'Separate Files'),
-        ('electronic', 'Electronic'),
-        ('manual', 'Manual'),
-    ], string="Submission Method", help="How to submit offers")
+    submission_method = fields.Selection([('single_file', 'Single File'), ('separate_files', 'Separate Files'), ('electronic', 'Electronic'), ('manual', 'Manual')], string="Submission Method")
     
     # Additional Dates
-    offer_opening_date = fields.Datetime("Offer Opening Date", help="Date of offer opening")
-    offer_examination_date = fields.Datetime("Offer Examination Date", help="Date of offer examination")
-    expected_award_date = fields.Date("Expected Award Date", help="Expected award date")
-    work_start_date = fields.Date("Work Start Date", help="Work or service start date")
-    inquiry_start_date = fields.Date("Inquiry Start Date", help="Start of inquiry period")
-    max_inquiry_response_days = fields.Integer("Max Inquiry Response Days", help="Max days to answer inquiries")
-    suspension_period_days = fields.Integer("Suspension Period (Days)", help="Mandatory standstill period before contract award")
+    offer_opening_date = fields.Datetime("Offer Opening Date")
+    offer_examination_date = fields.Datetime("Offer Examination Date")
+    expected_award_date = fields.Date("Expected Award Date")
+    work_start_date = fields.Date("Work Start Date")
+    inquiry_start_date = fields.Date("Inquiry Start Date")
+    max_inquiry_response_days = fields.Integer("Max Inquiry Response Days")
+    suspension_period_days = fields.Integer("Suspension Period (Days)")
     
     # Location Information
-    opening_location = fields.Char("Opening Location", help="Place of offer opening")
-    execution_location_type = fields.Selection([
-        ('inside_kingdom', 'Inside Kingdom'),
-        ('outside_kingdom', 'Outside Kingdom'),
-        ('both', 'Both'),
-    ], string="Execution Location Type", help="Where work is executed")
-    execution_regions = fields.Text("Execution Regions", help="Execution regions (JSON or text)")
-    execution_cities = fields.Text("Execution Cities", help="Execution cities (JSON or text)")
+    opening_location = fields.Char("Opening Location")
+    execution_location_type = fields.Selection([('inside_kingdom', 'Inside Kingdom'), ('outside_kingdom', 'Outside Kingdom'), ('both', 'Both')], string="Execution Location Type")
+    execution_regions = fields.Text("Execution Regions")
+    execution_cities = fields.Text("Execution Cities")
     
     # Classification and Activities
-    classification_field = fields.Char("Classification Field", help="Classification field")
-    classification_required = fields.Boolean("Classification Required", help="Whether classification is required")
-    activity_details = fields.Text("Activity Details", help="Activity details list")
+    classification_field = fields.Char("Classification Field")
+    classification_required = fields.Boolean("Classification Required")
+    activity_details = fields.Text("Activity Details")
     
     # Work Types
-    includes_supply_items = fields.Boolean("Includes Supply Items", help="Tender includes supply items")
-    construction_works = fields.Text("Construction Works", help="Construction works")
-    maintenance_works = fields.Text("Maintenance and Operation Works", help="Maintenance and operation works")
+    includes_supply_items = fields.Boolean("Includes Supply Items")
+    construction_works = fields.Text("Construction Works")
+    maintenance_works = fields.Text("Maintenance and Operation Works")
     
     # Award Information
     award_announced = fields.Boolean("Award Announced", default=False)
@@ -232,18 +218,13 @@ class EtimadTender(models.Model):
     
     # ========== CHANGE TRACKING (Etimad Updates) ==========
     # Track previous values to detect changes from Etimad
-    previous_offers_deadline = fields.Datetime("Previous Offers Deadline", readonly=True,
-        help="Previous deadline before last update from Etimad")
-    previous_last_enquiry_date = fields.Datetime("Previous Enquiry Deadline", readonly=True,
-        help="Previous enquiry deadline before last update from Etimad")
-    previous_estimated_amount = fields.Monetary("Previous Estimated Amount", currency_field='currency_id', readonly=True,
-        help="Previous estimated amount before last update from Etimad")
+    previous_offers_deadline = fields.Datetime("Previous Offers Deadline", readonly=True)
+    previous_last_enquiry_date = fields.Datetime("Previous Enquiry Deadline", readonly=True)
+    previous_estimated_amount = fields.Monetary("Previous Estimated Amount", currency_field='currency_id', readonly=True)
     
     # Deadline extension tracking
-    deadline_extended = fields.Boolean("Deadline Extended", default=False, readonly=True,
-        help="True if offers deadline was extended since first scrape")
-    deadline_extensions_count = fields.Integer("Extension Count", default=0, readonly=True,
-        help="Number of times the deadline has been extended")
+    deadline_extended = fields.Boolean("Deadline Extended", default=False, readonly=True)
+    deadline_extensions_count = fields.Integer("Extension Count", default=0, readonly=True)
     last_deadline_extension_date = fields.Datetime("Last Extension Date", readonly=True,
         help="When the last deadline extension was detected")
     
