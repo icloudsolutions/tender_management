@@ -498,6 +498,60 @@
                                 </group>
                             </group>
                         </page>
+                        
+                        <!-- Tab 6: Local Content & SME (المحتوى المحلي والمنشآت الصغيرة) -->
+                        <page string="6. Local Content &amp; SME" name="local_content">
+                            <group>
+                                <group string="Local Content Requirements (متطلبات المحتوى المحلي)">
+                                    <field name="local_content_required"/>
+                                </group>
+                            </group>
+                            
+                            <div invisible="local_content_required" class="alert alert-info text-center">
+                                <i class="fa fa-info-circle" style="font-size:3rem"/> 
+                                <br/>لا توجد متطلبات محتوى محلي
+                                <br/><small>No local content requirements for this tender</small>
+                            </div>
+                            
+                            <group invisible="not local_content_required">
+                                <group string="Local Content Details">
+                                    <field name="local_content_percentage" 
+                                           widget="percentage"
+                                           string="Minimum Required %"/>
+                                    <field name="local_content_target_percentage" 
+                                           widget="percentage"
+                                           string="Target for Evaluation %"/>
+                                    <field name="local_content_baseline_weight" 
+                                           widget="percentage"
+                                           string="Weight in Evaluation %"/>
+                                    <field name="local_content_mechanism" 
+                                           string="Calculation Mechanism"/>
+                                </group>
+                                
+                                <group string="SME Benefits (المنشآت الصغيرة والمتوسطة)">
+                                    <field name="sme_participation_allowed"/>
+                                    <field name="sme_price_preference" 
+                                           widget="percentage"
+                                           invisible="not sme_participation_allowed"
+                                           string="SME Price Preference %"/>
+                                    <field name="sme_qualification_mandatory" 
+                                           invisible="not sme_participation_allowed"
+                                           string="SME Certificate Mandatory"/>
+                                    
+                                    <div invisible="not sme_participation_allowed" class="alert alert-success mt-2">
+                                        <i class="fa fa-check-circle"/> <strong>SME Participation Allowed</strong><br/>
+                                        Small &amp; Medium Enterprises can participate in this tender with special benefits.
+                                    </div>
+                                </group>
+                            </group>
+                            
+                            <group invisible="not local_content_required">
+                                <field name="local_content_notes" 
+                                       widget="text" 
+                                       placeholder="Additional notes about local content requirements..."
+                                       nolabel="1"/>
+                            </group>
+                        </page>
                     </notebook>
                 </sheet>
                 
@@ -675,6 +729,8 @@
                 <filter string="👥 Participating" name="filter_participating" domain="[('is_participating','=',True)]"/>
                 <filter string="✅ Approved (Etimad)" name="filter_approved" domain="[('tender_status_approved','=',True)]"/>
                 <filter string="🏆 With Award Results" name="filter_awarded" domain="[('award_announced','=',True)]"/>
+                <filter string="🇸🇦 Local Content Required" name="filter_local_content" domain="[('local_content_required','=',True)]"/>
+                <filter string="🏢 SME Allowed" name="filter_sme" domain="[('sme_participation_allowed','=',True)]"/>
                 
                 <separator/>
                 <!-- Deadline Filters -->

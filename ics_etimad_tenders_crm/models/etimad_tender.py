@@ -160,6 +160,31 @@ class EtimadTender(models.Model):
     # Agency Code (for logo)
     agency_code = fields.Char("Agency Code", help="Agency code for logo loading")
     tender_type_id = fields.Integer("Tender Type ID", help="Tender type ID from Etimad")
+    
+    # ========== LOCAL CONTENT (المحتوى المحلي) ==========
+    # Saudi local content requirements and SME benefits
+    local_content_required = fields.Boolean("Local Content Required", 
+        help="Whether this tender has local content requirements (المحتوى المحلي)")
+    local_content_percentage = fields.Float("Local Content %", 
+        help="Minimum local content percentage required (نسبة المحتوى المحلي المطلوبة)")
+    local_content_mechanism = fields.Char("Local Content Mechanism",
+        help="Mechanism for calculating local content (آلية احتساب المحتوى المحلي)")
+    
+    # SME (Small & Medium Enterprises) Benefits
+    sme_participation_allowed = fields.Boolean("SME Participation Allowed",
+        help="Whether Small & Medium Enterprises can participate (مشاركة المنشآت الصغيرة والمتوسطة)")
+    sme_price_preference = fields.Float("SME Price Preference %",
+        help="Price preference given to SME participants (الأفضلية السعرية للمنشآت الصغيرة والمتوسطة)")
+    sme_qualification_mandatory = fields.Boolean("SME Qualification Mandatory",
+        help="Whether SME certificate is mandatory (شهادة المنشآت الصغيرة إلزامية)")
+    
+    # Additional Local Content Info
+    local_content_target_percentage = fields.Float("Target Local Content %",
+        help="Target percentage for local content evaluation (نسبة المحتوى المحلي المستهدفة للتقييم)")
+    local_content_baseline_weight = fields.Float("Local Content Weight %",
+        help="Weight of local content in evaluation (وزن المحتوى المحلي في التقييم)")
+    local_content_notes = fields.Text("Local Content Notes",
+        help="Additional notes about local content requirements")
 
     @api.depends('tender_id_string')
     def _compute_tender_url(self):
@@ -1036,6 +1061,38 @@ class EtimadTender(models.Model):
             except Exception as e:
                 _logger.warning(f"Error fetching award results: {e}")
             
+            # 4. Fetch Local Content Details (المحتوى المحلي)
+            try:
+                url = "https://tenders.etimad.sa/Tender/GetLocalContentDetailsViewComponenet"
+                params = {'tenderIdStr': self.tender_id_string}
+                response = session.get(url, params=params, timeout=30)
+                
+                if response.status_code == 200 and response.text:
+                    local_content_data = self._parse_local_content_html(response.text)
+                    
+                    if local_content_data.get('local_content_required') is not None:
+                        update_vals['local_content_required'] = local_content_data['local_content_required']
+                    if local_content_data.get('local_content_percentage'):
+                        update_vals['local_content_percentage'] = local_content_data['local_content_percentage']
+                    if local_content_data.get('local_content_mechanism'):
+                        update_vals['local_content_mechanism'] = local_content_data['local_content_mechanism']
+                    if local_content_data.get('local_content_target_percentage'):
+                        update_vals['local_content_target_percentage'] = local_content_data['local_content_target_percentage']
+                    if local_content_data.get('local_content_baseline_weight'):
+                        update_vals['local_content_baseline_weight'] = local_content_data['local_content_baseline_weight']
+                    if local_content_data.get('sme_participation_allowed') is not None:
+                        update_vals['sme_participation_allowed'] = local_content_data['sme_participation_allowed']
+                    if local_content_data.get('sme_price_preference'):
+                        update_vals['sme_price_preference'] = local_content_data['sme_price_preference']
+                    if local_content_data.get('sme_qualification_mandatory') is not None:
+                        update_vals['sme_qualification_mandatory'] = local_content_data['sme_qualification_mandatory']
+                    if local_content_data.get('local_content_notes'):
+                        update_vals['local_content_notes'] = local_content_data['local_content_notes']
+                    
+                    fetched_count += 1
+            except Exception as e:
+                _logger.warning(f"Error fetching local content details: {e}")
+            
             # Update tender with all fetched data
             if update_vals:
                 self.write(update_vals)
@@ -1381,28 +1438,245 @@ class EtimadTender(models.Model):
         
         try:
             # Check if award has been announced
-            if 'لم يتم اعلان نتائج الترسية بعد' in html_content or 'لم يتم' in html_content:
+            if 'لم يتم اعلان نتائج الترسية بعد' in html_content or 'Award results have not been announced yet' in html_content:
                 parsed_data['award_announced'] = False
-            else:
-                # Try to extract award information if available
-                parsed_data['award_announced'] = True
+                return parsed_data
+            
+            # Award has been announced - extract details
+            parsed_data['award_announced'] = True
+            
+            if LXML_AVAILABLE:
+                tree = html.fromstring(html_content)
                 
-                if LXML_AVAILABLE:
-                    tree = html.fromstring(html_content)
-                    
-                    # Extract award date, company, amount if available in the HTML
-                    # (Structure may vary when award is announced)
-                    award_date_elements = tree.xpath('//text()[contains(., "تاريخ")]/following::text()[1]')
-                    company_elements = tree.xpath('//text()[contains(., "الشركة")]/following::text()[1]')
-                    amount_elements = tree.xpath('//text()[contains(., "المبلغ")]/following::text()[1]')
-                    
-                    # This is a placeholder - actual structure may vary
-                    # when award results are available
+                # Extract award announcement date
+                # Look for "تاريخ الاعلان" or "Announcement Date"
+                date_elements = tree.xpath('//div[contains(@class, "etd-item-title") and (contains(text(), "تاريخ الاعلان") or contains(text(), "تاريخ الإعلان"))]/following-sibling::div[1]//span/text()')
+                if date_elements:
+                    date_str = html_module.unescape(date_elements[0].strip())
+                    parsed_data['award_announcement_date'] = self._parse_date_from_string(date_str)
+                
+                # Extract awarded company name
+                # Look for "اسم الشركة المرسية" or "Awarded Company"
+                company_elements = tree.xpath('//div[contains(@class, "etd-item-title") and (contains(text(), "الشركة") or contains(text(), "المورد"))]/following-sibling::div[1]//span/text()')
+                if company_elements:
+                    company_name = html_module.unescape(company_elements[0].strip())
+                    if company_name and 'لا يوجد' not in company_name:
+                        parsed_data['awarded_company_name'] = company_name
+                
+                # Extract awarded amount
+                # Look for "المبلغ" or "Amount"
+                amount_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "المبلغ")]/following-sibling::div[1]//span/text()')
+                if amount_elements:
+                    amount_str = html_module.unescape(amount_elements[0].strip())
+                    # Remove commas and currency symbols, extract number
+                    amount_str = re.sub(r'[^\d.]', '', amount_str)
+                    try:
+                        if amount_str:
+                            parsed_data['awarded_amount'] = float(amount_str)
+                    except ValueError:
+                        pass
+                
+                # Alternative: Try table structure for award results
+                # Some tenders display results in a table format
+                rows = tree.xpath('//table//tr')
+                for row in rows:
+                    cells = row.xpath('.//td//text()')
+                    if len(cells) >= 2:
+                        # Check if row contains company/amount info
+                        for i, cell in enumerate(cells):
+                            cell_text = html_module.unescape(cell.strip())
+                            if 'شركة' in cell_text or 'مؤسسة' in cell_text:
+                                # Next cell might be company name or amount
+                                if i + 1 < len(cells):
+                                    next_cell = html_module.unescape(cells[i + 1].strip())
+                                    if next_cell and 'لا يوجد' not in next_cell:
+                                        if not parsed_data.get('awarded_company_name'):
+                                            parsed_data['awarded_company_name'] = next_cell
+            else:
+                # Fallback to regex parsing
+                parsed_data.update(self._parse_award_results_regex(html_content))
                     
         except Exception as e:
             _logger.error(f"Error parsing award results HTML: {e}")
-            # Default to not announced if parsing fails
-            parsed_data['award_announced'] = False
+            # Try regex fallback
+            try:
+                parsed_data.update(self._parse_award_results_regex(html_content))
+            except:
+                parsed_data['award_announced'] = False
+        
+        return parsed_data
+    
+    def _parse_award_results_regex(self, html_content):
+        """Fallback regex parsing for award results"""
+        parsed_data = {'award_announced': True}
+        
+        try:
+            # Extract company name
+            company_match = re.search(r'(?:الشركة|المورد).*?<span>\s*([^<]+?)\s*</span>', html_content, re.DOTALL)
+            if company_match:
+                company_name = html_module.unescape(re.sub(r'<[^>]+>', '', company_match.group(1)).strip())
+                if company_name and 'لا يوجد' not in company_name:
+                    parsed_data['awarded_company_name'] = company_name
+            
+            # Extract amount
+            amount_match = re.search(r'المبلغ.*?<span>\s*([0-9,.]+)', html_content, re.DOTALL)
+            if amount_match:
+                amount_str = re.sub(r'[^\d.]', '', amount_match.group(1))
+                try:
+                    if amount_str:
+                        parsed_data['awarded_amount'] = float(amount_str)
+                except ValueError:
+                    pass
+            
+            # Extract date
+            date_match = re.search(r'تاريخ.*?(?:الإعلان|الاعلان).*?<span>\s*(\d{2}/\d{2}/\d{4})', html_content, re.DOTALL)
+            if date_match:
+                parsed_data['award_announcement_date'] = self._parse_date_from_string(date_match.group(1))
+                
+        except Exception as e:
+            _logger.error(f"Error in regex award parsing: {e}")
+        
+        return parsed_data
+    
+    def _parse_local_content_html(self, html_content):
+        """Parse HTML content from GetLocalContentDetailsViewComponenet API"""
+        parsed_data = {}
+        
+        try:
+            # Check if local content requirements exist
+            if 'لا توجد بيانات' in html_content or 'No data available' in html_content:
+                parsed_data['local_content_required'] = False
+                return parsed_data
+            
+            parsed_data['local_content_required'] = True
+            
+            if LXML_AVAILABLE:
+                tree = html.fromstring(html_content)
+                
+                # Extract minimum local content percentage
+                # Look for "نسبة المحتوى المحلي الدنيا" or "Minimum Local Content %"
+                percentage_elements = tree.xpath('//div[contains(@class, "etd-item-title") and (contains(text(), "نسبة المحتوى المحلي") or contains(text(), "المحتوى المحلي الدنيا"))]/following-sibling::div[1]//span/text()')
+                if percentage_elements:
+                    percentage_str = html_module.unescape(percentage_elements[0].strip())
+                    # Extract number from text like "30%" or "30 %" or "30"
+                    percentage_match = re.search(r'(\d+(?:\.\d+)?)', percentage_str)
+                    if percentage_match:
+                        parsed_data['local_content_percentage'] = float(percentage_match.group(1))
+                
+                # Extract local content mechanism
+                # Look for "آلية احتساب المحتوى المحلي"
+                mechanism_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "آلية احتساب")]/following-sibling::div[1]//span/text()')
+                if mechanism_elements:
+                    mechanism_text = html_module.unescape(mechanism_elements[0].strip())
+                    if mechanism_text and 'لا يوجد' not in mechanism_text:
+                        parsed_data['local_content_mechanism'] = mechanism_text
+                
+                # Extract target percentage for evaluation
+                # Look for "نسبة المحتوى المحلي المستهدفة للتقييم"
+                target_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "المستهدفة للتقييم")]/following-sibling::div[1]//span/text()')
+                if target_elements:
+                    target_str = html_module.unescape(target_elements[0].strip())
+                    target_match = re.search(r'(\d+(?:\.\d+)?)', target_str)
+                    if target_match:
+                        parsed_data['local_content_target_percentage'] = float(target_match.group(1))
+                
+                # Extract local content weight in evaluation
+                # Look for "وزن المحتوى المحلي"
+                weight_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "وزن المحتوى المحلي")]/following-sibling::div[1]//span/text()')
+                if weight_elements:
+                    weight_str = html_module.unescape(weight_elements[0].strip())
+                    weight_match = re.search(r'(\d+(?:\.\d+)?)', weight_str)
+                    if weight_match:
+                        parsed_data['local_content_baseline_weight'] = float(weight_match.group(1))
+                
+                # Extract SME (Small & Medium Enterprises) participation
+                # Look for "مشاركة المنشآت الصغيرة والمتوسطة"
+                sme_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "المنشآت الصغيرة")]/following-sibling::div[1]//span/text()')
+                if sme_elements:
+                    sme_text = html_module.unescape(sme_elements[0].strip()).lower()
+                    parsed_data['sme_participation_allowed'] = 'نعم' in sme_text or 'yes' in sme_text or 'مسموح' in sme_text
+                
+                # Extract SME price preference
+                # Look for "الأفضلية السعرية"
+                sme_preference_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "الأفضلية السعرية")]/following-sibling::div[1]//span/text()')
+                if sme_preference_elements:
+                    preference_str = html_module.unescape(sme_preference_elements[0].strip())
+                    preference_match = re.search(r'(\d+(?:\.\d+)?)', preference_str)
+                    if preference_match:
+                        parsed_data['sme_price_preference'] = float(preference_match.group(1))
+                
+                # Extract SME qualification mandatory
+                # Look for "شهادة المنشآت" or "SME Certificate"
+                sme_cert_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "شهادة المنشآت")]/following-sibling::div[1]//span/text()')
+                if sme_cert_elements:
+                    cert_text = html_module.unescape(sme_cert_elements[0].strip()).lower()
+                    parsed_data['sme_qualification_mandatory'] = 'إلزامي' in cert_text or 'mandatory' in cert_text or 'مطلوب' in cert_text
+                
+                # Collect any additional notes about local content
+                notes_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "ملاحظات")]/following-sibling::div[1]//span/text()')
+                if notes_elements:
+                    notes_text = html_module.unescape(notes_elements[0].strip())
+                    if notes_text and 'لا يوجد' not in notes_text:
+                        parsed_data['local_content_notes'] = notes_text
+            else:
+                # Fallback to regex parsing
+                parsed_data.update(self._parse_local_content_regex(html_content))
+                
+        except Exception as e:
+            _logger.error(f"Error parsing local content HTML: {e}")
+            try:
+                parsed_data.update(self._parse_local_content_regex(html_content))
+            except:
+                parsed_data['local_content_required'] = False
+        
+        return parsed_data
+    
+    def _parse_local_content_regex(self, html_content):
+        """Fallback regex parsing for local content"""
+        parsed_data = {'local_content_required': True}
+        
+        try:
+            # Extract minimum percentage
+            percentage_match = re.search(r'(?:نسبة المحتوى المحلي|المحتوى المحلي الدنيا).*?<span>\s*(\d+(?:\.\d+)?)', html_content, re.DOTALL)
+            if percentage_match:
+                parsed_data['local_content_percentage'] = float(percentage_match.group(1))
+            
+            # Extract mechanism
+            mechanism_match = re.search(r'آلية احتساب.*?<span>\s*([^<]+?)\s*</span>', html_content, re.DOTALL)
+            if mechanism_match:
+                mechanism_text = html_module.unescape(re.sub(r'<[^>]+>', '', mechanism_match.group(1)).strip())
+                if mechanism_text and 'لا يوجد' not in mechanism_text:
+                    parsed_data['local_content_mechanism'] = mechanism_text
+            
+            # Extract target percentage
+            target_match = re.search(r'المستهدفة للتقييم.*?<span>\s*(\d+(?:\.\d+)?)', html_content, re.DOTALL)
+            if target_match:
+                parsed_data['local_content_target_percentage'] = float(target_match.group(1))
+            
+            # Extract weight
+            weight_match = re.search(r'وزن المحتوى المحلي.*?<span>\s*(\d+(?:\.\d+)?)', html_content, re.DOTALL)
+            if weight_match:
+                parsed_data['local_content_baseline_weight'] = float(weight_match.group(1))
+            
+            # Extract SME participation
+            sme_match = re.search(r'المنشآت الصغيرة.*?<span>\s*([^<]+?)\s*</span>', html_content, re.DOTALL)
+            if sme_match:
+                sme_text = html_module.unescape(re.sub(r'<[^>]+>', '', sme_match.group(1)).strip()).lower()
+                parsed_data['sme_participation_allowed'] = 'نعم' in sme_text or 'yes' in sme_text
+            
+            # Extract SME price preference
+            preference_match = re.search(r'الأفضلية السعرية.*?<span>\s*(\d+(?:\.\d+)?)', html_content, re.DOTALL)
+            if preference_match:
+                parsed_data['sme_price_preference'] = float(preference_match.group(1))
+            
+            # Extract SME mandatory
+            cert_match = re.search(r'شهادة المنشآت.*?<span>\s*([^<]+?)\s*</span>', html_content, re.DOTALL)
+            if cert_match:
+                cert_text = html_module.unescape(re.sub(r'<[^>]+>', '', cert_match.group(1)).strip()).lower()
+                parsed_data['sme_qualification_mandatory'] = 'إلزامي' in cert_text or 'مطلوب' in cert_text
+                
+        except Exception as e:
+            _logger.error(f"Error in regex local content parsing: {e}")
         
         return parsed_data
     
