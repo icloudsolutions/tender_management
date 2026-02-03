@@ -175,12 +175,10 @@
                             <field name="opportunity_count" widget="statinfo" string="Opportunity"/>
                         </button>
                         
-                        <!-- Deadline Indicator with Extension Alert -->
+                        <!-- Deadline Indicator -->
                         <button class="oe_stat_button" 
                                 icon="fa-clock-o" 
-                                title="Days until deadline"
-                                t-attf-style="{{deadline_extended and 'background-color: #d4edda; border-color: #c3e6cb;' or ''}}">
-                            <field name="deadline_extended" invisible="1"/>
+                                title="Days until deadline">
                             <field name="remaining_days" widget="statinfo" string="Days Left"/>
                         </button>
                         
@@ -188,8 +186,7 @@
                         <button class="oe_stat_button" 
                                 icon="fa-refresh" 
                                 title="Deadline Extensions"
-                                invisible="deadline_extensions_count == 0"
-                                style="background-color: #d4edda; border-color: #c3e6cb; color: #155724;">
+                                invisible="deadline_extensions_count == 0">
                             <field name="deadline_extensions_count" widget="statinfo" string="Extensions"/>
                         </button>
                         
