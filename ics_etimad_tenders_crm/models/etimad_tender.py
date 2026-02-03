@@ -1047,17 +1047,16 @@ class EtimadTender(models.Model):
             # Update tender with all fetched data
             if update_vals:
                 self.write(update_vals)
-                self.message_post(
-                    body=_('Detailed information fetched from {} Etimad API endpoint(s).').format(fetched_count),
-                    subject=_('Details Updated')
-                )
+                msg = _('Detailed information fetched from {} Etimad API endpoint(s).').format(fetched_count)
+                self.message_post(body=msg, subject=_('Details Updated'))
                 
+                success_msg = _('Detailed information has been fetched and updated from {} endpoint(s).').format(fetched_count)
                 return {
                     'type': 'ir.actions.client',
                     'tag': 'display_notification',
                     'params': {
                         'title': _('Success'),
-                        'message': _('Detailed information has been fetched and updated from {} endpoint(s).').format(fetched_count),
+                        'message': success_msg,
                         'type': 'success',
                         'sticky': False,
                     }
