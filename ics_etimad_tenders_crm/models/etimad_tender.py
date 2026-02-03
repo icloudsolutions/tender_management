@@ -216,10 +216,8 @@ class EtimadTender(models.Model):
 
     # ========== COMPUTED FIELDS ==========
     
-    is_urgent = fields.Boolean("Urgent", compute='_compute_is_urgent', store=True,
-                                help="Auto-set when remaining days < 3")
-    is_hot_tender = fields.Boolean("Hot Tender", compute='_compute_is_hot_tender', store=True,
-                                    help="High-value tender with approaching deadline")
+    is_urgent = fields.Boolean("Urgent", compute='_compute_is_urgent', store=True)
+    is_hot_tender = fields.Boolean("Hot Tender", compute='_compute_is_hot_tender', store=True)
     estimated_value_category = fields.Selection([
         ('small', 'Small (< 100K SAR)'),
         ('medium', 'Medium (100K-1M SAR)'),
