@@ -238,6 +238,31 @@ class EtimadTender(models.Model):
                                    compute='_compute_matching_score', store=True)
     matching_reasons = fields.Text("Matching Reasons", compute='_compute_matching_score', store=True)
     
+    # ========== CHANGE TRACKING (Etimad Updates) ==========
+    # Track previous values to detect changes from Etimad
+    previous_offers_deadline = fields.Datetime("Previous Offers Deadline", readonly=True,
+        help="Previous deadline before last update from Etimad")
+    previous_last_enquiry_date = fields.Datetime("Previous Enquiry Deadline", readonly=True,
+        help="Previous enquiry deadline before last update from Etimad")
+    previous_estimated_amount = fields.Monetary("Previous Estimated Amount", currency_field='currency_id', readonly=True,
+        help="Previous estimated amount before last update from Etimad")
+    
+    # Deadline extension tracking
+    deadline_extended = fields.Boolean("Deadline Extended", default=False, readonly=True,
+        help="True if offers deadline was extended since first scrape")
+    deadline_extensions_count = fields.Integer("Extension Count", default=0, readonly=True,
+        help="Number of times the deadline has been extended")
+    last_deadline_extension_date = fields.Datetime("Last Extension Date", readonly=True,
+        help="When the last deadline extension was detected")
+    
+    # Change log summary
+    has_etimad_updates = fields.Boolean("Has Etimad Updates", default=False, readonly=True,
+        help="True if tender has been updated from Etimad after initial creation")
+    last_significant_change = fields.Text("Last Significant Change", readonly=True,
+        help="Summary of last significant change from Etimad")
+    change_notification_sent = fields.Boolean("Change Notification Sent", default=False,
+        help="Whether users have been notified of the last change")
+    
     @api.depends('remaining_days')
     def _compute_is_urgent(self):
         """Mark tender as urgent if deadline is very close"""
@@ -538,10 +563,14 @@ class EtimadTender(models.Model):
         return self.fetch_etimad_tenders(page_size=50, page_number=1, max_pages=3)
 
     def _process_tender_data(self, raw_data):
-        """Process and create/update tender record with improved error tracking"""
+        """Process and create/update tender record with change detection and notifications"""
         
         try:
             # Map the raw data to Odoo fields
+            new_offers_deadline = self._parse_date(raw_data.get('lastOfferPresentationDate'))
+            new_enquiry_deadline = self._parse_date(raw_data.get('lastEnqueriesDate'))
+            new_estimated_amount = float(raw_data.get('estimatedAmount', 0) or 0)
+            
             vals = {
                 'name': raw_data.get('tenderName', 'Unnamed Tender'),
                 'reference_number': raw_data.get('referenceNumber'),
@@ -553,11 +582,12 @@ class EtimadTender(models.Model):
                 'tender_type': raw_data.get('tenderTypeName'),
                 'activity_name': raw_data.get('tenderActivityName'),
                 'activity_id': raw_data.get('tenderActivityId'),
-                'last_enquiry_date': self._parse_date(raw_data.get('lastEnqueriesDate')),
-                'offers_deadline': self._parse_date(raw_data.get('lastOfferPresentationDate')),
+                'last_enquiry_date': new_enquiry_deadline,
+                'offers_deadline': new_offers_deadline,
                 'submission_date': self._parse_date(raw_data.get('submitionDate')),
                 'invitation_cost': float(raw_data.get('invitationCost', 0) or 0),
                 'financial_fees': float(raw_data.get('financialFees', 0) or 0),
+                'estimated_amount': new_estimated_amount,
                 'tender_status_id': raw_data.get('tenderStatusId'),
                 'last_enquiry_date_hijri': raw_data.get('lastEnqueriesDateHijri'),
                 'last_offer_date_hijri': raw_data.get('lastOfferPresentationDateHijri'),
@@ -587,10 +617,64 @@ class EtimadTender(models.Model):
             ], limit=1)
             
             if existing:
-                existing.write(vals)
-                _logger.info(f"Updated tender: {vals['name'][:50]}")
+                # CHANGE DETECTION - Track what changed from Etimad
+                changes = []
+                
+                # Check deadline extension
+                if new_offers_deadline and existing.offers_deadline:
+                    if new_offers_deadline > existing.offers_deadline:
+                        days_extended = (new_offers_deadline - existing.offers_deadline).days
+                        changes.append(f"⏰ Offers deadline EXTENDED by {days_extended} days (new: {new_offers_deadline.strftime('%Y-%m-%d %H:%M')})")
+                        vals['previous_offers_deadline'] = existing.offers_deadline
+                        vals['deadline_extended'] = True
+                        vals['deadline_extensions_count'] = existing.deadline_extensions_count + 1
+                        vals['last_deadline_extension_date'] = fields.Datetime.now()
+                    elif new_offers_deadline < existing.offers_deadline:
+                        days_reduced = (existing.offers_deadline - new_offers_deadline).days
+                        changes.append(f"⚠️ Offers deadline REDUCED by {days_reduced} days (new: {new_offers_deadline.strftime('%Y-%m-%d %H:%M')})")
+                        vals['previous_offers_deadline'] = existing.offers_deadline
+                
+                # Check enquiry deadline changes
+                if new_enquiry_deadline and existing.last_enquiry_date:
+                    if new_enquiry_deadline != existing.last_enquiry_date:
+                        changes.append(f"📝 Enquiry deadline changed to {new_enquiry_deadline.strftime('%Y-%m-%d %H:%M')}")
+                        vals['previous_last_enquiry_date'] = existing.last_enquiry_date
+                
+                # Check estimated amount changes
+                if new_estimated_amount and existing.estimated_amount:
+                    if abs(new_estimated_amount - existing.estimated_amount) > 1000:  # Significant if > 1000 SAR
+                        change_pct = ((new_estimated_amount - existing.estimated_amount) / existing.estimated_amount) * 100
+                        changes.append(f"💰 Estimated amount changed: {existing.estimated_amount:,.0f} → {new_estimated_amount:,.0f} SAR ({change_pct:+.1f}%)")
+                        vals['previous_estimated_amount'] = existing.estimated_amount
+                
+                # Update record with change tracking
+                if changes:
+                    vals['has_etimad_updates'] = True
+                    vals['last_significant_change'] = '\n'.join(changes)
+                    vals['change_notification_sent'] = False  # Reset so users can be notified
+                    
+                    # Post to chatter
+                    existing.sudo().write(vals)
+                    existing.message_post(
+                        body=f"<strong>🔄 Etimad Tender Updated</strong><br/><br/>{'<br/>'.join(changes)}",
+                        subject='Etimad Update Detected',
+                        message_type='notification',
+                        subtype_xmlid='mail.mt_note',
+                    )
+                    
+                    # Create activity for deadline extension (important!)
+                    if 'deadline_extended' in vals and vals['deadline_extended']:
+                        existing._create_deadline_extension_activity(vals.get('previous_offers_deadline'), new_offers_deadline)
+                    
+                    _logger.info(f"Updated tender with changes: {vals['name'][:50]}")
+                else:
+                    # No significant changes, just update scraping metadata
+                    existing.write(vals)
+                    _logger.info(f"Updated tender (no significant changes): {vals['name'][:50]}")
+                
                 return False
             else:
+                # New tender
                 self.create(vals)
                 _logger.info(f"Created tender: {vals['name'][:50]}")
                 return True
@@ -609,6 +693,34 @@ class EtimadTender(models.Model):
                         'last_scraped_at': fields.Datetime.now(),
                     })
             raise
+    
+    def _create_deadline_extension_activity(self, old_deadline, new_deadline):
+        """Create activity to alert users about deadline extension"""
+        self.ensure_one()
+        days_extended = (new_deadline - old_deadline).days
+        
+        # Create activity for responsible user or tender team
+        activity_user = self.env.user
+        if self.opportunity_id and self.opportunity_id.user_id:
+            activity_user = self.opportunity_id.user_id
+        
+        self.activity_schedule(
+            'mail.mail_activity_data_todo',
+            summary=f'Deadline Extended: {self.name[:50]}',
+            note=f'''
+                <p><strong>Good News! The tender deadline has been extended.</strong></p>
+                <ul>
+                    <li><strong>Tender:</strong> {self.name}</li>
+                    <li><strong>Agency:</strong> {self.agency_name}</li>
+                    <li><strong>Previous Deadline:</strong> {old_deadline.strftime("%Y-%m-%d %H:%M")}</li>
+                    <li><strong>New Deadline:</strong> {new_deadline.strftime("%Y-%m-%d %H:%M")}</li>
+                    <li><strong>Extended by:</strong> {days_extended} days</li>
+                </ul>
+                <p>You now have more time to prepare your quotation.</p>
+                <p><a href="/web#id={self.id}&model=ics.etimad.tender">View Tender</a></p>
+            ''',
+            user_id=activity_user.id,
+        )
     
     def _parse_contract_duration(self, duration_text):
         """Parse contract duration text to extract days (e.g., '10 يوم' -> 10)"""
