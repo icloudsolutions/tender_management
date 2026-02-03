@@ -925,9 +925,8 @@ class EtimadTender(models.Model):
             self.message_post(body=_('⬜ Unmarked as participating'))
     
     def action_fetch_detailed_info(self):
-        """Fetch detailed tender information from all Etimad API endpoints"""
+        # Fetch detailed tender information from all Etimad API endpoints
         self.ensure_one()
-        
         if not self.tender_id_string:
             raise UserError(_('Tender ID String is required to fetch detailed information.'))
         
