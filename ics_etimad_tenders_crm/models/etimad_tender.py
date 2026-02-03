@@ -99,11 +99,11 @@ class EtimadTender(models.Model):
     # Document Cost
     document_cost_type = fields.Selection([('free', 'Free'), ('paid', 'Paid')], string="Document Cost Type")
     document_cost_amount = fields.Monetary("Document Cost Amount", currency_field='currency_id')
-    
+
     # Tender Status Details
     tender_status_text = fields.Char("Tender Status Text")
     tender_status_approved = fields.Boolean("Tender Approved", compute='_compute_tender_status_approved', store=True)
-    
+
     # Submission Method
     submission_method = fields.Selection([('single_file', 'Single File'), ('separate_files', 'Separate Files'), ('electronic', 'Electronic'), ('manual', 'Manual')], string="Submission Method")
     
@@ -121,26 +121,28 @@ class EtimadTender(models.Model):
     execution_location_type = fields.Selection([('inside_kingdom', 'Inside Kingdom'), ('outside_kingdom', 'Outside Kingdom'), ('both', 'Both')], string="Execution Location Type")
     execution_regions = fields.Text("Execution Regions")
     execution_cities = fields.Text("Execution Cities")
-    
+
     # Classification and Activities
     classification_field = fields.Char("Classification Field")
     classification_required = fields.Boolean("Classification Required")
     activity_details = fields.Text("Activity Details")
-    
+
     # Work Types
     includes_supply_items = fields.Boolean("Includes Supply Items")
     construction_works = fields.Text("Construction Works")
     maintenance_works = fields.Text("Maintenance and Operation Works")
-    
+
     # Award Information
     award_announced = fields.Boolean("Award Announced", default=False)
     award_announcement_date = fields.Date("Award Announcement Date")
     awarded_company_name = fields.Char("Awarded Company Name")
     awarded_amount = fields.Monetary("Awarded Amount", currency_field='currency_id')
 
+    # Agency and Type
     agency_code = fields.Char("Agency Code")
     tender_type_id = fields.Integer("Tender Type ID")
 
+    # Local Content and SME
     local_content_required = fields.Boolean("Local Content Required")
     local_content_percentage = fields.Float("Local Content Pct")
     local_content_mechanism = fields.Char("Local Content Mechanism")
