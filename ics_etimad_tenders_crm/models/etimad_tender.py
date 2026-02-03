@@ -1062,12 +1062,14 @@ class EtimadTender(models.Model):
                     }
                 }
             else:
+                no_update_title = _('No Updates')
+                no_update_msg = _('No new information found to update.')
                 return {
                     'type': 'ir.actions.client',
                     'tag': 'display_notification',
                     'params': {
-                        'title': _('No Updates'),
-                        'message': _('No new information found to update.'),
+                        'title': no_update_title,
+                        'message': no_update_msg,
                         'type': 'info',
                         'sticky': False,
                     }
@@ -1075,7 +1077,8 @@ class EtimadTender(models.Model):
                 
         except Exception as e:
             _logger.error(f"Error fetching detailed info: {e}")
-            raise UserError(_('Error fetching detailed information: %s') % str(e))
+            error_msg = _('Error fetching detailed information: {}').format(str(e))
+            raise UserError(error_msg)
     
     def _parse_relations_details_html(self, html_content):
         """Parse HTML content from GetRelationsDetailsViewComponenet API"""
