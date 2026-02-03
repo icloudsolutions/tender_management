@@ -105,7 +105,12 @@ class EtimadTender(models.Model):
     tender_status_approved = fields.Boolean("Tender Approved", compute='_compute_tender_status_approved', store=True)
 
     # Submission Method
-    submission_method = fields.Selection([('single_file', 'Single File'), ('separate_files', 'Separate Files'), ('electronic', 'Electronic'), ('manual', 'Manual')], string="Submission Method")
+    submission_method = fields.Selection([
+        ('single_file', 'Single File'),
+        ('separate_files', 'Separate Files'),
+        ('electronic', 'Electronic'),
+        ('manual', 'Manual')
+    ], string="Submission Method")
     
     # Additional Dates
     offer_opening_date = fields.Datetime("Offer Opening Date")
@@ -118,7 +123,11 @@ class EtimadTender(models.Model):
     
     # Location Information
     opening_location = fields.Char("Opening Location")
-    execution_location_type = fields.Selection([('inside_kingdom', 'Inside Kingdom'), ('outside_kingdom', 'Outside Kingdom'), ('both', 'Both')], string="Execution Location Type")
+    execution_location_type = fields.Selection([
+        ('inside_kingdom', 'Inside Kingdom'),
+        ('outside_kingdom', 'Outside Kingdom'),
+        ('both', 'Both')
+    ], string="Execution Location Type")
     execution_regions = fields.Text("Execution Regions")
     execution_cities = fields.Text("Execution Cities")
 
@@ -206,13 +215,23 @@ class EtimadTender(models.Model):
     
     is_urgent = fields.Boolean("Urgent", compute='_compute_is_urgent', store=True)
     is_hot_tender = fields.Boolean("Hot Tender", compute='_compute_is_hot_tender', store=True)
-    estimated_value_category = fields.Selection([('small', 'Small'), ('medium', 'Medium'), ('large', 'Large'), ('mega', 'Mega')], string="Value Category", compute='_compute_estimated_value_category', store=True)
+    estimated_value_category = fields.Selection([
+        ('small', 'Small'),
+        ('medium', 'Medium'),
+        ('large', 'Large'),
+        ('mega', 'Mega')
+    ], string="Value Category", compute='_compute_estimated_value_category', store=True)
     
     # Scraping metadata
     last_scraped_at = fields.Datetime("Last Scraped At", readonly=True)
     scraping_error_count = fields.Integer("Scraping Errors", default=0, readonly=True)
     last_scraping_error = fields.Text("Last Scraping Error", readonly=True)
-    scraping_status = fields.Selection([('success', 'Success'), ('partial', 'Partial'), ('failed', 'Failed'), ('pending', 'Pending')], string="Scraping Status", default='pending', readonly=True)
+    scraping_status = fields.Selection([
+        ('success', 'Success'),
+        ('partial', 'Partial'),
+        ('failed', 'Failed'),
+        ('pending', 'Pending')
+    ], string="Scraping Status", default='pending', readonly=True)
     
     # Matching and scoring
     matching_score = fields.Float("Matching Score", compute='_compute_matching_score', store=True)
