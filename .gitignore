@@ -1,2 +1,5 @@
 node_modules/
 .env
+# Deploy SSH key (generated for GitHub Actions; never commit)
+deploy_key
+deploy_key.pub
