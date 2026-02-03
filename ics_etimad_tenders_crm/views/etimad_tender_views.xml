@@ -186,11 +186,6 @@
                             invisible="not is_favorite"/>
                     
                     <widget name="web_ribbon" 
-                            title="✓ Won" 
-                            bg_color="bg-success" 
-                            invisible="state != 'won'"/>
-                    
-                    <widget name="web_ribbon" 
                             title="⚠ Urgent" 
                             bg_color="bg-danger" 
                             invisible="remaining_days &gt; 3 or remaining_days &lt;= 0"/>
@@ -376,9 +371,9 @@
                                     <field name="tender_url" readonly="1" widget="url"/>
                                 </group>
                                 <group string="Status Information">
-                                    <field name="state" readonly="1"/>
                                     <field name="tender_status_text"/>
                                     <field name="tender_status_approved" readonly="1"/>
+                                    <field name="is_participating" readonly="1"/>
                                     <field name="is_favorite" readonly="1"/>
                                     <field name="remaining_days" readonly="1"/>
                                 </group>
@@ -518,7 +513,7 @@
         <field name="name">etimad.tender.kanban</field>
         <field name="model">ics.etimad.tender</field>
         <field name="arch" type="xml">
-            <kanban class="o_kanban_mobile o_etimad_kanban" default_group_by="state">
+            <kanban class="o_kanban_mobile o_etimad_kanban" default_group_by="tender_type">
                 <header>
                     <button name="%(action_server_fetch_etimad_tenders)d" 
                             string="🔄 Fetch Latest" 
@@ -539,7 +534,8 @@
                 <field name="total_fees"/>
                 <field name="remaining_days"/>
                 <field name="offers_deadline"/>
-                <field name="state"/>
+                <field name="tender_status_text"/>
+                <field name="is_participating"/>
                 <field name="is_favorite"/>
                 <field name="is_urgent"/>
                 <field name="is_hot_tender"/>
