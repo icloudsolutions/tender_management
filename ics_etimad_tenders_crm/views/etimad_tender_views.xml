@@ -45,6 +45,7 @@
                 <field name="total_fees" widget="monetary" options="{'currency_field': 'currency_id'}" optional="hide" string="Total Fees"/>
                 <field name="tender_status_text" optional="show" string="Etimad Status" widget="badge"/>
                 <field name="is_participating" widget="boolean" optional="show" string="👥 Participating"/>
+                <field name="award_announced" widget="boolean" optional="hide" string="🏆 Awarded"/>
                 <field name="opportunity_id" optional="show" string="Opportunity"/>
                 <field name="deadline_extended" widget="boolean" optional="show" string="🔄 Extended"/>
                 <field name="scraping_status" widget="badge" optional="hide" string="Data Status"

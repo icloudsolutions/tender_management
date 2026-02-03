@@ -1438,7 +1438,22 @@ class EtimadTender(models.Model):
         
         try:
             # Check if award has been announced
-            if 'لم يتم اعلان نتائج الترسية بعد' in html_content or 'Award results have not been announced yet' in html_content:
+            # Multiple variations of "no award yet" message
+            no_award_phrases = [
+                'لم يتم اعلان نتائج الترسية بعد',
+                'لم يتم الإعلان عن نتائج الترسية',
+                'لم يتم',  # Partial match
+                'Award results have not been announced yet',
+                'No award results',
+                'لا توجد نتائج',  # No results
+                'لا يوجد'  # Does not exist
+            ]
+            
+            # Check for any "no award" indicator
+            has_no_award_message = any(phrase in html_content for phrase in no_award_phrases)
+            
+            # Additional check: if HTML is very short, likely means no data
+            if len(html_content.strip()) < 100 or has_no_award_message:
                 parsed_data['award_announced'] = False
                 return parsed_data
             
@@ -1495,6 +1510,16 @@ class EtimadTender(models.Model):
             else:
                 # Fallback to regex parsing
                 parsed_data.update(self._parse_award_results_regex(html_content))
+            
+            # Final check: If award_announced is True but no actual data extracted, set to False
+            if parsed_data.get('award_announced') and not any([
+                parsed_data.get('award_announcement_date'),
+                parsed_data.get('awarded_company_name'),
+                parsed_data.get('awarded_amount')
+            ]):
+                # Announced but no data found - probably false positive
+                _logger.warning("Award announced flag set but no award data extracted - likely no award yet")
+                parsed_data['award_announced'] = False
                     
         except Exception as e:
             _logger.error(f"Error parsing award results HTML: {e}")
