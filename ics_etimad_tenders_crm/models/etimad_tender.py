@@ -96,26 +96,11 @@ class EtimadTender(models.Model):
     final_guarantee_percentage = fields.Float("Final Guarantee Pct")
     final_guarantee_required = fields.Boolean("Final Guarantee Required", compute='_compute_final_guarantee_required', store=True)
     
-    # Document Cost
-    document_cost_type = fields.Selection([
-        ('free', 'Free'),
-        ('paid', 'Paid')
-    ], string="Document Cost Type")
+    document_cost_type = fields.Selection([('free', 'Free'), ('paid', 'Paid')], string="Document Cost Type")
     document_cost_amount = fields.Monetary("Document Cost Amount", currency_field='currency_id')
-
-    # Tender Status Details
     tender_status_text = fields.Char("Tender Status Text")
     tender_status_approved = fields.Boolean("Tender Approved", compute='_compute_tender_status_approved', store=True)
-
-    # Submission Method
-    submission_method = fields.Selection([
-        ('single_file', 'Single File'),
-        ('separate_files', 'Separate Files'),
-        ('electronic', 'Electronic'),
-        ('manual', 'Manual')
-    ], string="Submission Method")
-    
-    # Additional Dates
+    submission_method = fields.Selection([('single_file', 'Single File'), ('separate_files', 'Separate Files'), ('electronic', 'Electronic'), ('manual', 'Manual')], string="Submission Method")
     offer_opening_date = fields.Datetime("Offer Opening Date")
     offer_examination_date = fields.Datetime("Offer Examination Date")
     expected_award_date = fields.Date("Expected Award Date")
@@ -123,38 +108,22 @@ class EtimadTender(models.Model):
     inquiry_start_date = fields.Date("Inquiry Start Date")
     max_inquiry_response_days = fields.Integer("Max Inquiry Response Days")
     suspension_period_days = fields.Integer("Suspension Period (Days)")
-    
-    # Location Information
     opening_location = fields.Char("Opening Location")
-    execution_location_type = fields.Selection([
-        ('inside_kingdom', 'Inside Kingdom'),
-        ('outside_kingdom', 'Outside Kingdom'),
-        ('both', 'Both')
-    ], string="Execution Location Type")
+    execution_location_type = fields.Selection([('inside_kingdom', 'Inside Kingdom'), ('outside_kingdom', 'Outside Kingdom'), ('both', 'Both')], string="Execution Location Type")
     execution_regions = fields.Text("Execution Regions")
     execution_cities = fields.Text("Execution Cities")
-
-    # Classification and Activities
     classification_field = fields.Char("Classification Field")
     classification_required = fields.Boolean("Classification Required")
     activity_details = fields.Text("Activity Details")
-
-    # Work Types
     includes_supply_items = fields.Boolean("Includes Supply Items")
     construction_works = fields.Text("Construction Works")
     maintenance_works = fields.Text("Maintenance and Operation Works")
-
-    # Award Information
     award_announced = fields.Boolean("Award Announced", default=False)
     award_announcement_date = fields.Date("Award Announcement Date")
     awarded_company_name = fields.Char("Awarded Company Name")
     awarded_amount = fields.Monetary("Awarded Amount", currency_field='currency_id')
-
-    # Agency and Type
     agency_code = fields.Char("Agency Code")
     tender_type_id = fields.Integer("Tender Type ID")
-
-    # Local Content and SME
     local_content_required = fields.Boolean("Local Content Required")
     local_content_percentage = fields.Float("Local Content Pct")
     local_content_mechanism = fields.Char("Local Content Mechanism")
@@ -214,41 +183,21 @@ class EtimadTender(models.Model):
         for record in self:
             record.opportunity_count = 1 if record.opportunity_id else 0
 
-    # ========== COMPUTED FIELDS ==========
-    
     is_urgent = fields.Boolean("Urgent", compute='_compute_is_urgent', store=True)
     is_hot_tender = fields.Boolean("Hot Tender", compute='_compute_is_hot_tender', store=True)
-    estimated_value_category = fields.Selection([
-        ('small', 'Small'),
-        ('medium', 'Medium'),
-        ('large', 'Large'),
-        ('mega', 'Mega')
-    ], string="Value Category", compute='_compute_estimated_value_category', store=True)
-    
-    # Scraping metadata
+    estimated_value_category = fields.Selection([('small', 'Small'), ('medium', 'Medium'), ('large', 'Large'), ('mega', 'Mega')], string="Value Category", compute='_compute_estimated_value_category', store=True)
     last_scraped_at = fields.Datetime("Last Scraped At", readonly=True)
     scraping_error_count = fields.Integer("Scraping Errors", default=0, readonly=True)
     last_scraping_error = fields.Text("Last Scraping Error", readonly=True)
-    scraping_status = fields.Selection([
-        ('success', 'Success'),
-        ('partial', 'Partial'),
-        ('failed', 'Failed'),
-        ('pending', 'Pending')
-    ], string="Scraping Status", default='pending', readonly=True)
-    
-    # Matching and scoring
+    scraping_status = fields.Selection([('success', 'Success'), ('partial', 'Partial'), ('failed', 'Failed'), ('pending', 'Pending')], string="Scraping Status", default='pending', readonly=True)
     matching_score = fields.Float("Matching Score", compute='_compute_matching_score', store=True)
     matching_reasons = fields.Text("Matching Reasons", compute='_compute_matching_score', store=True)
     previous_offers_deadline = fields.Datetime("Previous Offers Deadline", readonly=True)
     previous_last_enquiry_date = fields.Datetime("Previous Enquiry Deadline", readonly=True)
     previous_estimated_amount = fields.Monetary("Previous Estimated Amount", currency_field='currency_id', readonly=True)
-    
-    # Deadline extension tracking
     deadline_extended = fields.Boolean("Deadline Extended", default=False, readonly=True)
     deadline_extensions_count = fields.Integer("Extension Count", default=0, readonly=True)
     last_deadline_extension_date = fields.Datetime("Last Extension Date", readonly=True)
-    
-    # Change log summary
     has_etimad_updates = fields.Boolean("Has Etimad Updates", default=False, readonly=True)
     last_significant_change = fields.Text("Last Significant Change", readonly=True)
     change_notification_sent = fields.Boolean("Change Notification Sent", default=False)
