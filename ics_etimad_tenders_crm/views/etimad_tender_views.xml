@@ -13,6 +13,19 @@
                   decoration-bf="is_favorite"
                   multi_edit="1">
                 
+                <header>
+                    <button name="%(action_server_fetch_etimad_tenders)d" 
+                            string="🔄 Fetch Latest (50)" 
+                            type="action" 
+                            class="btn-primary"
+                            title="Fetch latest 50 tenders from Etimad portal"/>
+                    <button name="%(action_server_fetch_batch_etimad_tenders)d" 
+                            string="🔄 Fetch Batch (150)" 
+                            type="action" 
+                            class="btn-secondary"
+                            title="Fetch 150 tenders (3 pages) from Etimad portal"/>
+                </header>
+                
                 <field name="is_favorite" widget="boolean_favorite" nolabel="1"/>
                 <field name="reference_number" string="المرجع | Reference"/>
                 <field name="name" string="اسم المنافسة | Tender Name"/>
@@ -534,6 +547,16 @@
         <field name="model">ics.etimad.tender</field>
         <field name="arch" type="xml">
             <kanban class="o_kanban_mobile o_etimad_kanban" default_group_by="state">
+                <header>
+                    <button name="%(action_server_fetch_etimad_tenders)d" 
+                            string="🔄 Fetch Latest" 
+                            type="action" 
+                            class="btn-primary"/>
+                    <button name="%(action_server_fetch_batch_etimad_tenders)d" 
+                            string="🔄 Fetch Batch" 
+                            type="action" 
+                            class="btn-secondary"/>
+                </header>
                 <field name="name"/>
                 <field name="reference_number"/>
                 <field name="agency_name"/>

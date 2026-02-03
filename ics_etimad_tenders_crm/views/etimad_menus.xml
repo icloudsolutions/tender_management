@@ -89,6 +89,35 @@
               sequence="40"/>
 
     <!-- ========================================================= -->
+    <!-- 🔄 SYNC ACTIONS -->
+    <!-- ========================================================= -->
+    <record id="action_fetch_etimad_tenders_menu" model="ir.actions.server">
+        <field name="name">🔄 Fetch Latest Tenders (50)</field>
+        <field name="model_id" ref="model_ics_etimad_tender"/>
+        <field name="state">code</field>
+        <field name="code">action = model.fetch_etimad_tenders(page_size=50, page_number=1)</field>
+    </record>
+
+    <menuitem id="menu_fetch_latest_tenders"
+              name="🔄 Fetch Latest Tenders"
+              parent="menu_etimad_root"
+              action="action_fetch_etimad_tenders_menu"
+              sequence="15"/>
+
+    <record id="action_fetch_batch_etimad_tenders_menu" model="ir.actions.server">
+        <field name="name">🔄 Fetch Batch (150 Tenders)</field>
+        <field name="model_id" ref="model_ics_etimad_tender"/>
+        <field name="state">code</field>
+        <field name="code">action = model.action_fetch_batch()</field>
+    </record>
+
+    <menuitem id="menu_fetch_batch_tenders"
+              name="🔄 Fetch Batch (150)"
+              parent="menu_etimad_root"
+              action="action_fetch_batch_etimad_tenders_menu"
+              sequence="16"/>
+
+    <!-- ========================================================= -->
     <!-- ⚙️ CONFIGURATION -->
     <!-- ========================================================= -->
     <!-- ⚙️ CONFIGURATION -->
