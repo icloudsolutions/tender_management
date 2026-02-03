@@ -97,7 +97,10 @@ class EtimadTender(models.Model):
     final_guarantee_required = fields.Boolean("Final Guarantee Required", compute='_compute_final_guarantee_required', store=True)
     
     # Document Cost
-    document_cost_type = fields.Selection([('free', 'Free'), ('paid', 'Paid')], string="Document Cost Type")
+    document_cost_type = fields.Selection([
+        ('free', 'Free'),
+        ('paid', 'Paid')
+    ], string="Document Cost Type")
     document_cost_amount = fields.Monetary("Document Cost Amount", currency_field='currency_id')
 
     # Tender Status Details
