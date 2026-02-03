@@ -328,15 +328,6 @@ class EtimadTender(models.Model):
                 if agencies_list and any(pref in agency_lower or agency_lower in pref for pref in agencies_list):
                     score += 15
                     reasons.append(f'Agency "{record.agency_name}" is in preferred list')
-                else:
-                    # Check historical wins
-                    won_count = self.search_count([
-                        ('agency_name', '=', record.agency_name),
-                        ('state', '=', 'won')
-                    ])
-                    if won_count > 0:
-                        score += 15
-                        reasons.append(f'Previous wins with {record.agency_name}')
             
             # Deadline availability (15 points)
             if record.remaining_days >= min_prep_days:
