@@ -93,3 +93,16 @@ ssh user@38.242.237.64 "cd /root/libya/dev-18 && docker compose restart odoo18"
 ```
 
 Replace `user` with your SSH user (e.g. `root`).
+
+## Troubleshooting
+
+### KeyError: 'ics.tender'
+
+If Odoo shows `KeyError: 'ics.tender'` when loading the web client, the database has mail activities pointing to the tender model but the **ics_tender_management** module is not loaded (not installed or addons path missing).
+
+- **Fix 1 (recommended):** Ensure addons are mounted and install/upgrade **ICS Tender Management** (and **ICS Etimad Tenders CRM**) in Apps. Restart Odoo after deploy so the modules load.
+- **Fix 2 (orphan data):** If this DB was used before without these modules, remove orphan activities. On the server, run:
+  ```bash
+  docker compose exec -T db psql -U odoo -d YOUR_DATABASE_NAME -f - < fix_orphan_ics_tender_activities.sql
+  ```
+  Or execute the SQL in `deploy/fix_orphan_ics_tender_activities.sql` against your database (replace `YOUR_DATABASE_NAME` with the real DB name).

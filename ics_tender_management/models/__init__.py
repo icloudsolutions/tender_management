@@ -1,5 +1,6 @@
 from . import tender_stage
 from . import tender
+from . import etimad_tender
 from . import tender_boq
 from . import tender_dashboard
 from . import tender_team

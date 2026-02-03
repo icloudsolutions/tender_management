@@ -166,6 +166,7 @@
         'views/tender_views.xml',
         'views/tender_boq_views.xml',
         'views/crm_lead_views.xml',
+        'views/etimad_tender_views.xml',
         'views/purchase_requisition_views.xml',
         'views/sale_order_views.xml',
         'wizard/vendor_comparison_wizard_views.xml',

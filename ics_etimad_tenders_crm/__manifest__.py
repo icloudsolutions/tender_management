@@ -52,7 +52,6 @@
         "base",
         "mail",
         "web",
-        "ics_tender_management",  # Required for tender_id_ics field
     ],
     "data": [
         "security/ir.model.access.csv",

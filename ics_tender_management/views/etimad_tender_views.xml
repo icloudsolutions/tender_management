@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Add ICS Tender field and "Create Tender Directly" to Etimad views (when ics_tender_management is installed) -->
+
+    <record id="view_etimad_tender_list_tender_ics" model="ir.ui.view">
+        <field name="name">etimad.tender.list.tender.ics</field>
+        <field name="model">ics.etimad.tender</field>
+        <field name="inherit_id" ref="ics_etimad_tenders_crm.view_etimad_tender_list"/>
+        <field name="arch" type="xml">
+            <field name="opportunity_id" position="after">
+                <field name="tender_id_ics" optional="hide" string="ICS Tender"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_etimad_tender_form_tender_ics" model="ir.ui.view">
+        <field name="name">etimad.tender.form.tender.ics</field>
+        <field name="model">ics.etimad.tender</field>
+        <field name="inherit_id" ref="ics_etimad_tenders_crm.view_etimad_tender_form"/>
+        <field name="arch" type="xml">
+            <group name="crm_info" position="after">
+                <group string="🎯 Direct Tender Integration" name="tender_ics_group" invisible="not context.get('show_tender_integration', True)">
+                    <field name="tender_id_ics"
+                           string="Linked ICS Tender"
+                           options="{'no_create': True}"
+                           readonly="1"/>
+                    <div invisible="not tender_id_ics" class="alert alert-success mt-2">
+                        <i class="fa fa-check-circle"/> This tender is linked directly to ICS Tender Management
+                    </div>
+                    <div invisible="tender_id_ics" class="alert alert-info mt-2">
+                        <i class="fa fa-lightbulb-o"/> Click "Create Tender Directly" to skip CRM and preserve all data
+                    </div>
+                </group>
+            </group>
+            <button name="action_create_opportunity" position="after">
+                <button name="action_create_tender_direct"
+                        string="🎯 Create Tender Directly"
+                        type="object"
+                        class="btn btn-info flex-grow-1"
+                        icon="fa-rocket"
+                        invisible="tender_id_ics"
+                        title="Create ICS Tender directly (skip CRM)"/>
+            </button>
+        </field>
+    </record>
+
+    <record id="view_etimad_tender_kanban_tender_ics" model="ir.ui.view">
+        <field name="name">etimad.tender.kanban.tender.ics</field>
+        <field name="model">ics.etimad.tender</field>
+        <field name="inherit_id" ref="ics_etimad_tenders_crm.view_etimad_tender_kanban"/>
+        <field name="arch" type="xml">
+            <field name="opportunity_id" position="after">
+                <field name="tender_id_ics"/>
+            </field>
+            <xpath expr="//t[@t-if='record.opportunity_id.raw_value']" position="after">
+                <t t-if="record.tender_id_ics.raw_value">
+                    <span class="badge badge-success"><i class="fa fa-check"/> ICS Tender</span>
+                </t>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_etimad_tender_search_tender_ics" model="ir.ui.view">
+        <field name="name">etimad.tender.search.tender.ics</field>
+        <field name="model">ics.etimad.tender</field>
+        <field name="inherit_id" ref="ics_etimad_tenders_crm.view_etimad_tender_search"/>
+        <field name="arch" type="xml">
+            <filter name="without_opportunity" position="after">
+                <filter string="With ICS Tender" name="with_ics_tender" domain="[('tender_id_ics', '!=', False)]"/>
+            </filter>
+        </field>
+    </record>
+</odoo>
