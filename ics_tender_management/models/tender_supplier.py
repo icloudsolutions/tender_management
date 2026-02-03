@@ -11,7 +11,7 @@ class TenderSupplier(models.Model):
     sequence = fields.Integer('Sequence', default=10)
     
     partner_id = fields.Many2one('res.partner', string='Supplier', required=True, 
-        domain=[('supplier_rank', '>', 0)])
+        domain=['|', ('supplier_rank', '>', 0), ('is_company', '=', True)])
     
     # Supplier Scope
     scope_of_work = fields.Text('Scope of Work / Scope within Tender')

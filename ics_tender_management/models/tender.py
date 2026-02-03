@@ -310,7 +310,7 @@ class Tender(models.Model):
     # Supplier Selection
     selected_suppliers_ids = fields.Many2many('res.partner', 'tender_supplier_rel', 
         'tender_id', 'partner_id', string='Selected Suppliers', 
-        domain=[('supplier_rank', '>', 0)])
+        domain=['|', ('supplier_rank', '>', 0), ('is_company', '=', True)])
     potential_suppliers_ids = fields.One2many('ics.tender.supplier', 'tender_id', 
         string='Potential Suppliers')
 
