@@ -5,12 +5,10 @@
         <field name="model">ics.etimad.tender</field>
         <field name="arch" type="xml">
             <list string="Etimad Tenders" 
-                  decoration-muted="state in ('cancelled', 'lost')" 
-                  decoration-success="state == 'won'" 
                   decoration-warning="remaining_days &lt; 7 and remaining_days &gt; 0" 
                   decoration-danger="is_urgent" 
                   decoration-info="is_hot_tender" 
-                  decoration-bf="is_favorite"
+                  decoration-bf="is_favorite or is_participating"
                   multi_edit="1">
                 
                 <header>
@@ -45,12 +43,8 @@
                        decoration-danger="is_urgent" 
                        decoration-warning="remaining_days &lt; 7 and remaining_days &gt; 3"/>
                 <field name="total_fees" widget="monetary" options="{'currency_field': 'currency_id'}" optional="hide" string="Total Fees"/>
-                <field name="state" widget="badge" 
-                       string="الحالة | Status"
-                       decoration-success="state == 'won'" 
-                       decoration-danger="state in ('lost', 'cancelled')" 
-                       decoration-warning="state == 'qualification'" 
-                       decoration-info="state in ('new', 'in_progress')"/>
+                <field name="tender_status_text" optional="show" string="Etimad Status" widget="badge"/>
+                <field name="is_participating" widget="boolean" optional="show" string="👥 Participating"/>
                 <field name="opportunity_id" optional="show" string="Opportunity"/>
                 <field name="deadline_extended" widget="boolean" optional="show" string="🔄 Extended"/>
                 <field name="scraping_status" widget="badge" optional="hide" string="Data Status"
@@ -93,37 +87,18 @@
         <field name="arch" type="xml">
             <form string="Etimad Tender" class="o_etimad_tender_form">
                 <header>
-                    <button name="action_set_state" 
-                            string="Start Progress" 
+                    <button name="action_toggle_participating" 
+                            string="✅ Mark as Participating" 
                             type="object" 
-                            class="oe_highlight"
-                            context="{'state': 'in_progress'}" 
-                            invisible="state != 'new'"/>
-                    <button name="action_set_state" 
-                            string="Move to Qualification" 
+                            class="btn-success"
+                            invisible="is_participating"
+                            help="Mark that your company is preparing a quotation for this tender"/>
+                    <button name="action_toggle_participating" 
+                            string="⬜ Unmark Participating" 
                             type="object" 
-                            context="{'state': 'qualification'}" 
-                            invisible="state not in ['new', 'in_progress']"/>
-                    <button name="action_set_state" 
-                            string="Mark as Won" 
-                            type="object"
-                            class="oe_highlight"
-                            context="{'state': 'won'}" 
-                            invisible="state in ['won', 'lost', 'cancelled']"/>
-                    <button name="action_set_state" 
-                            string="Mark as Lost" 
-                            type="object" 
-                            context="{'state': 'lost'}" 
-                            invisible="state in ['won', 'lost', 'cancelled']"/>
-                    <button name="action_set_state" 
-                            string="Cancel Tender" 
-                            type="object" 
-                            context="{'state': 'cancelled'}" 
-                            invisible="state in ['won', 'lost', 'cancelled']"/>
-                    <field name="state" 
-                           widget="statusbar" 
-                           statusbar_visible="new,in_progress,qualification,won"
-                           options="{'clickable': '1'}"/>
+                            class="btn-secondary"
+                            invisible="not is_participating"
+                            help="Remove participation flag"/>
                 </header>
                 
                 <sheet>
@@ -701,11 +676,9 @@
                 
                 <separator/>
                 <!-- Status Filters -->
-                <filter string="New" name="state_new" domain="[('state', '=', 'new')]"/>
-                <filter string="In Progress" name="state_in_progress" domain="[('state', '=', 'in_progress')]"/>
-                <filter string="Qualification" name="state_qualification" domain="[('state', '=', 'qualification')]"/>
-                <filter string="Won" name="state_won" domain="[('state', '=', 'won')]"/>
-                <filter string="Lost" name="state_lost" domain="[('state', '=', 'lost')]"/>
+                <filter string="👥 Participating" name="filter_participating" domain="[('is_participating','=',True)]"/>
+                <filter string="✅ Approved (Etimad)" name="filter_approved" domain="[('tender_status_approved','=',True)]"/>
+                <filter string="🏆 With Award Results" name="filter_awarded" domain="[('award_announced','=',True)]"/>
                 
                 <separator/>
                 <!-- Deadline Filters -->
@@ -752,7 +725,7 @@
                     <filter string="Agency" name="group_agency" context="{'group_by': 'agency_name'}"/>
                     <filter string="Tender Type" name="group_type" context="{'group_by': 'tender_type'}"/>
                     <filter string="Activity" name="group_activity" context="{'group_by': 'activity_name'}"/>
-                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Participating" name="group_participating" context="{'group_by': 'is_participating'}"/>
                     <filter string="Value Category" name="group_value" context="{'group_by': 'estimated_value_category'}"/>
                     <filter string="Published Date" name="group_published" context="{'group_by': 'published_at:month'}"/>
                     <filter string="Deadline" name="group_deadline" context="{'group_by': 'offers_deadline:week'}"/>
@@ -768,7 +741,6 @@
         <field name="view_mode">list,kanban,form</field>
         <field name="search_view_id" ref="view_etimad_tender_search"/>
         <field name="context">{
-            'search_default_state_new': 1,
             'search_default_without_opportunity': 1,
         }</field>
         <field name="help" type="html">

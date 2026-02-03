@@ -63,17 +63,8 @@ class EtimadTender(models.Model):
     tender_url = fields.Char("Etimad URL", compute='_compute_tender_url', store=True)
     external_source = fields.Char("External Source", default="Etimad Portal", readonly=True)
     
-    # Status and Classification
-    state = fields.Selection([
-        ('new', 'New'),
-        ('in_progress', 'In Progress'),
-        ('qualification', 'Qualification'),
-        ('won', 'Won'),
-        ('lost', 'Lost'),
-        ('cancelled', 'Cancelled')
-    ], string="Status", default='new', tracking=True)
-    
-    tender_status_id = fields.Integer("Tender Status ID")
+    # Status and Classification (from Etimad Portal)
+    tender_status_id = fields.Integer("Tender Status ID", help="Status ID from Etimad portal")
     
     # CRM Integration
     opportunity_id = fields.Many2one('crm.lead', string="Opportunity", tracking=True)
@@ -83,6 +74,10 @@ class EtimadTender(models.Model):
     description = fields.Text("Description")
     notes = fields.Text("Internal Notes")
     is_favorite = fields.Boolean("Favorite", default=False)
+    
+    # Internal Tracking (not related to Etimad portal status)
+    is_participating = fields.Boolean("Participating", default=False,
+        help="Mark this if your company is preparing a quotation for this tender")
     tender_purpose = fields.Text("Tender Purpose", help="الغرض من المنافسة")
     
     # Hijri Dates (as text)
@@ -601,13 +596,7 @@ class EtimadTender(models.Model):
                 'last_scraping_error': False,
             }
             
-            # Map status
-            status_map = {
-                4: 'qualification',
-                5: 'won',
-                6: 'lost'
-            }
-            vals['state'] = status_map.get(raw_data.get('tenderStatusId'), 'new')
+            # No need to map status - we keep Etimad portal status as-is
             
             # Check if tender already exists
             existing = self.search([
@@ -925,10 +914,14 @@ class EtimadTender(models.Model):
         except Exception as e:
             _logger.error(f"Scheduled tender fetch failed: {e}")
 
-    def action_set_state(self, state):
-        """Set tender state"""
-        for record in self:
-            record.state = state
+    def action_toggle_participating(self):
+        """Toggle participation status"""
+        self.ensure_one()
+        self.is_participating = not self.is_participating
+        if self.is_participating:
+            self.message_post(body=_('✅ Marked as participating in this tender'))
+        else:
+            self.message_post(body=_('⬜ Unmarked as participating'))
     
     def action_fetch_detailed_info(self):
         """Fetch detailed tender information from all Etimad API endpoints"""

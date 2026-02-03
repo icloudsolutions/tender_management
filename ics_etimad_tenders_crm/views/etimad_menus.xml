@@ -45,7 +45,7 @@
         <field name="res_model">ics.etimad.tender</field>
         <field name="view_mode">list,kanban,form</field>
         <field name="domain">[('is_favorite', '=', True)]</field>
-        <field name="context">{'search_default_state_new': 1}</field>
+        <field name="context">{}</field>
     </record>
 
     <menuitem id="menu_etimad_favorites"
@@ -78,7 +78,7 @@
         <field name="name">Urgent Tenders (≤7 days)</field>
         <field name="res_model">ics.etimad.tender</field>
         <field name="view_mode">list,kanban,form</field>
-        <field name="domain">[('remaining_days', '&lt;=', 7), ('remaining_days', '&gt;', 0), ('state', 'in', ['new', 'in_progress'])]</field>
+        <field name="domain">[('remaining_days', '&lt;=', 7), ('remaining_days', '&gt;', 0)]</field>
         <field name="context">{'create': False}</field>
     </record>
 
