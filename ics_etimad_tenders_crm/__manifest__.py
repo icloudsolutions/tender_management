@@ -56,6 +56,7 @@
     "data": [
         "security/ir.model.access.csv",
         "data/ir_cron_data.xml",
+        "data/etimad_server_actions.xml",
         "views/etimad_menus.xml",
         "views/etimad_tender_views.xml",
         "views/res_config_settings_views.xml",

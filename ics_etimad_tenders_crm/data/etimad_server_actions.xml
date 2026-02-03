@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="0">
+    <!-- Server actions must load before views that reference them by xml id -->
+
+    <!-- Server Action for Fetching Tenders -->
+    <record id="action_server_fetch_etimad_tenders" model="ir.actions.server">
+        <field name="name">Fetch Etimad Tenders</field>
+        <field name="model_id" ref="model_ics_etimad_tender"/>
+        <field name="binding_model_id" ref="model_ics_etimad_tender"/>
+        <field name="binding_view_types">list,form</field>
+        <field name="state">code</field>
+        <field name="code">
+if records:
+    action = records[0].fetch_etimad_tenders()
+else:
+    action = model.fetch_etimad_tenders()
+        </field>
+    </record>
+
+    <!-- Server Action for Batch Fetching (3 pages) -->
+    <record id="action_server_fetch_batch_etimad_tenders" model="ir.actions.server">
+        <field name="name">Fetch Batch (150 Tenders)</field>
+        <field name="model_id" ref="model_ics_etimad_tender"/>
+        <field name="binding_model_id" ref="model_ics_etimad_tender"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+action = model.action_fetch_batch()
+        </field>
+    </record>
+
+    <!-- Bulk Action: Create Opportunities -->
+    <record id="action_server_bulk_create_opportunities" model="ir.actions.server">
+        <field name="name">Create Opportunities</field>
+        <field name="model_id" ref="model_ics_etimad_tender"/>
+        <field name="binding_model_id" ref="model_ics_etimad_tender"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+if records:
+    action = records.action_bulk_create_opportunities()
+        </field>
+    </record>
+
+    <!-- Bulk Action: Mark as In Progress -->
+    <record id="action_server_bulk_mark_progress" model="ir.actions.server">
+        <field name="name">Mark as In Progress</field>
+        <field name="model_id" ref="model_ics_etimad_tender"/>
+        <field name="binding_model_id" ref="model_ics_etimad_tender"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+if records:
+    action = records.action_bulk_mark_as_progress()
+        </field>
+    </record>
+
+    <!-- Bulk Action: Mark as Lost -->
+    <record id="action_server_bulk_mark_lost" model="ir.actions.server">
+        <field name="name">Mark as Lost</field>
+        <field name="model_id" ref="model_ics_etimad_tender"/>
+        <field name="binding_model_id" ref="model_ics_etimad_tender"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+if records:
+    action = records.action_bulk_mark_as_lost()
+        </field>
+    </record>
+
+    <!-- Bulk Action: Add to Favorites -->
+    <record id="action_server_bulk_add_favorites" model="ir.actions.server">
+        <field name="name">Add to Favorites</field>
+        <field name="model_id" ref="model_ics_etimad_tender"/>
+        <field name="binding_model_id" ref="model_ics_etimad_tender"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+if records:
+    action = records.action_bulk_add_to_favorites()
+        </field>
+    </record>
+</odoo>

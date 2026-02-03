@@ -9,14 +9,14 @@ import re
 import html as html_module
 from datetime import datetime
 
+_logger = logging.getLogger(__name__)
+
 try:
     from lxml import html
     LXML_AVAILABLE = True
 except ImportError:
     LXML_AVAILABLE = False
     _logger.warning("lxml not available, HTML parsing will be limited")
-
-_logger = logging.getLogger(__name__)
 
 
 class EtimadTender(models.Model):
@@ -79,7 +79,7 @@ class EtimadTender(models.Model):
     # Internal Tracking (not related to Etimad portal status)
     is_participating = fields.Boolean("Participating", default=False,
         help="Mark this if your company is preparing a quotation for this tender")
-    tender_purpose = fields.Text("Tender Purpose", help="الغرض من المنافسة")
+    tender_purpose = fields.Text("Tender Purpose", help="Purpose of the tender")
     
     # Hijri Dates (as text)
     last_enquiry_date_hijri = fields.Char("Last Enquiry Date (Hijri)")
@@ -88,112 +88,84 @@ class EtimadTender(models.Model):
     # ========== ENHANCED FIELDS FROM ETIMAD DETAIL PAGES ==========
     
     # Contract & Duration
-    contract_duration = fields.Char("Contract Duration", help="مدة العقد (e.g., 10 يوم)")
+    contract_duration = fields.Char("Contract Duration", help="Contract duration (e.g. 10 days)")
     contract_duration_days = fields.Integer("Contract Duration (Days)", help="Contract duration in days")
     
     # Insurance & Guarantees
-    insurance_required = fields.Boolean("Insurance Required", help="هل التأمين من متطلبات المنافسة")
-    initial_guarantee_required = fields.Boolean("Initial Guarantee Required", help="مطلوب ضمان الإبتدائي")
-    initial_guarantee_type = fields.Char("Initial Guarantee Type", help="نوع الضمان الإبتدائي (e.g., لا يوجد ضمان)")
-    final_guarantee_percentage = fields.Float("Final Guarantee %", 
-        help="الضمان النهائي - Performance guarantee percentage (حسن الأداء)")
-    final_guarantee_required = fields.Boolean("Final Guarantee Required",
-        compute='_compute_final_guarantee_required', store=True,
-        help="Whether final guarantee is required")
+    insurance_required = fields.Boolean("Insurance Required", help="Insurance required for tender")
+    initial_guarantee_required = fields.Boolean("Initial Guarantee Required", help="Initial guarantee required")
+    initial_guarantee_type = fields.Char("Initial Guarantee Type", help="Type of initial guarantee")
+    final_guarantee_percentage = fields.Float("Final Guarantee Pct", help="Performance guarantee percentage")
+    final_guarantee_required = fields.Boolean("Final Guarantee Required", compute='_compute_final_guarantee_required', store=True, help="Whether final guarantee is required")
     
     # Document Cost
     document_cost_type = fields.Selection([
-        ('free', 'Free / مجانا'),
-        ('paid', 'Paid / مدفوع'),
-    ], string="Document Cost Type", help="قيمة وثائق المنافسة")
-    document_cost_amount = fields.Monetary("Document Cost Amount", currency_field='currency_id',
-        help="Amount if documents are paid")
+        ('free', 'Free'),
+        ('paid', 'Paid'),
+    ], string="Document Cost Type", help="Document cost type")
+    document_cost_amount = fields.Monetary("Document Cost Amount", currency_field='currency_id', help="Amount if documents are paid")
     
     # Tender Status Details
-    tender_status_text = fields.Char("Tender Status Text", help="حالة المنافسة (e.g., معتمدة)")
-    tender_status_approved = fields.Boolean("Tender Approved", compute='_compute_tender_status_approved', store=True,
-        help="Whether tender is approved (معتمدة)")
+    tender_status_text = fields.Char("Tender Status Text", help="Tender status from Etimad")
+    tender_status_approved = fields.Boolean("Tender Approved", compute='_compute_tender_status_approved', store=True, help="Whether tender is approved")
     
     # Submission Method
     submission_method = fields.Selection([
-        ('single_file', 'Single File (Technical & Financial) / ملف واحد للعرض الفني والمالي معا'),
-        ('separate_files', 'Separate Files / ملفات منفصلة'),
-        ('electronic', 'Electronic / إلكتروني'),
-        ('manual', 'Manual / يدوي'),
-    ], string="Submission Method", help="طريقة تقديم العروض")
+        ('single_file', 'Single File (Technical and Financial)'),
+        ('separate_files', 'Separate Files'),
+        ('electronic', 'Electronic'),
+        ('manual', 'Manual'),
+    ], string="Submission Method", help="How to submit offers")
     
     # Additional Dates
-    offer_opening_date = fields.Datetime("Offer Opening Date", help="تاريخ فتح العروض")
-    offer_examination_date = fields.Datetime("Offer Examination Date", help="تاريخ فحص العروض")
-    expected_award_date = fields.Date("Expected Award Date", help="التاريخ المتوقع للترسية")
-    work_start_date = fields.Date("Work Start Date", help="تاريخ بدء الأعمال / الخدمات")
-    inquiry_start_date = fields.Date("Inquiry Start Date", help="بداية إرسال الأسئلة و الاستفسارات")
-    max_inquiry_response_days = fields.Integer("Max Inquiry Response Days", 
-        help="اقصى مدة للاجابة على الاستفسارات (in days)")
-    suspension_period_days = fields.Integer("Suspension Period (Days)", 
-        help="فترة التوقيف - Mandatory standstill/waiting period before contract award")
+    offer_opening_date = fields.Datetime("Offer Opening Date", help="Date of offer opening")
+    offer_examination_date = fields.Datetime("Offer Examination Date", help="Date of offer examination")
+    expected_award_date = fields.Date("Expected Award Date", help="Expected award date")
+    work_start_date = fields.Date("Work Start Date", help="Work or service start date")
+    inquiry_start_date = fields.Date("Inquiry Start Date", help="Start of inquiry period")
+    max_inquiry_response_days = fields.Integer("Max Inquiry Response Days", help="Max days to answer inquiries")
+    suspension_period_days = fields.Integer("Suspension Period (Days)", help="Mandatory standstill period before contract award")
     
     # Location Information
-    opening_location = fields.Char("Opening Location", help="مكان فتح العرض")
+    opening_location = fields.Char("Opening Location", help="Place of offer opening")
     execution_location_type = fields.Selection([
-        ('inside_kingdom', 'Inside Kingdom / داخل المملكة'),
-        ('outside_kingdom', 'Outside Kingdom / خارج المملكة'),
-        ('both', 'Both / داخل وخارج المملكة'),
-    ], string="Execution Location Type", help="مكان التنفيذ")
-    execution_regions = fields.Text("Execution Regions", help="مناطق التنفيذ (JSON or text)")
-    execution_cities = fields.Text("Execution Cities", help="مدن التنفيذ (JSON or text)")
+        ('inside_kingdom', 'Inside Kingdom'),
+        ('outside_kingdom', 'Outside Kingdom'),
+        ('both', 'Both'),
+    ], string="Execution Location Type", help="Where work is executed")
+    execution_regions = fields.Text("Execution Regions", help="Execution regions (JSON or text)")
+    execution_cities = fields.Text("Execution Cities", help="Execution cities (JSON or text)")
     
-    # Classification & Activities
-    classification_field = fields.Char("Classification Field", help="مجال التصنيف")
-    classification_required = fields.Boolean("Classification Required", 
-        help="Whether classification is required (غير مطلوب = False)")
-    activity_details = fields.Text("Activity Details", help="نشاط المنافسة (detailed list)")
+    # Classification and Activities
+    classification_field = fields.Char("Classification Field", help="Classification field")
+    classification_required = fields.Boolean("Classification Required", help="Whether classification is required")
+    activity_details = fields.Text("Activity Details", help="Activity details list")
     
     # Work Types
-    includes_supply_items = fields.Boolean("Includes Supply Items", 
-        help="تشمل المنافسة على بنود توريد")
-    construction_works = fields.Text("Construction Works", help="أعمال الإنشاء")
-    maintenance_works = fields.Text("Maintenance & Operation Works", help="أعمال الصيانة والتشغيل")
+    includes_supply_items = fields.Boolean("Includes Supply Items", help="Tender includes supply items")
+    construction_works = fields.Text("Construction Works", help="Construction works")
+    maintenance_works = fields.Text("Maintenance and Operation Works", help="Maintenance and operation works")
     
     # Award Information
-    award_announced = fields.Boolean("Award Announced", default=False, 
-        help="Whether award results have been announced")
-    award_announcement_date = fields.Date("Award Announcement Date", 
-        help="Date when award was announced")
-    awarded_company_name = fields.Char("Awarded Company Name", help="اسم الشركة المرسية")
-    awarded_amount = fields.Monetary("Awarded Amount", currency_field='currency_id',
-        help="المبلغ المرسى عليه")
-    
-    # Agency Code (for logo)
-    agency_code = fields.Char("Agency Code", help="Agency code for logo loading")
-    tender_type_id = fields.Integer("Tender Type ID", help="Tender type ID from Etimad")
-    
-    # ========== LOCAL CONTENT (المحتوى المحلي) ==========
-    # Saudi local content requirements and SME benefits
-    local_content_required = fields.Boolean("Local Content Required", 
-        help="Whether this tender has local content requirements (المحتوى المحلي)")
-    local_content_percentage = fields.Float("Local Content %", 
-        help="Minimum local content percentage required (نسبة المحتوى المحلي المطلوبة)")
-    local_content_mechanism = fields.Char("Local Content Mechanism",
-        help="Mechanism for calculating local content (آلية احتساب المحتوى المحلي)")
-    
-    # SME (Small & Medium Enterprises) Benefits
-    sme_participation_allowed = fields.Boolean("SME Participation Allowed",
-        help="Whether Small & Medium Enterprises can participate (مشاركة المنشآت الصغيرة والمتوسطة)")
-    sme_price_preference = fields.Float("SME Price Preference %",
-        help="Price preference given to SME participants (الأفضلية السعرية للمنشآت الصغيرة والمتوسطة)")
-    sme_qualification_mandatory = fields.Boolean("SME Qualification Mandatory",
-        help="Whether SME certificate is mandatory (شهادة المنشآت الصغيرة إلزامية)")
-    
-    # Additional Local Content Info
-    local_content_target_percentage = fields.Float("Target Local Content %",
-        help="Target percentage for local content evaluation (نسبة المحتوى المحلي المستهدفة للتقييم)")
-    local_content_baseline_weight = fields.Float("Local Content Weight %",
-        help="Weight of local content in evaluation (وزن المحتوى المحلي في التقييم)")
-    local_content_notes = fields.Text("Local Content Notes",
-        help="Additional notes about local content requirements")
+    award_announced = fields.Boolean("Award Announced", default=False)
+    award_announcement_date = fields.Date("Award Announcement Date")
+    awarded_company_name = fields.Char("Awarded Company Name")
+    awarded_amount = fields.Monetary("Awarded Amount", currency_field='currency_id')
 
-    @api.depends('tender_id_string')
+    agency_code = fields.Char("Agency Code")
+    tender_type_id = fields.Integer("Tender Type ID")
+
+    local_content_required = fields.Boolean("Local Content Required")
+    local_content_percentage = fields.Float("Local Content Pct")
+    local_content_mechanism = fields.Char("Local Content Mechanism")
+    sme_participation_allowed = fields.Boolean("SME Participation Allowed")
+    sme_price_preference = fields.Float("SME Price Preference Pct")
+    sme_qualification_mandatory = fields.Boolean("SME Qualification Mandatory")
+    local_content_target_percentage = fields.Float("Target Local Content Pct")
+    local_content_baseline_weight = fields.Float("Local Content Weight Pct")
+    local_content_notes = fields.Text("Local Content Notes")
+
+    @api.depends("tender_id_string")
     def _compute_tender_url(self):
         """Generate Etimad tender URL"""
         for record in self:
@@ -1580,7 +1552,7 @@ class EtimadTender(models.Model):
             # Try regex fallback
             try:
                 parsed_data.update(self._parse_award_results_regex(html_content))
-            except:
+            except Exception:
                 parsed_data['award_announced'] = False
         
         return parsed_data
@@ -1705,7 +1677,7 @@ class EtimadTender(models.Model):
             _logger.error(f"Error parsing local content HTML: {e}")
             try:
                 parsed_data.update(self._parse_local_content_regex(html_content))
-            except:
+            except Exception:
                 parsed_data['local_content_required'] = False
         
         return parsed_data
@@ -1822,7 +1794,8 @@ class EtimadTender(models.Model):
         except Exception as e:
             _logger.warning(f"Error parsing datetime: {date_str} {time_str}, error: {e}")
             # Return just the date if time parsing fails
-            return datetime.combine(self._parse_date_from_string(date_str), datetime.min.time()) if date_str else False
+            parsed_date = self._parse_date_from_string(date_str) if date_str else False
+            return datetime.combine(parsed_date, datetime.min.time()) if parsed_date else False
     
     def action_open_detailed_report(self):
         """Open detailed tender report on Etimad portal"""
