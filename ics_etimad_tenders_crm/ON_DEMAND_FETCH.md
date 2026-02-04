@@ -10,8 +10,8 @@ In addition to the **automatic daily synchronization** at 6 AM, users can manual
 
 Navigate to **Etimad Tenders** in the main menu and click:
 
-- **🔄 Fetch Latest Tenders** - Fetches the latest 50 tenders from Etimad (page 1)
-- **🔄 Fetch Batch (150)** - Fetches 150 tenders (3 pages of 50 tenders each)
+- **Fetch Latest Tenders** - Fetches the latest 50 tenders from Etimad (page 1)
+- **Fetch Batch (150)** - Fetches 150 tenders (3 pages of 50 tenders each)
 
 These menu items are visible to all users and appear right below "Dashboard" in the menu structure.
 
@@ -21,8 +21,8 @@ When viewing the tender list:
 
 1. Go to **Etimad Tenders → All Tenders**
 2. At the top of the list, you'll see two buttons:
-   - **🔄 Fetch Latest (50)** - Quick fetch of 50 tenders
-   - **🔄 Fetch Batch (150)** - Batch fetch of 150 tenders
+   - **Fetch Latest (50)** - Quick fetch of 50 tenders
+   - **Fetch Batch (150)** - Batch fetch of 150 tenders
 
 These buttons are always visible above the tender list.
 
@@ -33,15 +33,15 @@ When viewing tenders in Kanban view:
 1. Go to **Etimad Tenders → All Tenders**
 2. Switch to Kanban view (card view)
 3. At the top of the kanban, you'll see:
-   - **🔄 Fetch Latest** - Fetches 50 tenders
-   - **🔄 Fetch Batch** - Fetches 150 tenders
+   - **Fetch Latest** - Fetches 50 tenders
+   - **Fetch Batch** - Fetches 150 tenders
 
 ### 4. **Action Menu** (Advanced)
 
 From the tender list or form view:
 
 1. Select one or more tenders (or open a single tender)
-2. Click the **Action** menu (⚙️ gear icon)
+2. Click the **Action** menu (gear icon)
 3. Choose:
    - **Fetch Etimad Tenders** - Fetches 20 tenders from page 1
    - **Fetch Batch (150 Tenders)** - Fetches 150 tenders (3 pages)
@@ -53,7 +53,7 @@ This method is useful when you're already working with tenders and want to updat
 For a specific tender:
 
 1. Open the tender in form view
-2. Click **📋 Fetch Details** button (in list view) or **Fetch Detailed Info** (in form view)
+2. Click **Fetch Details** button (in list view) or **Fetch Detailed Info** (in form view)
 3. This fetches additional detailed information from Etimad for that specific tender:
    - Contract duration
    - Insurance requirements
@@ -96,14 +96,14 @@ For a specific tender:
 After fetching, you'll see a notification like:
 
 ```
-✅ Tenders Synchronized
+[OK] Tenders Synchronized
 15 created, 8 updated from 1 page
 ```
 
 Or for batch fetch:
 
 ```
-✅ Tenders Synchronized
+[OK] Tenders Synchronized
 45 created, 22 updated from 3 pages
 ```
 
@@ -119,18 +119,18 @@ If the fetch fails, you'll see an error message:
 
 ### When to Use Each Method
 
-**🔄 Fetch Latest (50):**
+**Fetch Latest (50):**
 - Daily manual check before automatic cron
 - After hearing about new tenders
 - Quick refresh during business hours
 
-**🔄 Fetch Batch (150):**
+**Fetch Batch (150):**
 - Weekly comprehensive update
 - After system downtime
 - When catching up after vacation
 - Monthly full sync
 
-**📋 Fetch Details:**
+**Fetch Details:**
 - Before creating quotation
 - When deadline is near
 - To verify award results

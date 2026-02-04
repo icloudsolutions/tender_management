@@ -199,7 +199,7 @@
                             </h1>
                         </div>
                         <div class="alert alert-info" role="alert" invisible="partner_id">
-                            <strong>ℹ️ Customer Required</strong><br/>
+                            <strong><i class="fa fa-info-circle"/> Customer Required</strong><br/>
                             Please set a <strong>Customer</strong> below. The customer is required for generating quotations and submitting the tender.
                         </div>
                         <group>
@@ -419,15 +419,15 @@
                             <page string="5. Approvals &amp; Documents" name="approvals"
                                 invisible="state in ['draft', 'technical', 'won', 'lost', 'cancelled']">
                                 <div class="alert alert-info" role="alert" invisible="not require_direct_manager and not require_department_manager and not require_financial_manager and not require_ceo">
-                                    <strong>ℹ️ Approval Requirements:</strong>
+                                    <strong><i class="fa fa-info-circle"/> Approval Requirements:</strong>
                                     <p class="mb-0">
                                         Based on tender category and amount, the following approvals are required:
                                     </p>
                                     <ul class="mb-0">
-                                        <li invisible="not require_direct_manager">✓ Direct Manager Approval Required</li>
-                                        <li invisible="not require_department_manager">✓ Department Manager Approval Required</li>
-                                        <li invisible="not require_financial_manager">✓ Financial Manager Approval Required</li>
-                                        <li invisible="not require_ceo">✓ CEO Approval Required</li>
+                                        <li invisible="not require_direct_manager"><i class="fa fa-check"/> Direct Manager Approval Required</li>
+                                        <li invisible="not require_department_manager"><i class="fa fa-check"/> Department Manager Approval Required</li>
+                                        <li invisible="not require_financial_manager"><i class="fa fa-check"/> Financial Manager Approval Required</li>
+                                        <li invisible="not require_ceo"><i class="fa fa-check"/> CEO Approval Required</li>
                                     </ul>
                                 </div>
                                 <group>

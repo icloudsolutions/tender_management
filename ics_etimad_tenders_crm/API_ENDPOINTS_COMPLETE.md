@@ -8,7 +8,7 @@ All 4 Etimad tender detail API endpoints are now fully implemented with robust p
 
 ## Implemented Endpoints
 
-### 1. GetRelationsDetailsViewComponenet ✅
+### 1. GetRelationsDetailsViewComponenet [OK]
 
 **URL:** `https://tenders.etimad.sa/Tender/GetRelationsDetailsViewComponenet?tenderIdStr={tender_id}`
 
@@ -36,11 +36,11 @@ All 4 Etimad tender detail API endpoints are now fully implemented with robust p
 - `construction_works`
 - `maintenance_works`
 
-**Status:** ✅ Complete - Full lxml + regex fallback
+**Status:** [OK] Complete - Full lxml + regex fallback
 
 ---
 
-### 2. GetTenderDatesViewComponenet ✅
+### 2. GetTenderDatesViewComponenet [OK]
 
 **URL:** `https://tenders.etimad.sa/Tender/GetTenderDatesViewComponenet?tenderIdStr={tender_id}`
 
@@ -66,11 +66,11 @@ All 4 Etimad tender detail API endpoints are now fully implemented with robust p
 - `max_inquiry_response_days`
 - `opening_location`
 
-**Status:** ✅ Complete - Full lxml + regex fallback, date/time parsing
+**Status:** [OK] Complete - Full lxml + regex fallback, date/time parsing
 
 ---
 
-### 3. GetAwardingResultsForVisitorViewComponenet ✅ (Improved)
+### 3. GetAwardingResultsForVisitorViewComponenet [OK] (Improved)
 
 **URL:** `https://tenders.etimad.sa/Tender/GetAwardingResultsForVisitorViewComponenet?tenderIdStr={tender_id}`
 
@@ -86,7 +86,7 @@ All 4 Etimad tender detail API endpoints are now fully implemented with robust p
 - `awarded_company_name`
 - `awarded_amount`
 
-**Status:** ✅ Complete - **IMPROVED** with full extraction (was incomplete)
+**Status:** [OK] Complete - **IMPROVED** with full extraction (was incomplete)
 
 **Improvements Made:**
 - Added company name extraction with multiple xpath strategies
@@ -97,7 +97,7 @@ All 4 Etimad tender detail API endpoints are now fully implemented with robust p
 
 ---
 
-### 4. GetLocalContentDetailsViewComponenet ✅ (NEW)
+### 4. GetLocalContentDetailsViewComponenet [OK] (NEW)
 
 **URL:** `https://tenders.etimad.sa/Tender/GetLocalContentDetailsViewComponenet?tenderIdStr={tender_id}`
 
@@ -123,7 +123,7 @@ All 4 Etimad tender detail API endpoints are now fully implemented with robust p
 - `sme_qualification_mandatory`
 - `local_content_notes`
 
-**Status:** ✅ NEW - Full lxml + regex fallback implementation
+**Status:** [OK] NEW - Full lxml + regex fallback implementation
 
 ---
 
@@ -134,7 +134,7 @@ All 4 Etimad tender detail API endpoints are now fully implemented with robust p
 When the system fetches tenders (daily cron or manual fetch), it retrieves basic information. To get complete details including local content:
 
 1. Open any tender record
-2. Click **"📋 Fetch Details"** button (in list view) or **"Fetch Detailed Info"** (in form)
+2. Click **"Fetch Details"** button (in list view) or **"Fetch Detailed Info"** (in form)
 3. System fetches from all 4 endpoints
 4. All fields updated
 5. Notification shows how many endpoints succeeded
@@ -215,10 +215,10 @@ Local content changes are tracked like other critical fields:
 
 | Field | Status | Enhancement |
 |-------|--------|-------------|
-| `award_announced` | Existing | ✅ Working |
-| `award_announcement_date` | Existing | ✅ **NOW EXTRACTED** |
-| `awarded_company_name` | Existing | ✅ **NOW EXTRACTED** |
-| `awarded_amount` | Existing | ✅ **NOW EXTRACTED** |
+| `award_announced` | Existing | [OK] Working |
+| `award_announcement_date` | Existing | [OK] **NOW EXTRACTED** |
+| `awarded_company_name` | Existing | [OK] **NOW EXTRACTED** |
+| `awarded_amount` | Existing | [OK] **NOW EXTRACTED** |
 
 ---
 
@@ -290,13 +290,13 @@ After deploying, verify:
 
 **Local Content Tab Shows:**
 ```
-Local Content Required: ✅ Yes
+Local Content Required: [OK] Yes
 Minimum Required %: 30%
 Target for Evaluation %: 50%
 Weight in Evaluation %: 20%
 Mechanism: نسبة المكون المحلي حسب شهادة هيئة المحتوى المحلي
 
-SME Participation Allowed: ✅ Yes
+SME Participation Allowed: [OK] Yes
 SME Price Preference %: 10%
 SME Certificate Mandatory: ❌ No
 ```

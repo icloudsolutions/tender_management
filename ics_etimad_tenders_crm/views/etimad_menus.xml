@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- ========================================================= -->
-    <!-- 🌐 ROOT MENU -->
+    <!-- ROOT MENU -->
     <!-- ========================================================= -->
     <menuitem id="menu_etimad_root"
               name="Etimad Tenders"
@@ -9,7 +9,7 @@
               sequence="5"/>
 
     <!-- ========================================================= -->
-    <!-- 📋 ACTION: ALL TENDERS -->
+    <!-- ACTION: ALL TENDERS -->
     <!-- ========================================================= -->
     <record id="action_etimad_tenders" model="ir.actions.act_window">
         <field name="name">All Tenders</field>
@@ -29,7 +29,7 @@
               sequence="10"/>
 
     <!-- ========================================================= -->
-    <!-- 📊 DASHBOARD -->
+    <!-- DASHBOARD -->
     <!-- ========================================================= -->
     <menuitem id="menu_etimad_dashboard"
               name="Dashboard"
@@ -38,7 +38,7 @@
     <!-- (You can later attach a custom action here if you have a dashboard view) -->
 
     <!-- ========================================================= -->
-    <!-- ⭐ FAVORITE TENDERS -->
+    <!-- FAVORITE TENDERS -->
     <!-- ========================================================= -->
     <record id="action_etimad_tenders_favorites" model="ir.actions.act_window">
         <field name="name">Favorite Tenders</field>
@@ -55,7 +55,7 @@
               sequence="20"/>
 
     <!-- ========================================================= -->
-    <!-- 💼 MY OPPORTUNITIES -->
+    <!-- MY OPPORTUNITIES -->
     <!-- ========================================================= -->
     <record id="action_etimad_my_opportunities" model="ir.actions.act_window">
         <field name="name">My Tender Opportunities</field>
@@ -72,7 +72,7 @@
               sequence="30"/>
 
     <!-- ========================================================= -->
-    <!-- ⏰ URGENT TENDERS -->
+    <!-- URGENT TENDERS -->
     <!-- ========================================================= -->
     <record id="action_etimad_urgent_tenders" model="ir.actions.act_window">
         <field name="name">Urgent Tenders (≤7 days)</field>
@@ -89,38 +89,37 @@
               sequence="40"/>
 
     <!-- ========================================================= -->
-    <!-- 🔄 SYNC ACTIONS -->
+    <!-- SYNC ACTIONS -->
     <!-- ========================================================= -->
     <record id="action_fetch_etimad_tenders_menu" model="ir.actions.server">
-        <field name="name">🔄 Fetch Latest Tenders (50)</field>
+        <field name="name">Fetch Latest Tenders (50)</field>
         <field name="model_id" ref="model_ics_etimad_tender"/>
         <field name="state">code</field>
         <field name="code">action = model.fetch_etimad_tenders(page_size=50, page_number=1)</field>
     </record>
 
     <menuitem id="menu_fetch_latest_tenders"
-              name="🔄 Fetch Latest Tenders"
+              name="Fetch Latest Tenders"
               parent="menu_etimad_root"
               action="action_fetch_etimad_tenders_menu"
               sequence="15"/>
 
     <record id="action_fetch_batch_etimad_tenders_menu" model="ir.actions.server">
-        <field name="name">🔄 Fetch Batch (150 Tenders)</field>
+        <field name="name">Fetch Batch (150 Tenders)</field>
         <field name="model_id" ref="model_ics_etimad_tender"/>
         <field name="state">code</field>
         <field name="code">action = model.action_fetch_batch()</field>
     </record>
 
     <menuitem id="menu_fetch_batch_tenders"
-              name="🔄 Fetch Batch (150)"
+              name="Fetch Batch (150)"
               parent="menu_etimad_root"
               action="action_fetch_batch_etimad_tenders_menu"
               sequence="16"/>
 
     <!-- ========================================================= -->
-    <!-- ⚙️ CONFIGURATION -->
+    <!-- CONFIGURATION -->
     <!-- ========================================================= -->
-    <!-- ⚙️ CONFIGURATION -->
     <menuitem id="menu_etimad_config"
             name="Configuration"
             parent="menu_etimad_root"

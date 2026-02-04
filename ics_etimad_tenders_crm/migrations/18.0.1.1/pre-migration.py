@@ -22,6 +22,6 @@ def migrate(cr, version):
             ALTER TABLE ics_etimad_tender 
             RENAME COLUMN tender_type TO etimad_tender_type
         """)
-        print("✓ Successfully renamed column: tender_type → etimad_tender_type")
+        print("Success: renamed column tender_type to etimad_tender_type")
     else:
-        print("ℹ Column 'tender_type' not found, skipping migration (already renamed or fresh install)")
+        print("Info: column 'tender_type' not found, skipping (already renamed or fresh install)")

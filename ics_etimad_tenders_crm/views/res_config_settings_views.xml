@@ -9,7 +9,7 @@
                 <app string="Etimad Tenders" name="ics_etimad_tenders_crm" groups="base.group_system">
                     
                     <!-- Scraping & Sync Settings -->
-                    <block title="🔄 Scraping &amp; Synchronization" name="etimad_scraping_settings">
+                    <block title="Scraping &amp; Synchronization" name="etimad_scraping_settings">
                         <setting id="etimad_auto_sync_setting" help="Automatically fetch new tenders from Etimad platform">
                             <field name="etimad_auto_sync"/>
                             <div class="content-group" invisible="not etimad_auto_sync">
@@ -36,18 +36,20 @@
                         
                         <setting id="etimad_test_connection">
                             <button name="action_test_scraping" 
-                                    string="🧪 Test Connection" 
+                                    string="Test Connection" 
                                     type="object" 
-                                    class="btn-secondary"/>
+                                    class="btn-secondary"
+                                    icon="fa-plug"/>
                             <button name="action_manual_sync" 
-                                    string="🔄 Manual Sync Now" 
+                                    string="Manual Sync Now" 
                                     type="object" 
-                                    class="btn-primary ml-2"/>
+                                    class="btn-primary ml-2"
+                                    icon="fa-refresh"/>
                         </setting>
                     </block>
                     
                     <!-- Smart Matching Settings -->
-                    <block title="🎯 Smart Matching Configuration" name="etimad_matching_settings">
+                    <block title="Smart Matching Configuration" name="etimad_matching_settings">
                         <setting id="etimad_matching_enable" help="Calculate matching scores based on your company profile">
                             <field name="etimad_enable_matching"/>
                             <div class="content-group" invisible="not etimad_enable_matching">
@@ -93,14 +95,15 @@
                         
                         <setting id="etimad_recalc_scores">
                             <button name="action_recalculate_match_scores" 
-                                    string="♻️ Recalculate All Match Scores" 
+                                    string="Recalculate All Match Scores"
+                                    icon="fa-refresh" 
                                     type="object" 
                                     class="btn-secondary"/>
                         </setting>
                     </block>
                     
                     <!-- Auto Opportunity Creation -->
-                    <block title="🤖 Auto Opportunity Creation" name="etimad_opportunity_settings">
+                    <block title="Auto Opportunity Creation" name="etimad_opportunity_settings">
                         <setting id="etimad_auto_opportunity" title="Automatically create CRM opportunities for new tenders" help="Enable to create opportunities when tenders match criteria">
                             <field name="etimad_auto_create_opportunity"/>
                             <div class="content-group" invisible="not etimad_auto_create_opportunity">
@@ -123,7 +126,7 @@
                     </block>
                     
                     <!-- Auto Fetch Details -->
-                    <block title="📥 Auto Fetch Details" name="etimad_fetch_details_settings">
+                    <block title="Auto Fetch Details" name="etimad_fetch_details_settings">
                         <setting id="etimad_auto_fetch" help="Automatically fetch detailed information for high-match tenders">
                             <field name="etimad_auto_fetch_details"/>
                             <div class="content-group" invisible="not etimad_auto_fetch_details">
@@ -137,7 +140,7 @@
                     </block>
                     
                     <!-- Notification Settings -->
-                    <block title="🔔 Notification Settings" name="etimad_notification_settings">
+                    <block title="Notification Settings" name="etimad_notification_settings">
                         <setting id="etimad_notifications" help="Configure when and who receives tender notifications">
                             <field name="etimad_notify_new_tenders"/>
                             <label for="etimad_notify_new_tenders" string="Notify on New Tenders"/>
@@ -160,7 +163,7 @@
                     </block>
                     
                     <!-- Archive Settings -->
-                    <block title="📦 Archive Settings" name="etimad_archive_settings">
+                    <block title="Archive Settings" name="etimad_archive_settings">
                         <setting id="etimad_archive" help="Automatically archive old closed tenders to keep your data clean">
                             <field name="etimad_auto_archive"/>
                             <div class="content-group" invisible="not etimad_auto_archive">

@@ -48,10 +48,10 @@ When important changes are detected:
 
 **In Chatter:**
 - A message is posted with a summary of changes
-- Format: "🔄 Etimad Tender Updated" with bullet points for each change
+- Format: " Etimad Tender Updated" with bullet points for each change
 - Example:
   ```
-  🔄 Etimad Tender Updated
+ Etimad Tender Updated
   
   ⏰ Offers deadline EXTENDED by 7 days (new: 2026-02-15 14:00)
   💰 Estimated amount changed: 500,000 → 750,000 SAR (+50.0%)
@@ -67,7 +67,7 @@ When important changes are detected:
 ### 4. Visual Indicators
 
 **In List View:**
-- New column: "🔄 Extended" (boolean) - shows checkmark for extended deadlines
+- New column: " Extended" (boolean) - shows checkmark for extended deadlines
 - Easy to filter and sort by extended tenders
 
 **In Form View:**
@@ -197,7 +197,7 @@ Activities use standard Odoo activity mechanism:
 
 1. **Check Activities Daily** - Deadline extensions are time-sensitive
 2. **Review Chatter** - See full history of Etimad updates on each tender
-3. **Filter by Extended** - Use the "🔄 Extended" column to find tenders with more time
+3. **Filter by Extended** - Use the " Extended" column to find tenders with more time
 4. **Link to Opportunities** - When you link an Etimad tender to an opportunity, activities go to the right person
 5. **Manual Fetch** - Before important deadlines, click "Fetch Details" to ensure latest data
 
@@ -207,7 +207,7 @@ Activities use standard Odoo activity mechanism:
 A: Daily at 6 AM by default. You can also fetch manually anytime.
 
 **Q: Will I be notified if a deadline is shortened?**  
-A: Yes, the system detects reductions too: "⚠️ Offers deadline REDUCED by X days"
+A: Yes, the system detects reductions too: "[!] Offers deadline REDUCED by X days"
 
 **Q: What if I miss a notification?**  
 A: All changes are logged in the tender's chatter and the "Etimad Updates" section on the form view.
@@ -216,7 +216,7 @@ A: All changes are logged in the tender's chatter and the "Etimad Updates" secti
 A: Yes, the `previous_offers_deadline` field shows the deadline before the change.
 
 **Q: Does this work for tenders I haven't looked at yet?**  
-A: Yes, all tenders are monitored. Filter by "🔄 Extended" to find any extended tenders.
+A: Yes, all tenders are monitored. Filter by " Extended" to find any extended tenders.
 
 ## Future Enhancements
 

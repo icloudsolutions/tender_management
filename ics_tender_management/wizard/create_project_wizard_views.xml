@@ -10,7 +10,7 @@
                     <sheet>
                         <!-- Warning for existing projects -->
                         <div class="alert alert-warning" role="alert" invisible="not has_existing_projects">
-                            <strong>⚠️ Warning: Project Already Exists!</strong>
+                            <strong><i class="fa fa-exclamation-triangle"/> Warning: Project Already Exists!</strong>
                             <p class="mb-0">
                                 This tender already has an active project. 
                                 Creating a duplicate may cause confusion and data fragmentation.

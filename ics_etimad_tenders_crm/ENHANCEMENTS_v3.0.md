@@ -5,7 +5,7 @@ Major overhaul of the `ics_etimad_tenders_crm` module with focus on intelligent 
 
 ---
 
-## 🚀 New Features
+## New Features
 
 ### 1. Batch Scraping & Pagination Support
 
@@ -58,8 +58,8 @@ Computed field `matching_score` evaluates tender fit based on:
 
 #### Quick Action Filters (with emojis for visual identification)
 - ⭐ **Favorites**: Your starred tenders
-- 🔥 **Hot Tenders**: High-value + urgent
-- ⚠️ **Urgent**: ≤3 days remaining
+-  **Hot Tenders**: High-value + urgent
+- [!] **Urgent**: ≤3 days remaining
 
 #### Deadline Filters
 - Due Today
@@ -121,8 +121,8 @@ Computed field `matching_score` evaluates tender fit based on:
 ### 5. Rich Kanban View
 
 #### Visual Indicators
-- 🔥 Icon for hot tenders
-- ⚠️ Icon for urgent tenders
+-  Icon for hot tenders
+- [!] Icon for urgent tenders
 - Border colors: info (hot), danger (urgent)
 
 #### Comprehensive Card Display
@@ -169,7 +169,7 @@ All bulk actions provide notification feedback:
 
 ---
 
-## 🛠️ Technical Improvements
+## Technical Improvements
 
 ### Error Handling
 - Per-tender try/catch in batch processing
@@ -198,7 +198,7 @@ All bulk actions provide notification feedback:
 
 ---
 
-## 📊 Field Reference
+## Field Reference
 
 ### New Computed Fields
 | Field | Type | Description |
@@ -219,7 +219,7 @@ All bulk actions provide notification feedback:
 
 ---
 
-## 🎯 User Workflows
+## User Workflows
 
 ### Workflow 1: Finding Best-Match Tenders
 1. Navigate to Etimad Tenders
@@ -239,13 +239,13 @@ All bulk actions provide notification feedback:
 
 ### Workflow 3: Kanban Board Management
 1. Switch to Kanban view (grouped by state)
-2. Visual scan for 🔥 hot and ⚠️ urgent tenders
+2. Visual scan for  hot and [!] urgent tenders
 3. Check matching score progress bars
 4. Drag & drop between states
 5. Use quick action buttons for one-click operations
 
 ### Workflow 4: Urgent Tender Response
-1. Apply filter: "⚠️ Urgent" (≤3 days)
+1. Apply filter: "[!] Urgent" (≤3 days)
 2. List view shows danger highlights
 3. Sort by estimated value (highest first)
 4. For each tender:
@@ -303,7 +303,7 @@ Planned features:
 
 ---
 
-## 🔄 Migration Notes
+## Migration Notes
 
 ### Upgrading from v2.x to v3.0
 1. **Database Migration**: New fields added automatically
@@ -320,7 +320,7 @@ Planned features:
 
 ---
 
-## 📝 Development Notes
+## Development Notes
 
 ### Code Structure
 - **Model**: `ics_etimad_tenders_crm/models/etimad_tender.py`

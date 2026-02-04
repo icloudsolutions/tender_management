@@ -19,7 +19,7 @@
         <field name="inherit_id" ref="ics_etimad_tenders_crm.view_etimad_tender_form"/>
         <field name="arch" type="xml">
             <group name="crm_info" position="after">
-                <group string="🎯 Direct Tender Integration" name="tender_ics_group" invisible="not context.get('show_tender_integration', True)">
+                <group string="Direct Tender Integration" name="tender_ics_group" invisible="not context.get('show_tender_integration', True)">
                     <field name="tender_id_ics"
                            string="Linked ICS Tender"
                            options="{'no_create': True}"
@@ -34,7 +34,7 @@
             </group>
             <button name="action_create_opportunity" position="after">
                 <button name="action_create_tender_direct"
-                        string="🎯 Create Tender Directly"
+                        string="Create Tender Directly"
                         type="object"
                         class="btn btn-info flex-grow-1"
                         icon="fa-rocket"

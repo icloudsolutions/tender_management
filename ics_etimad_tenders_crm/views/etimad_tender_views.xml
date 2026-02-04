@@ -13,14 +13,16 @@
                 
                 <header>
                     <button name="%(action_server_fetch_etimad_tenders)d" 
-                            string="🔄 Fetch Latest (50)" 
+                            string="Fetch Latest (50)" 
                             type="action" 
                             class="btn-primary"
+                            icon="fa-refresh"
                             title="Fetch latest 50 tenders from Etimad portal"/>
                     <button name="%(action_server_fetch_batch_etimad_tenders)d" 
-                            string="🔄 Fetch Batch (150)" 
+                            string="Fetch Batch (150)" 
                             type="action" 
                             class="btn-secondary"
+                            icon="fa-refresh"
                             title="Fetch 150 tenders (3 pages) from Etimad portal"/>
                 </header>
                 
@@ -44,10 +46,10 @@
                        decoration-warning="remaining_days &lt; 7 and remaining_days &gt; 3"/>
                 <field name="total_fees" widget="monetary" options="{'currency_field': 'currency_id'}" optional="hide" string="Total Fees"/>
                 <field name="tender_status_text" optional="show" string="Etimad Status" widget="badge"/>
-                <field name="is_participating" widget="boolean" optional="show" string="👥 Participating"/>
-                <field name="award_announced" widget="boolean" optional="hide" string="🏆 Awarded"/>
+                <field name="is_participating" widget="boolean" optional="show" string="Participating"/>
+                <field name="award_announced" widget="boolean" optional="hide" string="Awarded"/>
                 <field name="opportunity_id" optional="show" string="Opportunity"/>
-                <field name="deadline_extended" widget="boolean" optional="show" string="🔄 Extended"/>
+                <field name="deadline_extended" widget="boolean" optional="show" string="Extended"/>
                 <field name="scraping_status" widget="badge" optional="hide" string="Data Status"
                        decoration-success="scraping_status == 'success'"
                        decoration-danger="scraping_status == 'failed'"
@@ -89,15 +91,17 @@
             <form string="Etimad Tender" class="o_etimad_tender_form">
                 <header>
                     <button name="action_toggle_participating" 
-                            string="✅ Mark as Participating" 
+                            string="Mark as Participating" 
                             type="object" 
                             class="btn-success"
+                            icon="fa-check"
                             invisible="is_participating"
                             help="Mark that your company is preparing a quotation for this tender"/>
                     <button name="action_toggle_participating" 
-                            string="⬜ Unmark Participating" 
+                            string="Unmark Participating" 
                             type="object" 
                             class="btn-secondary"
+                            icon="fa-times"
                             invisible="not is_participating"
                             help="Remove participation flag"/>
                 </header>
@@ -182,12 +186,12 @@
                     
                     <!-- Status Ribbons -->
                     <widget name="web_ribbon" 
-                            title="⭐ Favorite" 
+                            title="Favorite" 
                             bg_color="bg-warning" 
                             invisible="not is_favorite"/>
                     
                     <widget name="web_ribbon" 
-                            title="⚠ Urgent" 
+                            title="Urgent" 
                             bg_color="bg-danger" 
                             invisible="remaining_days &gt; 3 or remaining_days &lt;= 0"/>
                     
@@ -212,7 +216,7 @@
                     
                     <!-- Main Information Groups -->
                     <group>
-                        <group string="📋 Tender Information" name="tender_info">
+                        <group string="Tender Information" name="tender_info">
                             <field name="tender_number" 
                                    string="Tender Number"
                                    placeholder="Auto-filled from Etimad"/>
@@ -233,7 +237,7 @@
                                    readonly="1"/>
                         </group>
                         
-                        <group string="📅 Important Dates" name="dates_info">
+                        <group string="Important Dates" name="dates_info">
                             <field name="created_on" 
                                    string="Created" 
                                    readonly="1"
@@ -262,7 +266,7 @@
                     
                     <!-- Financial and CRM Information -->
                     <group>
-                        <group string="💰 Financial Information" name="financial_info">
+                        <group string="Financial Information" name="financial_info">
                             <field name="currency_id" invisible="1"/>
                             <field name="invitation_cost" 
                                    string="Invitation Cost"
@@ -279,7 +283,7 @@
                                    class="oe_subtotal_footer_separator fw-bold"/>
                         </group>
                         
-                        <group string="🤝 CRM Integration" name="crm_info">
+                        <group string="CRM Integration" name="crm_info">
                             <field name="opportunity_id" 
                                    string="Linked Opportunity"
                                    options="{'no_create': True}"/>
@@ -291,7 +295,7 @@
                             </div>
                         </group>
                         
-                        <group string="🔄 Etimad Updates" name="etimad_updates" invisible="not has_etimad_updates">
+                        <group string="Etimad Updates" name="etimad_updates" invisible="not has_etimad_updates">
                             <field name="has_etimad_updates" invisible="1"/>
                             <field name="deadline_extended" readonly="1" widget="boolean"/>
                             <field name="deadline_extensions_count" readonly="1" string="Times Extended" invisible="deadline_extensions_count == 0"/>
@@ -308,34 +312,34 @@
                     <group invisible="not tender_url">
                         <div class="d-flex gap-2 mt-3">
                             <button name="action_open_url" 
-                                    string="🔗 Open on Etimad Portal" 
+                                    string="Open on Etimad Portal" 
                                     type="object" 
                                     class="btn btn-primary flex-grow-1" 
                                     icon="fa-external-link"
                                     title="Visit this tender on the Etimad website"/>
                             <button name="action_open_details_page" 
-                                    string="📋 View Details Page" 
+                                    string="View Details Page" 
                                     type="object" 
                                     class="btn btn-primary flex-grow-1" 
                                     icon="fa-file-text-o"
                                     invisible="not tender_id_string"
                                     title="Open detailed tender information page"/>
                             <button name="action_open_detailed_report" 
-                                    string="📊 View Report" 
+                                    string="View Report" 
                                     type="object" 
                                     class="btn btn-secondary flex-grow-1" 
                                     icon="fa-bar-chart"
                                     invisible="not tender_id_string"
                                     title="Open detailed tender report"/>
                             <button name="action_fetch_detailed_info" 
-                                    string="🔄 Fetch Details" 
+                                    string="Fetch Details" 
                                     type="object" 
                                     class="btn btn-warning flex-grow-1" 
                                     icon="fa-download"
                                     invisible="not tender_id_string"
                                     title="Fetch detailed information from Etimad API"/>
                             <button name="action_create_opportunity" 
-                                    string="➕ Create Opportunity" 
+                                    string="Create Opportunity" 
                                     type="object" 
                                     class="btn btn-success flex-grow-1" 
                                     icon="fa-plus-circle"
@@ -346,21 +350,21 @@
                     
                     <!-- Detailed Information in Notebook -->
                     <notebook>
-                        <page string="📝 Description" name="description">
+                        <page string="Description" name="description">
                             <field name="description" 
                                    placeholder="Enter detailed tender description, requirements, and specifications..."
                                    widget="text"
                                    nolabel="1"/>
                         </page>
                         
-                        <page string="📓 Internal Notes" name="notes">
+                        <page string="Internal Notes" name="notes">
                             <field name="notes" 
                                    placeholder="Add internal notes, team comments, or action items here..."
                                    widget="text"
                                    nolabel="1"/>
                         </page>
                         
-                        <page string="📊 Technical Details" name="technical">
+                        <page string="Technical Details" name="technical">
                             <group>
                                 <group string="System Information">
                                     <field name="tender_id" readonly="1"/>
@@ -586,13 +590,15 @@
             <kanban class="o_kanban_mobile o_etimad_kanban" default_group_by="etimad_tender_type">
                 <header>
                     <button name="%(action_server_fetch_etimad_tenders)d" 
-                            string="🔄 Fetch Latest" 
+                            string="Fetch Latest" 
                             type="action" 
-                            class="btn-primary"/>
+                            class="btn-primary"
+                            icon="fa-refresh"/>
                     <button name="%(action_server_fetch_batch_etimad_tenders)d" 
-                            string="🔄 Fetch Batch" 
+                            string="Fetch Batch" 
                             type="action" 
-                            class="btn-secondary"/>
+                            class="btn-secondary"
+                            icon="fa-refresh"/>
                 </header>
                 <field name="name"/>
                 <field name="reference_number"/>
@@ -620,8 +626,8 @@
                             <div class="o_kanban_record_top">
                                 <div class="o_kanban_record_headings">
                                     <strong class="o_kanban_record_title">
-                                        <t t-if="record.is_hot_tender.raw_value">🔥 </t>
-                                        <t t-if="record.is_urgent.raw_value">⚠️ </t>
+                                        <t t-if="record.is_hot_tender.raw_value"><i class="fa fa-fire text-info"/> </t>
+                                        <t t-if="record.is_urgent.raw_value"><i class="fa fa-exclamation-triangle text-danger"/> </t>
                                         <field name="name"/>
                                     </strong>
                                     <div class="o_kanban_record_subtitle text-muted">
@@ -732,9 +738,9 @@
                 <field name="tender_number"/>
                 
                 <!-- Quick Filters -->
-                <filter string="⭐ Favorites" name="favorites" domain="[('is_favorite', '=', True)]"/>
-                <filter string="🔥 Hot Tenders" name="hot_tenders" domain="[('is_hot_tender', '=', True)]"/>
-                <filter string="⚠️ Urgent" name="urgent" domain="[('is_urgent', '=', True)]"/>
+                <filter string="Favorites" name="favorites" domain="[('is_favorite', '=', True)]"/>
+                <filter string="Hot Tenders" name="hot_tenders" domain="[('is_hot_tender', '=', True)]"/>
+                <filter string="Urgent" name="urgent" domain="[('is_urgent', '=', True)]"/>
                 
                 <separator/>
                 <filter string="With Opportunity" name="with_opportunity" domain="[('opportunity_id', '!=', False)]"/>
@@ -742,11 +748,11 @@
                 
                 <separator/>
                 <!-- Status Filters -->
-                <filter string="👥 Participating" name="filter_participating" domain="[('is_participating','=',True)]"/>
-                <filter string="✅ Approved (Etimad)" name="filter_approved" domain="[('tender_status_approved','=',True)]"/>
-                <filter string="🏆 With Award Results" name="filter_awarded" domain="[('award_announced','=',True)]"/>
-                <filter string="🇸🇦 Local Content Required" name="filter_local_content" domain="[('local_content_required','=',True)]"/>
-                <filter string="🏢 SME Allowed" name="filter_sme" domain="[('sme_participation_allowed','=',True)]"/>
+                <filter string="Participating" name="filter_participating" domain="[('is_participating','=',True)]"/>
+                <filter string="Approved (Etimad)" name="filter_approved" domain="[('tender_status_approved','=',True)]"/>
+                <filter string="With Award Results" name="filter_awarded" domain="[('award_announced','=',True)]"/>
+                <filter string="Local Content Required" name="filter_local_content" domain="[('local_content_required','=',True)]"/>
+                <filter string="SME Allowed" name="filter_sme" domain="[('sme_participation_allowed','=',True)]"/>
                 
                 <separator/>
                 <!-- Deadline Filters -->

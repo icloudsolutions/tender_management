@@ -19,7 +19,7 @@
                         <div class="d-flex align-items-center">
                             <i class="fa fa-lock fa-2x me-3"/>
                             <div class="flex-grow-1">
-                                <strong>🎯 This opportunity is controlled by Tender Management</strong>
+                                <strong><i class="fa fa-briefcase"/> This opportunity is controlled by Tender Management</strong>
                                 <p class="mb-0">
                                     This opportunity is linked to an active tender and cannot be edited directly.
                                     All changes must be made through the tender form to maintain data consistency.

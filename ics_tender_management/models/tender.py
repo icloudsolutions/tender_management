@@ -641,7 +641,7 @@ class Tender(models.Model):
         if self.etimad_tender_id or self.etimad_link:
             self.activity_schedule(
                 'mail.mail_activity_data_todo',
-                summary=_('📥 Download Tender Documents from Etimad'),
+                summary=_('Download Tender Documents from Etimad'),
                 note=_(
                     '<strong>Action Required:</strong><br/>'
                     '<ul>'
@@ -666,7 +666,7 @@ class Tender(models.Model):
         
         self.activity_schedule(
             'mail.mail_activity_data_meeting',
-            summary=_('📍 Schedule Site Visit (الزيارة الميدانية)'),
+            summary=_('Schedule Site Visit'),
             note=_(
                 '<strong>Site Visit Required</strong><br/>'
                 '<ul>'
@@ -686,7 +686,7 @@ class Tender(models.Model):
         
         self.activity_schedule(
             'mail.mail_activity_data_todo',
-            summary=_('📋 Complete Technical Study & BoQ'),
+            summary=_('Complete Technical Study & BoQ'),
             note=_(
                 '<strong>Technical Phase Tasks:</strong><br/>'
                 '<ul>'
@@ -708,7 +708,7 @@ class Tender(models.Model):
         # Activity: Request vendor quotes
         self.activity_schedule(
             'mail.mail_activity_data_todo',
-            summary=_('💰 Request Vendor Quotations'),
+            summary=_('Request Vendor Quotations'),
             note=_(
                 '<strong>Financial Phase Tasks:</strong><br/>'
                 '<ul>'
@@ -729,7 +729,7 @@ class Tender(models.Model):
         
         self.activity_schedule(
             'mail.mail_activity_data_todo',
-            summary=_('📄 Review & Approve Quotation'),
+            summary=_('Review & Approve Quotation'),
             note=_(
                 '<strong>Quotation Review:</strong><br/>'
                 '<ul>'
@@ -750,7 +750,7 @@ class Tender(models.Model):
         
         self.activity_schedule(
             'mail.mail_activity_data_todo',
-            summary=_('✅ Confirm Submission & Track'),
+            summary=_('Confirm Submission & Track'),
             note=_(
                 '<strong>Post-Submission:</strong><br/>'
                 '<ul>'
@@ -770,7 +770,7 @@ class Tender(models.Model):
         
         self.activity_schedule(
             'mail.mail_activity_data_todo',
-            summary=_('🔍 Monitor Evaluation & Prepare Response'),
+            summary=_('Monitor Evaluation & Prepare Response'),
             note=_(
                 '<strong>Evaluation Phase:</strong><br/>'
                 '<ul>'
@@ -791,7 +791,7 @@ class Tender(models.Model):
         
         self.activity_schedule(
             'mail.mail_activity_data_todo',
-            summary=_('⚖️ Consider Appeal (إعتراض) - You Have the Right!'),
+            summary=_('Consider Appeal - You Have the Right!'),
             note=_(
                 '<strong style="color: #d9534f;">Tender Lost - Appeal Option Available</strong><br/><br/>'
                 
@@ -816,7 +816,7 @@ class Tender(models.Model):
                 '<li>Track response status</li>'
                 '</ul><br/>'
                 
-                '<strong>⏰ Act quickly - appeals are usually time-sensitive!</strong>'
+                '<strong><i class="fa fa-clock-o"/> Act quickly - appeals are usually time-sensitive!</strong>'
             ),
             user_id=self.user_id.id,
             date_deadline=fields.Date.today()

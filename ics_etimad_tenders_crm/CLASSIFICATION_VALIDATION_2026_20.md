@@ -11,25 +11,25 @@ The user provided a screenshot showing the **"تصنيف المقاولين"** (
 | # | Etimad Field (Arabic) | Etimad Field (English) | Value in Tender 2026/20 | Model Field | Status |
 |---|---------------------|----------------------|----------------------|-------------|---------|
 | **تصنيف المقاولين (Contractor Classification)** |
-| 1 | مجال التصنيف | Classification Field | غير مطلوب (Not required) | `classification_field` | ✅ Captured |
-| | | | | `classification_required` | ✅ Captured (computed) |
+| 1 | مجال التصنيف | Classification Field | غير مطلوب (Not required) | `classification_field` | [OK] Captured |
+| | | | | `classification_required` | [OK] Captured (computed) |
 | **مجال التنفيذ وموقع التنفيذ والتقديم (Execution & Location)** |
-| 2 | مكان التنفيذ | Execution Location | داخل المملكة (Inside Kingdom) | `execution_location_type` | ✅ Captured |
-| 3 | منطقة الرياض | Execution Region | منطقة الرياض (Riyadh Region) | `execution_regions` | ✅ Captured |
-| 4 | المزاحمية | Execution City | المزاحمية (Al-Muzahmiyah) | `execution_cities` | ✅ Captured |
+| 2 | مكان التنفيذ | Execution Location | داخل المملكة (Inside Kingdom) | `execution_location_type` | [OK] Captured |
+| 3 | منطقة الرياض | Execution Region | منطقة الرياض (Riyadh Region) | `execution_regions` | [OK] Captured |
+| 4 | المزاحمية | Execution City | المزاحمية (Al-Muzahmiyah) | `execution_cities` | [OK] Captured |
 | **نشاط المنافسة (Competition Activity)** |
-| 5 | نشاط المنافسة | Competition Activity | الأشغال والصيانة والخلاطة المشآت - التشغيل والصيانة | `activity_details` | ✅ Captured |
-| 6 | التفاصيل | Details | (Activity details) | `tender_purpose` | ✅ Captured |
+| 5 | نشاط المنافسة | Competition Activity | الأشغال والصيانة والخلاطة المشآت - التشغيل والصيانة | `activity_details` | [OK] Captured |
+| 6 | التفاصيل | Details | (Activity details) | `tender_purpose` | [OK] Captured |
 | **بنود المنافسة (Competition Items)** |
-| 7 | تشتمل المنافسة على بنود توريد | Includes supply items | لا (No) | `includes_supply_items` | ✅ Captured |
-| 8 | أعمال الإنشاء | Construction works | (If any) | `construction_works` | ✅ Captured |
-| 9 | أعمال الصيانة والتشغيل | Maintenance & operation works | (Vehicle maintenance) | `maintenance_works` | ✅ Captured |
+| 7 | تشتمل المنافسة على بنود توريد | Includes supply items | لا (No) | `includes_supply_items` | [OK] Captured |
+| 8 | أعمال الإنشاء | Construction works | (If any) | `construction_works` | [OK] Captured |
+| 9 | أعمال الصيانة والتشغيل | Maintenance & operation works | (Vehicle maintenance) | `maintenance_works` | [OK] Captured |
 
 ---
 
 ## Validation Result
 
-### ✅ All Fields Captured (9/9)
+### [OK] All Fields Captured (9/9)
 
 **Classification & Requirements section is 100% covered!**
 
@@ -264,10 +264,10 @@ All fields also have regex fallback patterns for robustness.
 ### For Bidders
 
 **Qualification Assessment:**
-- ✅ Know if specific classification required
-- ✅ Check if location matches capabilities
-- ✅ Verify activity alignment with expertise
-- ✅ Understand work scope (supply vs. construction vs. maintenance)
+- [OK] Know if specific classification required
+- [OK] Check if location matches capabilities
+- [OK] Verify activity alignment with expertise
+- [OK] Understand work scope (supply vs. construction vs. maintenance)
 
 **Bid/No-Bid Decision:**
 - Classification match? Can we qualify?
@@ -312,13 +312,13 @@ All fields also have regex fallback patterns for robustness.
 
 | Criteria | Value | Assessment |
 |----------|-------|------------|
-| Classification Required | No | ✅ Can bid without classification |
-| Location | Riyadh - Al-Muzahmiyah | ✅ Accessible (60 km from Riyadh) |
-| Activity | Maintenance & Operations | ✅ Matches expertise |
-| Supply Items | No | ✅ Simplified logistics |
-| Work Type | Maintenance | ✅ Our core competency |
+| Classification Required | No | [OK] Can bid without classification |
+| Location | Riyadh - Al-Muzahmiyah | [OK] Accessible (60 km from Riyadh) |
+| Activity | Maintenance & Operations | [OK] Matches expertise |
+| Supply Items | No | [OK] Simplified logistics |
+| Work Type | Maintenance | [OK] Our core competency |
 
-**Result:** ✅ Good fit - Proceed with bid preparation
+**Result:** [OK] Good fit - Proceed with bid preparation
 
 ---
 
@@ -350,7 +350,7 @@ After deployment, verify with tender 2026/20:
 
 **Classification & Requirements Section:**
 
-✅ **9 out of 9 fields captured (100%)**
+[OK] **9 out of 9 fields captured (100%)**
 
 All fields from the Etimad portal's classification section are captured and displayed correctly in the Odoo module.
 
@@ -366,7 +366,7 @@ All fields from the Etimad portal's classification section are captured and disp
 
 ## Conclusion
 
-✅ **Classification Section Fully Validated**
+[OK] **Classification Section Fully Validated**
 
 The `GetRelationsDetailsViewComponenet` endpoint successfully captures all classification, location, activity, and work type information from the Etimad portal.
 
@@ -377,4 +377,4 @@ The `GetRelationsDetailsViewComponenet` endpoint successfully captures all class
 **Validated:** 2026-02-03  
 **Tender Sample:** 2026/20 (Riyadh Municipality)  
 **Section:** Classification & Execution  
-**Result:** ✅ 100% Coverage
+**Result:** [OK] 100% Coverage

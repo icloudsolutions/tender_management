@@ -13,22 +13,22 @@
 | Etimad Field (Arabic) | Etimad Field (English) | Model Field | Status | Notes |
 |----------------------|------------------------|-------------|---------|-------|
 | **المعلومات الأساسية (Basic Information)** |
-| اسم المنافسة | Tender Name | `name` | ✅ Captured | Main field |
-| رقم المنافسة | Competition Number | `tender_number` | ✅ Captured | e.g., "2026/20" |
-| الرقم المرجعي | Reference Number | `reference_number` | ✅ Captured | e.g., "260239001155" |
-| الغرض من المنافسة | Tender Purpose | `tender_purpose` | ✅ Captured | Text field for description |
-| قيمة وثائق المنافسة | Document Cost | `document_cost_amount` | ✅ Captured | 2500.00 SAR |
-| حالة المنافسة | Tender Status | `tender_status_text` | ✅ Captured | "معتمدة" (Approved) |
-| مدة العقد | Contract Duration | `contract_duration` | ✅ Captured | "90 يوم" |
-| | | `contract_duration_days` | ✅ Computed | 90 (integer) |
-| هل التأمين من متطلبات المنافسة | Insurance Required | `insurance_required` | ✅ Captured | Boolean (لا = False) |
-| نوع المنافسة | Competition Type | `tender_type` | ✅ Captured | "منافسة عامة" |
-| الجهة الحكوميه | Government Entity | `agency_name` | ✅ Captured | "أمانة منطقة الرياض" |
-| الوقت المتبقى | Time Remaining | `remaining_days` | ✅ Computed | Calculated from deadline |
-| طريقة تقديم العروض | Submission Method | `submission_method` | ✅ Captured | Selection field |
-| مطلوب ضمان الإبتدائي | Initial Guarantee Required | `initial_guarantee_required` | ✅ Captured | Boolean |
-| | Initial Guarantee Type | `initial_guarantee_type` | ✅ Captured | "لا يوجد ضمان" |
-| الضمان النهائي | Final Guarantee | ⚠️ **MISSING** | ⚠️ Not captured | **Need to add** |
+| اسم المنافسة | Tender Name | `name` | [OK] Captured | Main field |
+| رقم المنافسة | Competition Number | `tender_number` | [OK] Captured | e.g., "2026/20" |
+| الرقم المرجعي | Reference Number | `reference_number` | [OK] Captured | e.g., "260239001155" |
+| الغرض من المنافسة | Tender Purpose | `tender_purpose` | [OK] Captured | Text field for description |
+| قيمة وثائق المنافسة | Document Cost | `document_cost_amount` | [OK] Captured | 2500.00 SAR |
+| حالة المنافسة | Tender Status | `tender_status_text` | [OK] Captured | "معتمدة" (Approved) |
+| مدة العقد | Contract Duration | `contract_duration` | [OK] Captured | "90 يوم" |
+| | | `contract_duration_days` | [OK] Computed | 90 (integer) |
+| هل التأمين من متطلبات المنافسة | Insurance Required | `insurance_required` | [OK] Captured | Boolean (لا = False) |
+| نوع المنافسة | Competition Type | `tender_type` | [OK] Captured | "منافسة عامة" |
+| الجهة الحكوميه | Government Entity | `agency_name` | [OK] Captured | "أمانة منطقة الرياض" |
+| الوقت المتبقى | Time Remaining | `remaining_days` | [OK] Computed | Calculated from deadline |
+| طريقة تقديم العروض | Submission Method | `submission_method` | [OK] Captured | Selection field |
+| مطلوب ضمان الإبتدائي | Initial Guarantee Required | `initial_guarantee_required` | [OK] Captured | Boolean |
+| | Initial Guarantee Type | `initial_guarantee_type` | [OK] Captured | "لا يوجد ضمان" |
+| الضمان النهائي | Final Guarantee | [!] **MISSING** | [!] Not captured | **Need to add** |
 
 ---
 
@@ -65,7 +65,7 @@ final_guarantee_required = fields.Boolean("Final Guarantee Required",
 
 ## All Fields Summary
 
-### ✅ Currently Captured (19 fields)
+### [OK] Currently Captured (19 fields)
 
 1. `name` - Tender name
 2. `tender_number` - Competition number (2026/20)
@@ -87,7 +87,7 @@ final_guarantee_required = fields.Boolean("Final Guarantee Required",
 18. `published_at` - Publication date
 19. `tender_id_string` - Tender ID for API calls
 
-### ⚠️ Missing (1 field)
+### [!] Missing (1 field)
 
 1. `final_guarantee_percentage` - **Final guarantee % (الضمان النهائي)**
 
@@ -107,7 +107,7 @@ Captures basic info:
 - Classification
 - Locations
 - Activities
-- ✅ Final guarantee should be here
+- [OK] Final guarantee should be here
 
 **GetTenderDatesViewComponenet:**
 - All dates
@@ -157,7 +157,7 @@ if guarantee_elements:
 
 ## Impact Analysis
 
-### High Priority ⚠️
+### High Priority [!]
 Final guarantee is **critical financial information**:
 
 **For Bidders:**
@@ -232,7 +232,7 @@ agency_name = "أمانة منطقة الرياض"
 submission_method = "single_file"
 initial_guarantee_required = False
 initial_guarantee_type = "لا يوجد ضمان"
-final_guarantee_percentage = 5.00  ⚠️ Currently missing!
+final_guarantee_percentage = 5.00  [!] Currently missing!
 final_guarantee_required = True (computed)
 ```
 
@@ -240,13 +240,13 @@ final_guarantee_required = True (computed)
 
 ## Next Steps
 
-1. ✅ Validate all other fields are captured correctly
-2. ⚠️ Add final guarantee fields
-3. ⚠️ Update parser for GetRelationsDetailsViewComponenet
-4. ⚠️ Update form view
-5. ⚠️ Update list view (optional column)
-6. ✅ Test with tender 2026/20
-7. ✅ Document in FIELD_MAPPING.md
+1. [OK] Validate all other fields are captured correctly
+2. [!] Add final guarantee fields
+3. [!] Update parser for GetRelationsDetailsViewComponenet
+4. [!] Update form view
+5. [!] Update list view (optional column)
+6. [OK] Test with tender 2026/20
+7. [OK] Document in FIELD_MAPPING.md
 
 ---
 
@@ -254,11 +254,11 @@ final_guarantee_required = True (computed)
 
 **Status: 95% Complete**
 
-- ✅ 19 out of 20 basic fields captured correctly
-- ⚠️ 1 critical field missing: **Final Guarantee %**
-- ✅ All 4 detail API endpoints implemented
-- ✅ Change tracking working
-- ✅ Award results working
+- [OK] 19 out of 20 basic fields captured correctly
+- [!] 1 critical field missing: **Final Guarantee %**
+- [OK] All 4 detail API endpoints implemented
+- [OK] Change tracking working
+- [OK] Award results working
 
 **Priority:** Add final guarantee field to complete the basic information capture.
 

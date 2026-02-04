@@ -548,27 +548,27 @@ class EtimadTender(models.Model):
                 if new_offers_deadline and existing.offers_deadline:
                     if new_offers_deadline > existing.offers_deadline:
                         days_extended = (new_offers_deadline - existing.offers_deadline).days
-                        changes.append(f"⏰ Offers deadline EXTENDED by {days_extended} days (new: {new_offers_deadline.strftime('%Y-%m-%d %H:%M')})")
+                        changes.append(f"Offers deadline EXTENDED by {days_extended} days (new: {new_offers_deadline.strftime('%Y-%m-%d %H:%M')})")
                         vals['previous_offers_deadline'] = existing.offers_deadline
                         vals['deadline_extended'] = True
                         vals['deadline_extensions_count'] = existing.deadline_extensions_count + 1
                         vals['last_deadline_extension_date'] = fields.Datetime.now()
                     elif new_offers_deadline < existing.offers_deadline:
                         days_reduced = (existing.offers_deadline - new_offers_deadline).days
-                        changes.append(f"⚠️ Offers deadline REDUCED by {days_reduced} days (new: {new_offers_deadline.strftime('%Y-%m-%d %H:%M')})")
+                        changes.append(f"Offers deadline REDUCED by {days_reduced} days (new: {new_offers_deadline.strftime('%Y-%m-%d %H:%M')})")
                         vals['previous_offers_deadline'] = existing.offers_deadline
                 
                 # Check enquiry deadline changes
                 if new_enquiry_deadline and existing.last_enquiry_date:
                     if new_enquiry_deadline != existing.last_enquiry_date:
-                        changes.append(f"📝 Enquiry deadline changed to {new_enquiry_deadline.strftime('%Y-%m-%d %H:%M')}")
+                        changes.append(f"Enquiry deadline changed to {new_enquiry_deadline.strftime('%Y-%m-%d %H:%M')}")
                         vals['previous_last_enquiry_date'] = existing.last_enquiry_date
                 
                 # Check estimated amount changes
                 if new_estimated_amount and existing.estimated_amount:
                     if abs(new_estimated_amount - existing.estimated_amount) > 1000:  # Significant if > 1000 SAR
                         change_pct = ((new_estimated_amount - existing.estimated_amount) / existing.estimated_amount) * 100
-                        changes.append(f"💰 Estimated amount changed: {existing.estimated_amount:,.0f} → {new_estimated_amount:,.0f} SAR ({change_pct:+.1f}%)")
+                        changes.append(f"Estimated amount changed: {existing.estimated_amount:,.0f} to {new_estimated_amount:,.0f} SAR ({change_pct:+.1f}%)")
                         vals['previous_estimated_amount'] = existing.estimated_amount
                 
                 # Update record with change tracking
@@ -580,7 +580,7 @@ class EtimadTender(models.Model):
                     # Post to chatter
                     existing.sudo().write(vals)
                     existing.message_post(
-                        body=f"<strong>🔄 Etimad Tender Updated</strong><br/><br/>{'<br/>'.join(changes)}",
+                        body=f"<strong><i class=\"fa fa-refresh\"/> Etimad Tender Updated</strong><br/><br/>{'<br/>'.join(changes)}",
                         subject='Etimad Update Detected',
                         message_type='notification',
                         subtype_xmlid='mail.mt_note',
@@ -854,9 +854,9 @@ class EtimadTender(models.Model):
         self.ensure_one()
         self.is_participating = not self.is_participating
         if self.is_participating:
-            self.message_post(body=_('✅ Marked as participating in this tender'))
+            self.message_post(body=_('<i class="fa fa-check"/> Marked as participating in this tender'))
         else:
-            self.message_post(body=_('⬜ Unmarked as participating'))
+            self.message_post(body=_('Unmarked as participating'))
     
     def action_fetch_detailed_info(self):
         # Fetch detailed tender information from all Etimad API endpoints
