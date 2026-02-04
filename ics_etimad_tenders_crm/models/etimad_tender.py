@@ -963,6 +963,10 @@ class EtimadTender(models.Model):
                 if parsed_data.get('tender_status_text'):
                     update_vals['tender_status_text'] = parsed_data['tender_status_text']
                 
+                # Submission method (طريقة تقديم العروض)
+                if parsed_data.get('submission_method'):
+                    update_vals['submission_method'] = parsed_data['submission_method']
+                
                 # Classification
                 if parsed_data.get('classification_field'):
                     update_vals['classification_field'] = parsed_data['classification_field']
@@ -1110,6 +1114,19 @@ class EtimadTender(models.Model):
                 if status_elements:
                     parsed_data['tender_status_text'] = html_module.unescape(status_elements[0].strip())
                 
+                # Extract submission method (طريقة تقديم العروض)
+                submission_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "طريقة تقديم العروض")]/following-sibling::div[1]//span/text()')
+                if submission_elements:
+                    submission_text = html_module.unescape(submission_elements[0].strip())
+                    if 'ملف واحد' in submission_text or 'معا' in submission_text:
+                        parsed_data['submission_method'] = 'single_file'
+                    elif 'ملفين منفصلين' in submission_text or 'منفصل' in submission_text:
+                        parsed_data['submission_method'] = 'separate_files'
+                    elif 'إلكتروني' in submission_text:
+                        parsed_data['submission_method'] = 'electronic'
+                    elif 'يدوي' in submission_text:
+                        parsed_data['submission_method'] = 'manual'
+                
                 # Extract classification field
                 classification_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "مجال التصنيف")]/following-sibling::div[1]//span/text()')
                 if classification_elements:
@@ -1201,6 +1218,19 @@ class EtimadTender(models.Model):
                 status_text = re.sub(r'<[^>]+>', '', status_match.group(1)).strip()
                 if status_text:
                     parsed_data['tender_status_text'] = html_module.unescape(status_text)
+            
+            # Extract submission method (طريقة تقديم العروض)
+            submission_match = re.search(r'طريقة تقديم العروض.*?<span>\s*(.*?)\s*</span>', html_content, re.DOTALL)
+            if submission_match:
+                submission_text = html_module.unescape(re.sub(r'<[^>]+>', '', submission_match.group(1)).strip())
+                if 'ملف واحد' in submission_text or 'معا' in submission_text:
+                    parsed_data['submission_method'] = 'single_file'
+                elif 'ملفين منفصلين' in submission_text or 'منفصل' in submission_text:
+                    parsed_data['submission_method'] = 'separate_files'
+                elif 'إلكتروني' in submission_text:
+                    parsed_data['submission_method'] = 'electronic'
+                elif 'يدوي' in submission_text:
+                    parsed_data['submission_method'] = 'manual'
             
             # Extract classification field
             classification_match = re.search(r'مجال التصنيف.*?<span>\s*(.*?)\s*</span>', html_content, re.DOTALL)
