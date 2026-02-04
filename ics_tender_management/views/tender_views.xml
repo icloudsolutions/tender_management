@@ -314,7 +314,6 @@
                                 invisible="state in ['won', 'lost', 'cancelled']">
                                 <group>
                                     <group string="Tender Information">
-                                        <field name="etimad_link" widget="url"/>
                                         <field name="tender_completion_time"/>
                                         <field name="tender_submission_method"/>
                                         <field name="tender_booklet_price"/>
