@@ -38,7 +38,7 @@ class EtimadTender(models.Model):
     branch_name = fields.Char("Branch")
     
     # Tender Details
-    tender_type = fields.Char("Tender Type", tracking=True)
+    etimad_tender_type = fields.Char("Etimad Tender Type", tracking=True)
     activity_name = fields.Char("Tender Activity", tracking=True)
     activity_id = fields.Integer("Activity ID")
     
@@ -231,7 +231,7 @@ class EtimadTender(models.Model):
             else:
                 record.estimated_value_category = 'mega'
     
-    @api.depends('activity_name', 'tender_type', 'agency_name', 'estimated_amount')
+    @api.depends('activity_name', 'etimad_tender_type', 'agency_name', 'estimated_amount')
     def _compute_matching_score(self):
         """Calculate matching score based on company profile and preferences from settings"""
         for record in self:
@@ -274,7 +274,7 @@ class EtimadTender(models.Model):
             # Tender type / Category matching (20 points)
             # Check if tender matches any of the preferred categories
             if categories_list:
-                type_lower = (record.tender_type or '').lower()
+                type_lower = (record.etimad_tender_type or '').lower()
                 matched_categories = []
                 
                 # Category keywords mapping
@@ -509,7 +509,7 @@ class EtimadTender(models.Model):
                 'tender_id_string': raw_data.get('tenderIdString'),
                 'agency_name': raw_data.get('agencyName'),
                 'branch_name': raw_data.get('branchName'),
-                'tender_type': raw_data.get('tenderTypeName'),
+                'etimad_tender_type': raw_data.get('tenderTypeName'),
                 'activity_name': raw_data.get('tenderActivityName'),
                 'activity_id': raw_data.get('tenderActivityId'),
                 'last_enquiry_date': new_enquiry_deadline,

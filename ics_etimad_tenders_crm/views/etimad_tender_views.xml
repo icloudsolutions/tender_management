@@ -28,7 +28,7 @@
                 <field name="reference_number" string="المرجع | Reference"/>
                 <field name="name" string="اسم المنافسة | Tender Name"/>
                 <field name="agency_name" string="الجهة | Agency"/>
-                <field name="tender_type" string="النوع | Type"/>
+                <field name="etimad_tender_type" string="النوع | Type"/>
                 <field name="activity_name" string="النشاط | Activity" optional="hide"/>
                 <field name="estimated_amount" widget="monetary" options="{'currency_field': 'currency_id'}" optional="show" string="القيمة التقديرية | Est. Value"/>
                 <field name="estimated_value_category" widget="badge" optional="show" string="Value Category"
@@ -216,9 +216,9 @@
                             <field name="tender_number" 
                                    string="Tender Number"
                                    placeholder="Auto-filled from Etimad"/>
-                            <field name="tender_type" 
-                                   string="Type"
-                                   placeholder="Tender type"/>
+                            <field name="etimad_tender_type" 
+                                   string="Etimad Type"
+                                   placeholder="Tender type from Etimad"/>
                             <field name="activity_name" 
                                    string="Activity"
                                    placeholder="Tender activity"/>
@@ -583,7 +583,7 @@
         <field name="name">etimad.tender.kanban</field>
         <field name="model">ics.etimad.tender</field>
         <field name="arch" type="xml">
-            <kanban class="o_kanban_mobile o_etimad_kanban" default_group_by="tender_type">
+            <kanban class="o_kanban_mobile o_etimad_kanban" default_group_by="etimad_tender_type">
                 <header>
                     <button name="%(action_server_fetch_etimad_tenders)d" 
                             string="🔄 Fetch Latest" 
@@ -597,7 +597,7 @@
                 <field name="name"/>
                 <field name="reference_number"/>
                 <field name="agency_name"/>
-                <field name="tender_type"/>
+                <field name="etimad_tender_type"/>
                 <field name="activity_name"/>
                 <field name="estimated_amount"/>
                 <field name="estimated_value_category"/>
@@ -639,8 +639,8 @@
                                     <div class="col-12">
                                         <i class="fa fa-building-o text-muted"/> <field name="agency_name"/>
                                     </div>
-                                    <div class="col-12 mt-1" t-if="record.tender_type.raw_value">
-                                        <i class="fa fa-tag text-muted"/> <field name="tender_type"/>
+                                    <div class="col-12 mt-1" t-if="record.etimad_tender_type.raw_value">
+                                        <i class="fa fa-tag text-muted"/> <field name="etimad_tender_type"/>
                                     </div>
                                     <div class="col-12 mt-1" t-if="record.activity_name.raw_value">
                                         <i class="fa fa-briefcase text-muted"/> <field name="activity_name"/>
@@ -727,7 +727,7 @@
                 <field name="name" string="Tender Name"/>
                 <field name="reference_number"/>
                 <field name="agency_name"/>
-                <field name="tender_type"/>
+                <field name="etimad_tender_type"/>
                 <field name="activity_name"/>
                 <field name="tender_number"/>
                 
@@ -791,7 +791,7 @@
                 
                 <group expand="0" string="Group By">
                     <filter string="Agency" name="group_agency" context="{'group_by': 'agency_name'}"/>
-                    <filter string="Tender Type" name="group_type" context="{'group_by': 'tender_type'}"/>
+                    <filter string="Etimad Type" name="group_type" context="{'group_by': 'etimad_tender_type'}"/>
                     <filter string="Activity" name="group_activity" context="{'group_by': 'activity_name'}"/>
                     <filter string="Participating" name="group_participating" context="{'group_by': 'is_participating'}"/>
                     <filter string="Value Category" name="group_value" context="{'group_by': 'estimated_value_category'}"/>

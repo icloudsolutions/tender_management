@@ -189,7 +189,7 @@ class CrmLead(models.Model):
     
     def _map_tender_category_from_etimad(self, etimad):
         """Map Etimad activity to tender category"""
-        activity_text = etimad.activity_name or etimad.tender_type or ''
+        activity_text = etimad.activity_name or etimad.etimad_tender_type or ''
         activity_lower = activity_text.lower()
         
         if any(word in activity_lower for word in ['توريد', 'supply', 'توريدات', 'شراء']):

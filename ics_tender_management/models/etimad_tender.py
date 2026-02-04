@@ -48,7 +48,7 @@ class EtimadTender(models.Model):
     def _prepare_tender_vals_from_etimad(self):
         """Prepare complete tender values from Etimad data"""
         self.ensure_one()
-        category = self._map_tender_category(self.activity_name or self.tender_type)
+        category = self._map_tender_category(self.activity_name or self.etimad_tender_type)
         partner = self._find_or_create_partner(self.agency_name)
         vals = {
             'tender_title': self.name,
