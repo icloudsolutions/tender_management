@@ -519,6 +519,13 @@ class EtimadTender(models.Model):
                 'financial_fees': float(raw_data.get('financialFees', 0) or 0),
                 'estimated_amount': new_estimated_amount,
                 'tender_status_id': raw_data.get('tenderStatusId'),
+                'tender_status_text': (
+                    raw_data.get('tenderStatusName')
+                    or raw_data.get('tenderStatus')
+                    or raw_data.get('statusName')
+                    or raw_data.get('statusText')
+                    or raw_data.get('status')
+                ),
                 'last_enquiry_date_hijri': raw_data.get('lastEnqueriesDateHijri'),
                 'last_offer_date_hijri': raw_data.get('lastOfferPresentationDateHijri'),
                 'description': self._generate_description(raw_data),
@@ -598,9 +605,18 @@ class EtimadTender(models.Model):
                 
                 return False
             else:
-                # New tender
-                self.create(vals)
+                # New tender - create and fetch full details immediately
+                new_tender = self.create(vals)
                 _logger.info(f"Created tender: {vals['name'][:50]}")
+                
+                # Auto-fetch detailed info for new tenders (if tender_id_string exists)
+                if new_tender.tender_id_string:
+                    try:
+                        new_tender._fetch_detailed_info_silent()
+                        _logger.info(f"Auto-fetched details for new tender: {vals['name'][:50]}")
+                    except Exception as e:
+                        _logger.warning(f"Could not auto-fetch details for {vals['name'][:50]}: {e}")
+                
                 return True
                 
         except Exception as e:
@@ -858,181 +874,66 @@ class EtimadTender(models.Model):
         else:
             self.message_post(body=_('Unmarked as participating'))
     
+    def _fetch_detailed_info_silent(self):
+        """Fetch detailed info without showing notification (for batch operations)"""
+        self.ensure_one()
+        if not self.tender_id_string:
+            return
+        
+        try:
+            session = self._setup_scraper_session()
+            update_vals = self._fetch_all_detail_endpoints(session)
+            
+            # Remove counter before writing
+            update_vals.pop('_fetched_count', None)
+            
+            if update_vals:
+                self.write(update_vals)
+                _logger.info(f"Fetched {len(update_vals)} detail fields for tender {self.name}")
+        except Exception as e:
+            _logger.warning(f"Error in silent detail fetch for {self.name}: {e}")
+    
     def action_fetch_detailed_info(self):
-        # Fetch detailed tender information from all Etimad API endpoints
+        """Fetch detailed tender information from all Etimad API endpoints (with notification and view refresh)"""
         self.ensure_one()
         if not self.tender_id_string:
             raise UserError(_('Tender ID String is required to fetch detailed information.'))
         
         try:
             session = self._setup_scraper_session()
-            update_vals = {}
-            fetched_count = 0
+            update_vals = self._fetch_all_detail_endpoints(session)
             
-            # 1. Fetch Relations/Details
-            try:
-                url = "https://tenders.etimad.sa/Tender/GetRelationsDetailsViewComponenet"
-                params = {'tenderIdStr': self.tender_id_string}
-                response = session.get(url, params=params, timeout=30)
-                
-                if response.status_code == 200 and response.text:
-                    parsed_data = self._parse_relations_details_html(response.text)
-                    
-                    # Classification
-                    if parsed_data.get('classification_field'):
-                        update_vals['classification_field'] = parsed_data['classification_field']
-                        update_vals['classification_required'] = 'غير مطلوب' not in parsed_data['classification_field']
-                    
-                    # Execution location
-                    if parsed_data.get('execution_location_type'):
-                        update_vals['execution_location_type'] = parsed_data['execution_location_type']
-                    if parsed_data.get('execution_regions'):
-                        update_vals['execution_regions'] = parsed_data['execution_regions']
-                    if parsed_data.get('execution_cities'):
-                        update_vals['execution_cities'] = parsed_data['execution_cities']
-                    
-                    # Details
-                    if parsed_data.get('details'):
-                        update_vals['tender_purpose'] = parsed_data['details']
-                    
-                    # Activity details
-                    if parsed_data.get('activity_details'):
-                        update_vals['activity_details'] = parsed_data['activity_details']
-                    
-                    # Supply items
-                    if parsed_data.get('includes_supply_items') is not None:
-                        update_vals['includes_supply_items'] = parsed_data['includes_supply_items']
-                    
-                    # Construction works
-                    if parsed_data.get('construction_works'):
-                        update_vals['construction_works'] = parsed_data['construction_works']
-                    
-                    # Maintenance works
-                    if parsed_data.get('maintenance_works'):
-                        update_vals['maintenance_works'] = parsed_data['maintenance_works']
-                    
-                    # Final guarantee
-                    if parsed_data.get('final_guarantee_percentage'):
-                        update_vals['final_guarantee_percentage'] = parsed_data['final_guarantee_percentage']
-                    
-                    fetched_count += 1
-            except Exception as e:
-                _logger.warning(f"Error fetching relations details: {e}")
+            fetched_count = update_vals.pop('_fetched_count', 0) if update_vals else 0
             
-            # 2. Fetch Dates
-            try:
-                url = "https://tenders.etimad.sa/Tender/GetTenderDatesViewComponenet"
-                params = {'tenderIdStr': self.tender_id_string}
-                response = session.get(url, params=params, timeout=30)
-                
-                if response.status_code == 200 and response.text:
-                    dates_data = self._parse_dates_html(response.text)
-                    
-                    # Parse dates
-                    if dates_data.get('last_enquiry_date'):
-                        update_vals['last_enquiry_date'] = dates_data['last_enquiry_date']
-                    if dates_data.get('offers_deadline'):
-                        update_vals['offers_deadline'] = dates_data['offers_deadline']
-                    if dates_data.get('offer_opening_date'):
-                        update_vals['offer_opening_date'] = dates_data['offer_opening_date']
-                    if dates_data.get('offer_examination_date'):
-                        update_vals['offer_examination_date'] = dates_data['offer_examination_date']
-                    if dates_data.get('expected_award_date'):
-                        update_vals['expected_award_date'] = dates_data['expected_award_date']
-                    if dates_data.get('work_start_date'):
-                        update_vals['work_start_date'] = dates_data['work_start_date']
-                    if dates_data.get('inquiry_start_date'):
-                        update_vals['inquiry_start_date'] = dates_data['inquiry_start_date']
-                    if dates_data.get('max_inquiry_response_days'):
-                        update_vals['max_inquiry_response_days'] = dates_data['max_inquiry_response_days']
-                    if dates_data.get('suspension_period_days'):
-                        update_vals['suspension_period_days'] = dates_data['suspension_period_days']
-                    if dates_data.get('opening_location'):
-                        update_vals['opening_location'] = dates_data['opening_location']
-                    
-                    fetched_count += 1
-            except Exception as e:
-                _logger.warning(f"Error fetching dates: {e}")
-            
-            # 3. Fetch Award Results
-            try:
-                url = "https://tenders.etimad.sa/Tender/GetAwardingResultsForVisitorViewComponenet"
-                params = {'tenderIdStr': self.tender_id_string}
-                response = session.get(url, params=params, timeout=30)
-                
-                if response.status_code == 200 and response.text:
-                    award_data = self._parse_award_results_html(response.text)
-                    
-                    if award_data.get('award_announced') is not None:
-                        update_vals['award_announced'] = award_data['award_announced']
-                    if award_data.get('award_announcement_date'):
-                        update_vals['award_announcement_date'] = award_data['award_announcement_date']
-                    if award_data.get('awarded_company_name'):
-                        update_vals['awarded_company_name'] = award_data['awarded_company_name']
-                    if award_data.get('awarded_amount'):
-                        update_vals['awarded_amount'] = award_data['awarded_amount']
-                    
-                    fetched_count += 1
-            except Exception as e:
-                _logger.warning(f"Error fetching award results: {e}")
-            
-            # 4. Fetch Local Content Details (المحتوى المحلي)
-            try:
-                url = "https://tenders.etimad.sa/Tender/GetLocalContentDetailsViewComponenet"
-                params = {'tenderIdStr': self.tender_id_string}
-                response = session.get(url, params=params, timeout=30)
-                
-                if response.status_code == 200 and response.text:
-                    local_content_data = self._parse_local_content_html(response.text)
-                    
-                    if local_content_data.get('local_content_required') is not None:
-                        update_vals['local_content_required'] = local_content_data['local_content_required']
-                    if local_content_data.get('local_content_percentage'):
-                        update_vals['local_content_percentage'] = local_content_data['local_content_percentage']
-                    if local_content_data.get('local_content_mechanism'):
-                        update_vals['local_content_mechanism'] = local_content_data['local_content_mechanism']
-                    if local_content_data.get('local_content_target_percentage'):
-                        update_vals['local_content_target_percentage'] = local_content_data['local_content_target_percentage']
-                    if local_content_data.get('local_content_baseline_weight'):
-                        update_vals['local_content_baseline_weight'] = local_content_data['local_content_baseline_weight']
-                    if local_content_data.get('sme_participation_allowed') is not None:
-                        update_vals['sme_participation_allowed'] = local_content_data['sme_participation_allowed']
-                    if local_content_data.get('sme_price_preference'):
-                        update_vals['sme_price_preference'] = local_content_data['sme_price_preference']
-                    if local_content_data.get('sme_qualification_mandatory') is not None:
-                        update_vals['sme_qualification_mandatory'] = local_content_data['sme_qualification_mandatory']
-                    if local_content_data.get('local_content_notes'):
-                        update_vals['local_content_notes'] = local_content_data['local_content_notes']
-                    
-                    fetched_count += 1
-            except Exception as e:
-                _logger.warning(f"Error fetching local content details: {e}")
-            
-            # Update tender with all fetched data
             if update_vals:
                 self.write(update_vals)
-                msg = _('Detailed information fetched from {} Etimad API endpoint(s).').format(fetched_count)
-                self.message_post(body=msg, subject=_('Details Updated'))
+                self.message_post(
+                    body=_('Detailed information fetched from {count} Etimad API endpoint(s)').format(count=fetched_count),
+                    subject=_('Details Updated')
+                )
                 
-                success_msg = _('Detailed information has been fetched and updated from {} endpoint(s).').format(fetched_count)
+                # Success notification with view refresh
+                success_msg = _('Successfully fetched and updated {count} detail fields from {endpoints} endpoint(s)').format(
+                    count=len(update_vals),
+                    endpoints=fetched_count
+                )
+                
+                # Return action to reload the current record
                 return {
-                    'type': 'ir.actions.client',
-                    'tag': 'display_notification',
-                    'params': {
-                        'title': _('Success'),
-                        'message': success_msg,
-                        'type': 'success',
-                        'sticky': False,
-                    }
+                    'type': 'ir.actions.act_window',
+                    'res_model': 'ics.etimad.tender',
+                    'res_id': self.id,
+                    'view_mode': 'form',
+                    'target': 'current',
+                    'context': {'form_view_initial_mode': 'readonly'},
                 }
             else:
-                no_update_title = _('No Updates')
-                no_update_msg = _('No new information found to update.')
+                no_update_msg = _('No new data found or all fields already up to date')
                 return {
                     'type': 'ir.actions.client',
                     'tag': 'display_notification',
                     'params': {
-                        'title': no_update_title,
+                        'title': _('No Updates'),
                         'message': no_update_msg,
                         'type': 'info',
                         'sticky': False,
@@ -1044,6 +945,157 @@ class EtimadTender(models.Model):
             error_msg = _('Error fetching detailed information: {}').format(str(e))
             raise UserError(error_msg)
     
+    def _fetch_all_detail_endpoints(self, session):
+        """Fetch data from all detail API endpoints and return update values"""
+        update_vals = {}
+        fetched_count = 0
+        
+        # 1. Fetch Relations/Details
+        try:
+            url = "https://tenders.etimad.sa/Tender/GetRelationsDetailsViewComponenet"
+            params = {'tenderIdStr': self.tender_id_string}
+            response = session.get(url, params=params, timeout=30)
+            
+            if response.status_code == 200 and response.text:
+                parsed_data = self._parse_relations_details_html(response.text)
+                
+                # Tender status text (حالة المنافسة)
+                if parsed_data.get('tender_status_text'):
+                    update_vals['tender_status_text'] = parsed_data['tender_status_text']
+                
+                # Classification
+                if parsed_data.get('classification_field'):
+                    update_vals['classification_field'] = parsed_data['classification_field']
+                    update_vals['classification_required'] = 'غير مطلوب' not in parsed_data['classification_field']
+                
+                # Execution location
+                if parsed_data.get('execution_location_type'):
+                    update_vals['execution_location_type'] = parsed_data['execution_location_type']
+                if parsed_data.get('execution_regions'):
+                    update_vals['execution_regions'] = parsed_data['execution_regions']
+                if parsed_data.get('execution_cities'):
+                    update_vals['execution_cities'] = parsed_data['execution_cities']
+                
+                # Details
+                if parsed_data.get('details'):
+                    update_vals['tender_purpose'] = parsed_data['details']
+                
+                # Activity details
+                if parsed_data.get('activity_details'):
+                    update_vals['activity_details'] = parsed_data['activity_details']
+                
+                # Supply items
+                if parsed_data.get('includes_supply_items') is not None:
+                    update_vals['includes_supply_items'] = parsed_data['includes_supply_items']
+                
+                # Construction works
+                if parsed_data.get('construction_works'):
+                    update_vals['construction_works'] = parsed_data['construction_works']
+                
+                # Maintenance works
+                if parsed_data.get('maintenance_works'):
+                    update_vals['maintenance_works'] = parsed_data['maintenance_works']
+                
+                # Final guarantee
+                if parsed_data.get('final_guarantee_percentage'):
+                    update_vals['final_guarantee_percentage'] = parsed_data['final_guarantee_percentage']
+                
+                fetched_count += 1
+        except Exception as e:
+            _logger.warning(f"Error fetching relations details: {e}")
+            
+        # 2. Fetch Dates
+        try:
+            url = "https://tenders.etimad.sa/Tender/GetTenderDatesViewComponenet"
+            params = {'tenderIdStr': self.tender_id_string}
+            response = session.get(url, params=params, timeout=30)
+            
+            if response.status_code == 200 and response.text:
+                dates_data = self._parse_dates_html(response.text)
+                
+                # Parse dates
+                if dates_data.get('last_enquiry_date'):
+                    update_vals['last_enquiry_date'] = dates_data['last_enquiry_date']
+                if dates_data.get('offers_deadline'):
+                    update_vals['offers_deadline'] = dates_data['offers_deadline']
+                if dates_data.get('offer_opening_date'):
+                    update_vals['offer_opening_date'] = dates_data['offer_opening_date']
+                if dates_data.get('offer_examination_date'):
+                    update_vals['offer_examination_date'] = dates_data['offer_examination_date']
+                if dates_data.get('expected_award_date'):
+                    update_vals['expected_award_date'] = dates_data['expected_award_date']
+                if dates_data.get('work_start_date'):
+                    update_vals['work_start_date'] = dates_data['work_start_date']
+                if dates_data.get('inquiry_start_date'):
+                    update_vals['inquiry_start_date'] = dates_data['inquiry_start_date']
+                if dates_data.get('max_inquiry_response_days'):
+                    update_vals['max_inquiry_response_days'] = dates_data['max_inquiry_response_days']
+                if dates_data.get('suspension_period_days'):
+                    update_vals['suspension_period_days'] = dates_data['suspension_period_days']
+                if dates_data.get('opening_location'):
+                    update_vals['opening_location'] = dates_data['opening_location']
+                
+                fetched_count += 1
+        except Exception as e:
+            _logger.warning(f"Error fetching dates: {e}")
+            
+        # 3. Fetch Award Results
+        try:
+            url = "https://tenders.etimad.sa/Tender/GetAwardingResultsForVisitorViewComponenet"
+            params = {'tenderIdStr': self.tender_id_string}
+            response = session.get(url, params=params, timeout=30)
+            
+            if response.status_code == 200 and response.text:
+                award_data = self._parse_award_results_html(response.text)
+                
+                if award_data.get('award_announced') is not None:
+                    update_vals['award_announced'] = award_data['award_announced']
+                if award_data.get('award_announcement_date'):
+                    update_vals['award_announcement_date'] = award_data['award_announcement_date']
+                if award_data.get('awarded_company_name'):
+                    update_vals['awarded_company_name'] = award_data['awarded_company_name']
+                if award_data.get('awarded_amount'):
+                    update_vals['awarded_amount'] = award_data['awarded_amount']
+                
+                fetched_count += 1
+        except Exception as e:
+            _logger.warning(f"Error fetching award results: {e}")
+            
+        # 4. Fetch Local Content Details (المحتوى المحلي)
+        try:
+            url = "https://tenders.etimad.sa/Tender/GetLocalContentDetailsViewComponenet"
+            params = {'tenderIdStr': self.tender_id_string}
+            response = session.get(url, params=params, timeout=30)
+            
+            if response.status_code == 200 and response.text:
+                local_content_data = self._parse_local_content_html(response.text)
+                
+                if local_content_data.get('local_content_required') is not None:
+                    update_vals['local_content_required'] = local_content_data['local_content_required']
+                if local_content_data.get('local_content_percentage'):
+                    update_vals['local_content_percentage'] = local_content_data['local_content_percentage']
+                if local_content_data.get('local_content_mechanism'):
+                    update_vals['local_content_mechanism'] = local_content_data['local_content_mechanism']
+                if local_content_data.get('local_content_target_percentage'):
+                    update_vals['local_content_target_percentage'] = local_content_data['local_content_target_percentage']
+                if local_content_data.get('local_content_baseline_weight'):
+                    update_vals['local_content_baseline_weight'] = local_content_data['local_content_baseline_weight']
+                if local_content_data.get('sme_participation_allowed') is not None:
+                    update_vals['sme_participation_allowed'] = local_content_data['sme_participation_allowed']
+                if local_content_data.get('sme_price_preference'):
+                    update_vals['sme_price_preference'] = local_content_data['sme_price_preference']
+                if local_content_data.get('sme_qualification_mandatory') is not None:
+                    update_vals['sme_qualification_mandatory'] = local_content_data['sme_qualification_mandatory']
+                if local_content_data.get('local_content_notes'):
+                    update_vals['local_content_notes'] = local_content_data['local_content_notes']
+                
+                fetched_count += 1
+        except Exception as e:
+            _logger.warning(f"Error fetching local content details: {e}")
+            
+        update_vals['_fetched_count'] = fetched_count
+        return update_vals
+    
     def _parse_relations_details_html(self, html_content):
         """Parse HTML content from GetRelationsDetailsViewComponenet API"""
         parsed_data = {}
@@ -1052,6 +1104,11 @@ class EtimadTender(models.Model):
             if LXML_AVAILABLE:
                 # Use lxml for proper HTML parsing
                 tree = html.fromstring(html_content)
+                
+                # Extract tender status (حالة المنافسة)
+                status_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "حالة المنافسة")]/following-sibling::div[1]//span/text()')
+                if status_elements:
+                    parsed_data['tender_status_text'] = html_module.unescape(status_elements[0].strip())
                 
                 # Extract classification field
                 classification_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "مجال التصنيف")]/following-sibling::div[1]//span/text()')
@@ -1138,6 +1195,13 @@ class EtimadTender(models.Model):
         parsed_data = {}
         
         try:
+            # Extract tender status (حالة المنافسة)
+            status_match = re.search(r'حالة المنافسة.*?<span>\s*(.*?)\s*</span>', html_content, re.DOTALL)
+            if status_match:
+                status_text = re.sub(r'<[^>]+>', '', status_match.group(1)).strip()
+                if status_text:
+                    parsed_data['tender_status_text'] = html_module.unescape(status_text)
+            
             # Extract classification field
             classification_match = re.search(r'مجال التصنيف.*?<span>\s*(.*?)\s*</span>', html_content, re.DOTALL)
             if classification_match:
