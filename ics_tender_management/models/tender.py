@@ -38,7 +38,7 @@ class Tender(models.Model):
     tender_type = fields.Selection([
         ('single_vendor', 'Single Vendor for All Products'),
         ('product_wise', 'Product-wise Vendor Selection'),
-    ], string='Tender Type', default='single_vendor', required=True, tracking=True,
+    ], string='Tender Type', default='product_wise', required=True, tracking=True,
         help='Single Vendor: Select one vendor for all products (all prices mandatory). '
              'Product-wise: Select different vendors per product (prices optional, multiple POs).')
 
