@@ -1,13 +1,23 @@
-name: Deploy Veluna Addons
+# Update ics_tender_management & ics_etimad_tenders_crm on Odoo 18 test server
+# Repo: https://github.com/icloudsolutions/tender_management
+# Triggers: push to main (only when ics_tender_management or ics_etimad_tenders_crm change)
+# Server: 38.242.237.64 → /root/libya/dev-18/addons (existing addons updated in place)
+
+name: Deploy to Odoo Test Server
 
 on:
   push:
     branches: [main]
+    paths:
+      - 'ics_tender_management/**'
+      - 'ics_etimad_tenders_crm/**'
+      - '.github/workflows/deploy.yml'
   workflow_dispatch:
 
 env:
-  DEPLOY_PATH: /root/nextgen/veluna19
+  DEPLOY_PATH: /root/libya/dev-18
   ADDONS_DIR: addons
+  MODULES: ics_etimad_tenders_crm,ics_tender_management
 
 jobs:
   deploy:
@@ -20,30 +30,29 @@ jobs:
       - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
-          printf '%s\n' "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/deploy_key
+          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -p ${{ secrets.DEPLOY_SSH_PORT || 22 }} -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
 
       - name: Deploy addons (rsync)
         run: |
-          # Define the SSH command for rsync
-          RSYNC_RSH="ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new"
-          
-          # Sync everything from the GitHub root (./) to the server addons folder.
-          # We exclude files and folders that are NOT Odoo addons.
+          RSYNC_RSH="ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new -p ${{ secrets.DEPLOY_SSH_PORT || 22 }}"
           rsync -avz --delete -e "$RSYNC_RSH" \
-            --exclude '.git/' \
-            --exclude '.github/' \
-            --exclude 'postgresql/' \
-            --exclude 'etc/' \
-            --exclude 'docker-compose.yml' \
-            --exclude 'README.md' \
-            --exclude '.gitignore' \
-            ./ \
-            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ env.DEPLOY_PATH }}/${{ env.ADDONS_DIR }}/
+            ics_tender_management/ \
+            ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ env.DEPLOY_PATH }}/${{ env.ADDONS_DIR }}/ics_tender_management/
+          rsync -avz --delete -e "$RSYNC_RSH" \
+            ics_etimad_tenders_crm/ \
+            ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ env.DEPLOY_PATH }}/${{ env.ADDONS_DIR }}/ics_etimad_tenders_crm/
 
       - name: Restart Odoo container
         run: |
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
-            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} \
-            "cd ${{ env.DEPLOY_PATH }} && docker compose restart odoo19"
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -p ${{ secrets.DEPLOY_SSH_PORT || 22 }} \
+            ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} \
+            "cd ${{ env.DEPLOY_PATH }} && docker compose restart odoo18" || true
+
+      - name: Upgrade Odoo modules (optional)
+        if: vars.DEPLOY_ODOO_DATABASE != ''
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -p ${{ secrets.DEPLOY_SSH_PORT || 22 }} \
+            ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} \
+            "cd ${{ env.DEPLOY_PATH }} && docker compose exec -T odoo18 odoo -u ${{ env.MODULES }} -d ${{ vars.DEPLOY_ODOO_DATABASE }} --stop-after-init" || true
