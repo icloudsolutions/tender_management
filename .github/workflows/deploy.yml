@@ -11,7 +11,7 @@ env:
 
 jobs:
   deploy:
-    name: Deploy to Server
+    name: Deploy addons to server
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -20,10 +20,8 @@ jobs:
       - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
-          # Uses the private key we generated earlier
           printf '%s\n' "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          # Add your server to known hosts to prevent hanging
           ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy addons (rsync)
@@ -31,8 +29,8 @@ jobs:
           # Define the SSH command for rsync
           RSYNC_RSH="ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new"
           
-          # Sync everything from the GitHub root to the server addons folder
-          # We EXCLUDE the config/db folders so we don't overwrite server data
+          # Sync everything from the GitHub root (./) to the server addons folder.
+          # We exclude files and folders that are NOT Odoo addons.
           rsync -avz --delete -e "$RSYNC_RSH" \
             --exclude '.git/' \
             --exclude '.github/' \
@@ -40,6 +38,7 @@ jobs:
             --exclude 'etc/' \
             --exclude 'docker-compose.yml' \
             --exclude 'README.md' \
+            --exclude '.gitignore' \
             ./ \
             ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ env.DEPLOY_PATH }}/${{ env.ADDONS_DIR }}/
 
