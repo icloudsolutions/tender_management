@@ -1042,7 +1042,17 @@ class EtimadTender(models.Model):
             params = {'tenderIdStr': self.tender_id_string}
             response = session.get(url, params=params, timeout=30)
             
+            _logger.info(f"Relations Details API Response Status: {response.status_code}")
+            
             if response.status_code == 200 and response.text:
+                _logger.info(f"Relations Details HTML length: {len(response.text)} chars")
+                
+                # Log if we can find the submission method text in HTML
+                if 'طريقة تقديم العروض' in response.text:
+                    _logger.info("Found 'طريقة تقديم العروض' in HTML")
+                else:
+                    _logger.warning("'طريقة تقديم العروض' NOT found in HTML")
+                
                 parsed_data = self._parse_relations_details_html(response.text)
                 
                 # Tender status text (حالة المنافسة)
@@ -1052,6 +1062,9 @@ class EtimadTender(models.Model):
                 # Submission method (طريقة تقديم العروض)
                 if parsed_data.get('submission_method'):
                     update_vals['submission_method'] = parsed_data['submission_method']
+                    _logger.info(f"Setting submission_method to: {parsed_data['submission_method']}")
+                else:
+                    _logger.warning("Submission method not found in parsed data")
                 
                 # Classification
                 if parsed_data.get('classification_field'):
