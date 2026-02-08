@@ -1359,7 +1359,8 @@ class EtimadTender(models.Model):
                     # Extract number from "5.00" or "10.00" or "5"
                     guarantee_match = re.search(r'(\d+(?:\.\d+)?)', guarantee_str)
                     if guarantee_match:
-                        parsed_data['final_guarantee_percentage'] = float(guarantee_match.group(1))
+                        # Store as ratio for percentage widget (5.00 -> 0.05)
+                        parsed_data['final_guarantee_percentage'] = float(guarantee_match.group(1)) / 100.0
                 
                 # Extract tender purpose (الغرض من المنافسة)
                 # First try the full purpose span, then the truncated one
@@ -1471,7 +1472,8 @@ class EtimadTender(models.Model):
                     elif 'الضمان النهائي' in title:
                         guarantee_match = re.search(r'(\d+(?:\.\d+)?)', value)
                         if guarantee_match:
-                            parsed_data['final_guarantee_percentage'] = float(guarantee_match.group(1))
+                            # Store as ratio for percentage widget (5.00 -> 0.05)
+                            parsed_data['final_guarantee_percentage'] = float(guarantee_match.group(1)) / 100.0
             else:
                 # Minimal regex fallback for submission method
                 submission_match = re.search(r'طريقة تقديم العروض.*?<span>\s*(.*?)\s*</span>', html_content, re.DOTALL)
@@ -1577,7 +1579,8 @@ class EtimadTender(models.Model):
             guarantee_match = re.search(r'الضمان النهائي.*?<span>\s*(\d+(?:\.\d+)?)', html_content, re.DOTALL)
             if guarantee_match:
                 try:
-                    parsed_data['final_guarantee_percentage'] = float(guarantee_match.group(1))
+                    # Store as ratio for percentage widget (5.00 -> 0.05)
+                    parsed_data['final_guarantee_percentage'] = float(guarantee_match.group(1)) / 100.0
                 except ValueError:
                     pass
             
