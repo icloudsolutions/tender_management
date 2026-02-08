@@ -677,18 +677,32 @@ class EtimadTender(models.Model):
         )
     
     def _parse_contract_duration(self, duration_text):
-        """Parse contract duration text to extract days (e.g., '10 يوم' -> 10)"""
+        """Parse contract duration text to extract days (e.g., '1 سنة' -> 365, '6 أشهر' -> 180)"""
         if not duration_text:
-            return False, 0
+            return 0
         
         import re
-        # Try to extract number from text
-        numbers = re.findall(r'\d+', duration_text)
-        if numbers:
-            days = int(numbers[0])
-            return duration_text, days
+        duration_lower = duration_text.lower()
         
-        return duration_text, 0
+        # Extract number
+        numbers = re.findall(r'\d+', duration_text)
+        if not numbers:
+            return 0
+        
+        number = int(numbers[0])
+        
+        # Determine unit and calculate days
+        if 'سنة' in duration_lower or 'year' in duration_lower:
+            return number * 365
+        elif 'شهر' in duration_lower or 'month' in duration_lower:
+            return number * 30
+        elif 'أسبوع' in duration_lower or 'week' in duration_lower:
+            return number * 7
+        elif 'يوم' in duration_lower or 'day' in duration_lower:
+            return number
+        else:
+            # Default to days if no unit found
+            return number
 
     def _parse_date(self, date_str):
         """Parse date string to datetime"""
@@ -1285,12 +1299,19 @@ class EtimadTender(models.Model):
                         parsed_data['final_guarantee_percentage'] = float(guarantee_match.group(1))
                 
                 # Extract tender purpose (الغرض من المنافسة)
-                purpose_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "الغرض من المنافسة")]/following-sibling::div[1]//span[@id="purposeSpan"]/text() | //div[contains(@class, "etd-item-title") and contains(text(), "الغرض من المنافسة")]/following-sibling::div[1]//span[@id="subPurposSapn"]/text()')
+                # First try the full purpose span, then the truncated one
+                purpose_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "الغرض من المنافسة")]/following-sibling::div[1]//span[not(@hidden) and not(contains(@style, "display:none"))]//text()[not(contains(., "...عرض"))]')
+                if not purpose_elements:
+                    # Fallback to any span content
+                    purpose_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "الغرض من المنافسة")]/following-sibling::div[1]//span/text()')
+                
                 if purpose_elements:
-                    purpose_text = html_module.unescape(purpose_elements[0].strip())
+                    # Join all text nodes and clean up
+                    purpose_text = ' '.join([html_module.unescape(t.strip()) for t in purpose_elements if t.strip()])
                     # Remove "...عرض المزيد..." or "...عرض الأقل..." text
                     purpose_text = re.sub(r'\.\.\.عرض (المزيد|الأقل)\.\.\.', '', purpose_text).strip()
-                    parsed_data['tender_purpose'] = purpose_text
+                    if purpose_text:
+                        parsed_data['tender_purpose'] = purpose_text
                 
                 # Extract document cost (قيمة وثائق المنافسة)
                 doc_cost_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "قيمة وثائق المنافسة")]/following-sibling::div[1]//span/text()')
@@ -1435,9 +1456,10 @@ class EtimadTender(models.Model):
                     pass
             
             # Extract tender purpose (الغرض من المنافسة)
-            purpose_match = re.search(r'الغرض من المنافسة.*?<span[^>]*>\s*(.*?)\s*<', html_content, re.DOTALL)
+            purpose_match = re.search(r'الغرض من المنافسة.*?<span[^>]*id="purposeSpan"[^>]*>(.*?)</span>|الغرض من المنافسة.*?<span[^>]*id="subPurposSapn"[^>]*>(.*?)</span>', html_content, re.DOTALL)
             if purpose_match:
-                purpose_text = re.sub(r'<[^>]+>', '', purpose_match.group(1)).strip()
+                purpose_text = purpose_match.group(1) or purpose_match.group(2) or ''
+                purpose_text = re.sub(r'<[^>]+>', '', purpose_text).strip()
                 purpose_text = re.sub(r'\.\.\.عرض (المزيد|الأقل)\.\.\.', '', purpose_text).strip()
                 if purpose_text:
                     parsed_data['tender_purpose'] = html_module.unescape(purpose_text)
