@@ -1134,6 +1134,31 @@ class EtimadTender(models.Model):
                 fetched_count += 1
         except Exception as e:
             _logger.warning(f"Error fetching relations details: {e}")
+        
+        # 1.1 Fetch Basic Details page (fallback for missing fields)
+        try:
+            missing_basic_fields = [
+                'submission_method',
+                'tender_purpose',
+                'document_cost_amount',
+                'contract_duration',
+                'insurance_required',
+                'initial_guarantee_type',
+                'initial_guarantee_address',
+                'final_guarantee_percentage',
+                'tender_status_text',
+            ]
+            if any(update_vals.get(field) in (None, False) for field in missing_basic_fields):
+                details_url = f"https://tenders.etimad.sa/Tender/Details/{self.tender_id_string}"
+                details_response = session.get(details_url, timeout=30)
+                if details_response.status_code == 200 and details_response.text:
+                    basic_data = self._parse_basic_details_html(details_response.text)
+                    for key, value in basic_data.items():
+                        if update_vals.get(key) in (None, False) and value not in (None, False):
+                            update_vals[key] = value
+                    fetched_count += 1
+        except Exception as e:
+            _logger.warning(f"Error fetching basic details page: {e}")
             
         # 2. Fetch Dates
         try:
@@ -1389,6 +1414,66 @@ class EtimadTender(models.Model):
             # Fallback to regex parsing
             parsed_data = self._parse_relations_details_regex(html_content)
         
+        return parsed_data
+
+    def _parse_basic_details_html(self, html_content):
+        """Parse HTML content from Tender Details page (basic details section)"""
+        parsed_data = {}
+        try:
+            if LXML_AVAILABLE:
+                tree = html.fromstring(html_content)
+                items = tree.xpath('//div[@id="basicDetials"]//li[contains(@class, "list-group-item")]')
+                for item in items:
+                    title = ''.join(item.xpath('.//div[contains(@class, "etd-item-title")]/text()')).strip()
+                    value_texts = item.xpath('.//div[contains(@class, "etd-item-info")]//text()')
+                    value = ' '.join([v.strip() for v in value_texts if v.strip()])
+                    if not title:
+                        continue
+
+                    if 'طريقة تقديم العروض' in title:
+                        if 'ملف واحد' in value or 'معا' in value or 'معاً' in value:
+                            parsed_data['submission_method'] = 'single_file'
+                        elif 'ملفين منفصلين' in value or 'منفصل' in value:
+                            parsed_data['submission_method'] = 'separate_files'
+                        elif 'إلكتروني' in value:
+                            parsed_data['submission_method'] = 'electronic'
+                        elif 'يدوي' in value:
+                            parsed_data['submission_method'] = 'manual'
+                    elif 'حالة المنافسة' in title:
+                        parsed_data['tender_status_text'] = value
+                    elif 'الغرض من المنافسة' in title:
+                        cleaned = re.sub(r'\.\.\.عرض (المزيد|الأقل)\.\.\.', '', value).strip()
+                        if cleaned:
+                            parsed_data['tender_purpose'] = cleaned
+                    elif 'قيمة وثائق المنافسة' in title:
+                        cost_match = re.search(r'(\d+(?:\.\d+)?)', value)
+                        if cost_match:
+                            cost_value = float(cost_match.group(1))
+                            parsed_data['document_cost_amount'] = cost_value
+                            parsed_data['document_cost_type'] = 'free' if cost_value == 0 else 'paid'
+                    elif 'مدة العقد' in title:
+                        parsed_data['contract_duration'] = value
+                        parsed_data['contract_duration_days'] = self._parse_contract_duration(value)
+                    elif 'هل التأمين من متطلبات المنافسة' in title:
+                        parsed_data['insurance_required'] = 'نعم' in value or 'yes' in value.lower()
+                    elif 'مطلوب ضمان الإبتدائي' in title:
+                        parsed_data['initial_guarantee_type'] = value
+                        parsed_data['initial_guarantee_required'] = 'ضمان' in value or 'مطلوب' in value
+                    elif 'عنوان الضمان الإبتدائى' in title:
+                        parsed_data['initial_guarantee_address'] = value
+                    elif 'الضمان النهائي' in title:
+                        guarantee_match = re.search(r'(\d+(?:\.\d+)?)', value)
+                        if guarantee_match:
+                            parsed_data['final_guarantee_percentage'] = float(guarantee_match.group(1))
+            else:
+                # Minimal regex fallback for submission method
+                submission_match = re.search(r'طريقة تقديم العروض.*?<span>\s*(.*?)\s*</span>', html_content, re.DOTALL)
+                if submission_match:
+                    submission_text = html_module.unescape(re.sub(r'<[^>]+>', '', submission_match.group(1)).strip())
+                    if 'ملف واحد' in submission_text or 'معا' in submission_text or 'معاً' in submission_text:
+                        parsed_data['submission_method'] = 'single_file'
+        except Exception as e:
+            _logger.warning(f"Error parsing basic details HTML: {e}")
         return parsed_data
     
     def _parse_relations_details_regex(self, html_content):
