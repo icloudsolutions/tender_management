@@ -1466,7 +1466,11 @@ class EtimadTender(models.Model):
                         parsed_data['insurance_required'] = 'نعم' in value or 'yes' in value.lower()
                     elif 'مطلوب ضمان الإبتدائي' in title:
                         parsed_data['initial_guarantee_type'] = value
-                        parsed_data['initial_guarantee_required'] = 'ضمان' in value or 'مطلوب' in value
+                        value_lower = value.lower()
+                        if 'لا يوجد' in value or 'غير مطلوب' in value or 'not required' in value_lower:
+                            parsed_data['initial_guarantee_required'] = False
+                        else:
+                            parsed_data['initial_guarantee_required'] = 'ضمان' in value or 'مطلوب' in value or 'required' in value_lower
                     elif 'عنوان الضمان الإبتدائى' in title:
                         parsed_data['initial_guarantee_address'] = value
                     elif 'الضمان النهائي' in title:
@@ -1622,7 +1626,11 @@ class EtimadTender(models.Model):
             if init_guarantee_match:
                 init_guarantee_text = re.sub(r'<[^>]+>', '', init_guarantee_match.group(1)).strip()
                 parsed_data['initial_guarantee_type'] = html_module.unescape(init_guarantee_text)
-                parsed_data['initial_guarantee_required'] = 'ضمان إبتدائى' in init_guarantee_text or 'مطلوب' in init_guarantee_text
+                text_lower = init_guarantee_text.lower()
+                if 'لا يوجد' in init_guarantee_text or 'غير مطلوب' in init_guarantee_text or 'not required' in text_lower:
+                    parsed_data['initial_guarantee_required'] = False
+                else:
+                    parsed_data['initial_guarantee_required'] = 'ضمان إبتدائى' in init_guarantee_text or 'مطلوب' in init_guarantee_text or 'required' in text_lower
             
             # Extract initial guarantee address (عنوان الضمان الإبتدائى)
             guarantee_addr_match = re.search(r'عنوان الضمان الإبتدائى.*?<span>\s*(.*?)\s*</span>', html_content, re.DOTALL)
