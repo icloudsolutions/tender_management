@@ -626,10 +626,23 @@ class EtimadTender(models.Model):
                 # Auto-fetch detailed info for new tenders (if tender_id_string exists)
                 if new_tender.tender_id_string:
                     try:
+                        _logger.info(f"Starting auto-fetch details for new tender: {vals['name'][:50]}")
                         new_tender._fetch_detailed_info_silent()
-                        _logger.info(f"Auto-fetched details for new tender: {vals['name'][:50]}")
+                        _logger.info(f"Successfully auto-fetched details for new tender: {vals['name'][:50]}")
+                        
+                        # Post notification to chatter
+                        new_tender.message_post(
+                            body="<i class='fa fa-download'/> Detailed information automatically fetched from Etimad portal",
+                            message_type='notification',
+                            subtype_xmlid='mail.mt_note',
+                        )
                     except Exception as e:
                         _logger.warning(f"Could not auto-fetch details for {vals['name'][:50]}: {e}")
+                        new_tender.message_post(
+                            body=f"<i class='fa fa-exclamation-triangle'/> Could not auto-fetch details: {str(e)}",
+                            message_type='notification',
+                            subtype_xmlid='mail.mt_note',
+                        )
                 
                 return True
                 
