@@ -384,7 +384,11 @@ class EtimadTender(models.Model):
             Notification action dict with fetch results
         """
         session = self._setup_scraper_session()
-        max_retries = 3
+        
+        # Get max_retries from settings
+        params = self.env['ir.config_parameter'].sudo()
+        max_retries = int(params.get_param('ics_etimad_tenders_crm.etimad_max_retries', '3') or 3)
+        
         total_created = 0
         total_updated = 0
         total_errors = 0
@@ -866,13 +870,58 @@ class EtimadTender(models.Model):
 
     @api.model
     def action_fetch_tenders_cron(self):
-        """Scheduled action to fetch tenders automatically"""
+        """Scheduled action to fetch tenders automatically with configurable settings"""
         try:
-            _logger.info("Starting scheduled tender fetch...")
-            self.fetch_etimad_tenders(page_size=50, page_number=1)
+            # Get configuration parameters
+            params = self.env['ir.config_parameter'].sudo()
+            auto_sync = params.get_param('ics_etimad_tenders_crm.etimad_auto_sync', 'True') == 'True'
+            
+            # Check if auto sync is enabled
+            if not auto_sync:
+                _logger.info("Auto sync is disabled in settings. Skipping scheduled fetch.")
+                return
+            
+            page_size = int(params.get_param('ics_etimad_tenders_crm.etimad_fetch_page_size', '50') or 50)
+            pages = int(params.get_param('ics_etimad_tenders_crm.etimad_fetch_pages', '1') or 1)
+            
+            # Ensure page_size doesn't exceed Etimad's limit
+            page_size = min(page_size, 50)
+            
+            _logger.info(f"Starting scheduled tender fetch (page_size={page_size}, pages={pages})...")
+            self.fetch_etimad_tenders(page_size=page_size, page_number=1, max_pages=pages)
             _logger.info("Scheduled tender fetch completed successfully")
         except Exception as e:
             _logger.error(f"Scheduled tender fetch failed: {e}")
+    
+    @api.model
+    def update_cron_interval(self):
+        """Update the cron job interval based on settings"""
+        try:
+            params = self.env['ir.config_parameter'].sudo()
+            sync_interval = int(params.get_param('ics_etimad_tenders_crm.etimad_sync_interval', '24') or 24)
+            auto_sync = params.get_param('ics_etimad_tenders_crm.etimad_auto_sync', 'True') == 'True'
+            
+            # Find the cron job
+            cron = self.env.ref('ics_etimad_tenders_crm.ir_cron_fetch_etimad_tenders_daily', raise_if_not_found=False)
+            
+            if cron:
+                # Update cron active state
+                cron.active = auto_sync
+                
+                # Update interval
+                if sync_interval >= 24:
+                    # Daily interval
+                    cron.interval_number = sync_interval // 24
+                    cron.interval_type = 'days'
+                else:
+                    # Hourly interval
+                    cron.interval_number = sync_interval
+                    cron.interval_type = 'hours'
+                
+                _logger.info(f"Cron interval updated: {cron.interval_number} {cron.interval_type}, active={auto_sync}")
+            
+        except Exception as e:
+            _logger.error(f"Failed to update cron interval: {e}")
 
     def action_toggle_participating(self):
         """Toggle participation status"""

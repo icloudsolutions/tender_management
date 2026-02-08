@@ -13,23 +13,38 @@
                         <setting id="etimad_auto_sync_setting" help="Automatically fetch new tenders from Etimad platform">
                             <field name="etimad_auto_sync"/>
                             <div class="content-group" invisible="not etimad_auto_sync">
+                                <div class="alert alert-info mt16" role="alert">
+                                    <i class="fa fa-info-circle"/> These settings control how often and how many tenders are fetched from Etimad portal.
+                                    Changes will be applied to the scheduled sync job immediately after saving.
+                                </div>
                                 <div class="row mt16">
-                                    <label for="etimad_sync_interval" class="col-lg-3 o_light_label" string="Sync Interval (hours)"/>
+                                    <label for="etimad_sync_interval" class="col-lg-3 o_light_label" string="Sync Interval"/>
                                     <field name="etimad_sync_interval" class="oe_inline"/>
+                                    <span class="ml-2">hours</span>
+                                    <div class="text-muted ml-2">(Recommended: 24 hours for daily sync)</div>
                                 </div>
                                 <div class="row mt8">
                                     <label for="etimad_fetch_page_size" class="col-lg-3 o_light_label" string="Tenders per Page"/>
                                     <field name="etimad_fetch_page_size" class="oe_inline"/>
-                                    <span class="ml-2 text-muted">(max: 50)</span>
+                                    <span class="ml-2 text-muted">(Min: 10, Max: 50 - Etimad API limit)</span>
                                 </div>
                                 <div class="row mt8">
                                     <label for="etimad_fetch_pages" class="col-lg-3 o_light_label" string="Pages per Sync"/>
                                     <field name="etimad_fetch_pages" class="oe_inline"/>
-                                    <span class="ml-2 text-muted">(1 page = up to 50 tenders)</span>
+                                    <div class="text-muted ml-2">
+                                        Total tenders per sync = Page Size × Pages
+                                        <br/><small>Example: 50 × 3 = 150 tenders</small>
+                                    </div>
                                 </div>
                                 <div class="row mt8">
                                     <label for="etimad_max_retries" class="col-lg-3 o_light_label" string="Max Retries"/>
                                     <field name="etimad_max_retries" class="oe_inline"/>
+                                    <span class="ml-2 text-muted">(If scraping fails, retry this many times)</span>
+                                </div>
+                            </div>
+                            <div class="content-group" invisible="etimad_auto_sync">
+                                <div class="alert alert-warning mt16" role="alert">
+                                    <i class="fa fa-exclamation-triangle"/> Auto sync is disabled. Tenders must be fetched manually using the "Manual Sync Now" button below.
                                 </div>
                             </div>
                         </setting>
@@ -39,12 +54,14 @@
                                     string="Test Connection" 
                                     type="object" 
                                     class="btn-secondary"
-                                    icon="fa-plug"/>
+                                    icon="fa-plug"
+                                    help="Fetch 5 tenders to test Etimad API connection"/>
                             <button name="action_manual_sync" 
                                     string="Manual Sync Now" 
                                     type="object" 
                                     class="btn-primary ml-2"
-                                    icon="fa-refresh"/>
+                                    icon="fa-refresh"
+                                    help="Manually trigger tender synchronization with current settings"/>
                         </setting>
                     </block>
                     

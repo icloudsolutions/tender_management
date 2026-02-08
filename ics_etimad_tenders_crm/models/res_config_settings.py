@@ -1,4 +1,5 @@
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
 
 
 class ResConfigSettings(models.TransientModel):
@@ -17,28 +18,28 @@ class ResConfigSettings(models.TransientModel):
         string="Sync Interval (hours)",
         config_parameter="ics_etimad_tenders_crm.etimad_sync_interval",
         default=24,
-        help="How often to sync tenders (in hours)"
+        help="How often to sync tenders (in hours). Minimum: 1 hour, Recommended: 24 hours"
     )
     
     etimad_fetch_page_size = fields.Integer(
         string="Tenders per Sync",
         config_parameter="ics_etimad_tenders_crm.etimad_fetch_page_size",
         default=50,
-        help="Number of tenders to fetch in each synchronization (max: 50)"
+        help="Number of tenders to fetch in each synchronization (min: 10, max: 50)"
     )
     
     etimad_fetch_pages = fields.Integer(
         string="Pages per Sync",
         config_parameter="ics_etimad_tenders_crm.etimad_fetch_pages",
         default=1,
-        help="Number of pages to fetch per sync (1 page = up to 50 tenders)"
+        help="Number of pages to fetch per sync (1 page = up to 50 tenders). Max recommended: 5"
     )
     
     etimad_max_retries = fields.Integer(
         string="Max Retries",
         config_parameter="ics_etimad_tenders_crm.etimad_max_retries",
         default=3,
-        help="Number of retry attempts for failed scraping requests"
+        help="Number of retry attempts for failed scraping requests (min: 1, max: 10)"
     )
     
     # ==================== AUTO OPPORTUNITY CREATION ====================
@@ -248,3 +249,49 @@ class ResConfigSettings(models.TransientModel):
                 'sticky': False,
             }
         }
+    
+    def set_values(self):
+        """Override to update cron interval when scraping settings change"""
+        res = super(ResConfigSettings, self).set_values()
+        
+        # Update cron job interval when scraping settings are saved
+        if any(field in self._fields for field in ['etimad_auto_sync', 'etimad_sync_interval']):
+            self.env['ics.etimad.tender'].sudo().update_cron_interval()
+        
+        return res
+    
+    @api.constrains('etimad_sync_interval')
+    def _check_sync_interval(self):
+        """Validate sync interval is within acceptable range"""
+        for record in self:
+            if record.etimad_sync_interval and record.etimad_sync_interval < 1:
+                raise ValidationError("Sync interval must be at least 1 hour.")
+            if record.etimad_sync_interval and record.etimad_sync_interval > 168:  # 1 week
+                raise ValidationError("Sync interval cannot exceed 168 hours (1 week).")
+    
+    @api.constrains('etimad_fetch_page_size')
+    def _check_page_size(self):
+        """Validate page size is within Etimad API limits"""
+        for record in self:
+            if record.etimad_fetch_page_size and record.etimad_fetch_page_size < 10:
+                raise ValidationError("Page size must be at least 10.")
+            if record.etimad_fetch_page_size and record.etimad_fetch_page_size > 50:
+                raise ValidationError("Page size cannot exceed 50 (Etimad API limit).")
+    
+    @api.constrains('etimad_fetch_pages')
+    def _check_fetch_pages(self):
+        """Validate number of pages is reasonable"""
+        for record in self:
+            if record.etimad_fetch_pages and record.etimad_fetch_pages < 1:
+                raise ValidationError("Must fetch at least 1 page.")
+            if record.etimad_fetch_pages and record.etimad_fetch_pages > 10:
+                raise ValidationError("Fetching more than 10 pages per sync may cause performance issues. Maximum allowed: 10.")
+    
+    @api.constrains('etimad_max_retries')
+    def _check_max_retries(self):
+        """Validate retry count is reasonable"""
+        for record in self:
+            if record.etimad_max_retries and record.etimad_max_retries < 1:
+                raise ValidationError("Must allow at least 1 retry attempt.")
+            if record.etimad_max_retries and record.etimad_max_retries > 10:
+                raise ValidationError("Too many retries may cause excessive delays. Maximum allowed: 10.")
