@@ -249,29 +249,52 @@ class EtimadTender(models.Model):
             
             # Get configuration parameters
             preferred_agencies = params.get_param('ics_etimad_tenders_crm.etimad_preferred_agencies', '')
-            preferred_activities = params.get_param('ics_etimad_tenders_crm.etimad_preferred_activities', '')
             preferred_categories_str = params.get_param('ics_etimad_tenders_crm.etimad_preferred_categories', '')
-            min_value = float(params.get_param('ics_etimad_tenders_crm.etimad_min_value_target', '50000') or 0)
-            max_value = float(params.get_param('ics_etimad_tenders_crm.etimad_max_value_target', '5000000') or 0)
             min_prep_days = int(params.get_param('ics_etimad_tenders_crm.etimad_min_preparation_days', '7') or 7)
+            
+            # Get preferred activities from Many2many field (new approach)
+            config_settings = self.env['res.config.settings'].sudo().search([], limit=1)
+            preferred_activities_records = config_settings.etimad_preferred_activities_ids if config_settings else self.env['ics.etimad.activity']
+            
+            # Fallback to legacy comma-separated field if no activities selected
+            preferred_activities_legacy = params.get_param('ics_etimad_tenders_crm.etimad_preferred_activities', '')
             
             # Parse comma-separated lists
             agencies_list = [a.strip().lower() for a in preferred_agencies.split(',') if a.strip()] if preferred_agencies else []
-            activities_list = [a.strip().lower() for a in preferred_activities.split(',') if a.strip()] if preferred_activities else []
             categories_list = [c.strip().lower() for c in preferred_categories_str.split(',') if c.strip()] if preferred_categories_str else []
             
-            # Activity matching (30 points)
+            # Build activities list from both new Many2many and legacy text field
+            activities_list = []
+            
+            # From Many2many records (preferred method)
+            if preferred_activities_records:
+                for activity_rec in preferred_activities_records:
+                    # Add Arabic name
+                    activities_list.append(activity_rec.name.lower())
+                    # Add English name if available
+                    if activity_rec.name_en:
+                        activities_list.append(activity_rec.name_en.lower())
+                    # Add keywords if available
+                    if activity_rec.keywords:
+                        keywords = [k.strip().lower() for k in activity_rec.keywords.split(',') if k.strip()]
+                        activities_list.extend(keywords)
+            
+            # Fallback to legacy text field
+            elif preferred_activities_legacy:
+                activities_list = [a.strip().lower() for a in preferred_activities_legacy.split(',') if a.strip()]
+            
+            # Activity matching (40 points - increased from 30)
             if record.activity_name and activities_list:
                 activity_lower = record.activity_name.lower()
                 # Check for exact or partial match
                 if activity_lower in activities_list:
-                    score += 30
+                    score += 40
                     reasons.append(f'Activity "{record.activity_name}" matches preferences')
                 elif any(pref in activity_lower or activity_lower in pref for pref in activities_list):
-                    score += 20
+                    score += 25
                     reasons.append(f'Activity "{record.activity_name}" partially matches preferences')
             
-            # Tender type / Category matching (20 points)
+            # Tender type / Category matching (30 points - increased from 20)
             # Check if tender matches any of the preferred categories
             if categories_list:
                 type_lower = (record.etimad_tender_type or '').lower()
@@ -294,7 +317,7 @@ class EtimadTender(models.Model):
                             matched_categories.append(category)
                 
                 if matched_categories:
-                    score += 20
+                    score += 30
                     category_names = {
                         'supply': 'Supply',
                         'services': 'Services',
@@ -304,20 +327,6 @@ class EtimadTender(models.Model):
                     }
                     matched_names = [category_names.get(c, c) for c in matched_categories]
                     reasons.append(f'Tender type matches category: {", ".join(matched_names)}')
-            
-            # Value range matching (20 points)
-            if record.estimated_amount:
-                if min_value <= record.estimated_amount <= max_value:
-                    score += 20
-                    reasons.append(f'Tender value ({record.estimated_amount:,.0f} SAR) within target range')
-                elif record.estimated_amount < min_value:
-                    # Below minimum - partial points
-                    score += 5
-                    reasons.append('Tender value below target range')
-                elif record.estimated_amount > max_value:
-                    # Above maximum - still interested but challenging
-                    score += 10
-                    reasons.append('Tender value above target range (challenging)')
             
             # Agency experience (15 points)
             # Check if agency is in preferred list OR we've won tenders from them

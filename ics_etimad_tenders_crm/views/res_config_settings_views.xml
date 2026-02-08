@@ -54,6 +54,14 @@
                             <field name="etimad_enable_matching"/>
                             <div class="content-group" invisible="not etimad_enable_matching">
                                 <div class="row mt16">
+                                    <label for="etimad_preferred_activities_ids" class="col-lg-3 o_light_label" string="Preferred Activities"/>
+                                    <field name="etimad_preferred_activities_ids" 
+                                           widget="many2many_tags" 
+                                           options="{'color_field': 'color', 'no_create': True}"
+                                           class="o_field_many2many_tags"
+                                           placeholder="Select activities from Etimad classification..."/>
+                                </div>
+                                <div class="row mt16">
                                     <label for="etimad_preferred_categories" class="col-lg-3 o_light_label" string="Primary Business"/>
                                     <field name="etimad_preferred_categories" 
                                            placeholder="supply, maintenance, services"
@@ -68,23 +76,6 @@
                                            placeholder="Ministry of Health, General Authority for Transport, Saudi Aramco"
                                            class="o_field_char"/>
                                 </div>
-                                <div class="row mt8">
-                                    <label for="etimad_preferred_activities" class="col-lg-3 o_light_label" string="Preferred Activities"/>
-                                    <field name="etimad_preferred_activities" 
-                                           placeholder="Construction Works, IT Services, Maintenance Services"
-                                           class="o_field_char"/>
-                                </div>
-                            </div>
-                        </setting>
-                        
-                        <setting id="etimad_value_range" string="Target Value Range" help="Your typical tender value range (in SAR)">
-                            <div class="row">
-                                <label for="etimad_min_value_target" class="col-lg-3 o_light_label" string="Minimum (SAR)"/>
-                                <field name="etimad_min_value_target" class="oe_inline"/>
-                            </div>
-                            <div class="row mt8">
-                                <label for="etimad_max_value_target" class="col-lg-3 o_light_label" string="Maximum (SAR)"/>
-                                <field name="etimad_max_value_target" class="oe_inline"/>
                             </div>
                         </setting>
                         

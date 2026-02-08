@@ -1,7 +1,7 @@
 # __manifest__.py
 {
     "name": "ICS Etimad Tenders CRM",
-    "version": "18.0.3.1.0",
+    "version": "18.0.4.0.0",
     "category": "Sales/CRM",
     "author": "iCloud Solutions",
     "website": "https://icloud-solutions.net",
@@ -55,9 +55,11 @@
     ],
     "data": [
         "security/ir.model.access.csv",
+        "data/etimad_activities_data.xml",
         "data/ir_cron_data.xml",
         "data/etimad_server_actions.xml",
         "views/etimad_menus.xml",
+        "views/etimad_activity_views.xml",
         "views/etimad_tender_views.xml",
         "views/res_config_settings_views.xml",
     ],

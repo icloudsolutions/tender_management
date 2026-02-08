@@ -86,10 +86,20 @@ class ResConfigSettings(models.TransientModel):
         help="List of preferred agency names (comma-separated). Tenders from these agencies get higher match scores."
     )
     
-    etimad_preferred_activities = fields.Char(
+    etimad_preferred_activities_ids = fields.Many2many(
+        'ics.etimad.activity',
+        'etimad_config_activity_rel',
+        'config_id',
+        'activity_id',
         string="Preferred Activities",
+        help="Select your company's main business activities from Etimad classification. Tenders matching these activities will get higher scores."
+    )
+    
+    # Deprecated - kept for backward compatibility, will be removed in future versions
+    etimad_preferred_activities = fields.Char(
+        string="Preferred Activities (Legacy)",
         config_parameter="ics_etimad_tenders_crm.etimad_preferred_activities",
-        help="List of preferred tender activities (comma-separated). Matching activities get higher scores."
+        help="DEPRECATED: Use 'Preferred Activities' multi-select field above instead."
     )
     
     etimad_preferred_categories = fields.Char(
@@ -98,26 +108,14 @@ class ResConfigSettings(models.TransientModel):
         help="Your company's business categories (comma-separated). Options: supply, services, construction, maintenance, consulting. Example: 'supply, maintenance'"
     )
     
-    etimad_min_value_target = fields.Float(
-        string="Minimum Target Value (SAR)",
-        config_parameter="ics_etimad_tenders_crm.etimad_min_value_target",
-        default=50000.0,
-        help="Minimum tender value your company typically pursues"
-    )
-    
-    etimad_max_value_target = fields.Float(
-        string="Maximum Target Value (SAR)",
-        config_parameter="ics_etimad_tenders_crm.etimad_max_value_target",
-        default=5000000.0,
-        help="Maximum tender value your company can handle"
-    )
-    
     etimad_min_preparation_days = fields.Integer(
         string="Min Preparation Days",
         config_parameter="ics_etimad_tenders_crm.etimad_min_preparation_days",
         default=7,
         help="Minimum days needed to prepare a tender submission"
     )
+    
+    # Note: Target value range settings removed - estimated amounts not consistently published in Etimad
     
     # ==================== NOTIFICATION SETTINGS ====================
     

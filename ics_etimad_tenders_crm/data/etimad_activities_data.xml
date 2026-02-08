@@ -1,0 +1,141 @@
+<odoo>
+    <data noupdate="1">
+        
+        <!-- Etimad Main Activities List -->
+        <!-- Source: https://tenders.etimad.sa - النشاط الأساسي dropdown -->
+        
+        <record id="etimad_activity_1" model="ics.etimad.activity">
+            <field name="activity_id">1</field>
+            <field name="name">التجارة</field>
+            <field name="name_en">Trade</field>
+            <field name="keywords">trade, trading, commerce, تجارة, توريد, supply</field>
+        </record>
+        
+        <record id="etimad_activity_2" model="ics.etimad.activity">
+            <field name="activity_id">2</field>
+            <field name="name">المقاولات</field>
+            <field name="name_en">Contracting</field>
+            <field name="keywords">contracting, construction, contractor, مقاولات, إنشاءات, بناء</field>
+        </record>
+        
+        <record id="etimad_activity_3" model="ics.etimad.activity">
+            <field name="activity_id">3</field>
+            <field name="name">التشغيل والصيانة والنظافة للمنشآت</field>
+            <field name="name_en">Operation, Maintenance & Cleaning</field>
+            <field name="keywords">operation, maintenance, cleaning, facilities, تشغيل, صيانة, نظافة, منشآت</field>
+        </record>
+        
+        <record id="etimad_activity_4" model="ics.etimad.activity">
+            <field name="activity_id">4</field>
+            <field name="name">العقارات والأراضي</field>
+            <field name="name_en">Real Estate & Land</field>
+            <field name="keywords">real estate, land, property, عقارات, أراضي</field>
+        </record>
+        
+        <record id="etimad_activity_5" model="ics.etimad.activity">
+            <field name="activity_id">5</field>
+            <field name="name">الصناعة والتعدين والتدوير</field>
+            <field name="name_en">Industry, Mining & Recycling</field>
+            <field name="keywords">industry, manufacturing, mining, recycling, صناعة, تعدين, تدوير</field>
+        </record>
+        
+        <record id="etimad_activity_6" model="ics.etimad.activity">
+            <field name="activity_id">6</field>
+            <field name="name">الغاز والمياه والطاقة</field>
+            <field name="name_en">Gas, Water & Energy</field>
+            <field name="keywords">gas, water, energy, utilities, غاز, مياه, طاقة</field>
+        </record>
+        
+        <record id="etimad_activity_7" model="ics.etimad.activity">
+            <field name="activity_id">7</field>
+            <field name="name">المناجم والبترول والمحاجر</field>
+            <field name="name_en">Mines, Petroleum & Quarries</field>
+            <field name="keywords">mines, petroleum, oil, quarries, مناجم, بترول, نفط, محاجر</field>
+        </record>
+        
+        <record id="etimad_activity_8" model="ics.etimad.activity">
+            <field name="activity_id">8</field>
+            <field name="name">الإعلام والنشر والتوزيع</field>
+            <field name="name_en">Media, Publishing & Distribution</field>
+            <field name="keywords">media, publishing, distribution, press, إعلام, نشر, توزيع</field>
+        </record>
+        
+        <record id="etimad_activity_9" model="ics.etimad.activity">
+            <field name="activity_id">9</field>
+            <field name="name">الاتصالات وتقنية المعلومات</field>
+            <field name="name_en">Telecommunications & IT</field>
+            <field name="keywords">telecommunications, IT, information technology, software, hardware, اتصالات, تقنية, معلومات</field>
+        </record>
+        
+        <record id="etimad_activity_10" model="ics.etimad.activity">
+            <field name="activity_id">10</field>
+            <field name="name">الزراعة والصيد</field>
+            <field name="name_en">Agriculture & Fishing</field>
+            <field name="keywords">agriculture, farming, fishing, زراعة, صيد</field>
+        </record>
+        
+        <record id="etimad_activity_11" model="ics.etimad.activity">
+            <field name="activity_id">11</field>
+            <field name="name">الرعاية الصحية والنقاهة</field>
+            <field name="name_en">Healthcare & Convalescence</field>
+            <field name="keywords">healthcare, medical, hospital, clinic, رعاية, صحية, نقاهة, طبي</field>
+        </record>
+        
+        <record id="etimad_activity_12" model="ics.etimad.activity">
+            <field name="activity_id">12</field>
+            <field name="name">التعليم والتدريب</field>
+            <field name="name_en">Education & Training</field>
+            <field name="keywords">education, training, learning, teaching, تعليم, تدريب</field>
+        </record>
+        
+        <record id="etimad_activity_13" model="ics.etimad.activity">
+            <field name="activity_id">13</field>
+            <field name="name">التوظيف والاستقدام</field>
+            <field name="name_en">Employment & Recruitment</field>
+            <field name="keywords">employment, recruitment, hiring, staffing, توظيف, استقدام</field>
+        </record>
+        
+        <record id="etimad_activity_14" model="ics.etimad.activity">
+            <field name="activity_id">14</field>
+            <field name="name">الأمن والسلامة</field>
+            <field name="name_en">Security & Safety</field>
+            <field name="keywords">security, safety, protection, أمن, سلامة, حماية</field>
+        </record>
+        
+        <record id="etimad_activity_15" model="ics.etimad.activity">
+            <field name="activity_id">15</field>
+            <field name="name">النقل والبريد والتخزين</field>
+            <field name="name_en">Transport, Postal & Storage</field>
+            <field name="keywords">transport, logistics, shipping, postal, storage, warehousing, نقل, بريد, تخزين, لوجستيات</field>
+        </record>
+        
+        <record id="etimad_activity_16" model="ics.etimad.activity">
+            <field name="activity_id">16</field>
+            <field name="name">المهن الاستشارية</field>
+            <field name="name_en">Consulting Professions</field>
+            <field name="keywords">consulting, consultancy, advisory, professional services, استشارات, استشاري</field>
+        </record>
+        
+        <record id="etimad_activity_17" model="ics.etimad.activity">
+            <field name="activity_id">17</field>
+            <field name="name">السياحة والمطاعم والفنادق وتنظيم المعارض</field>
+            <field name="name_en">Tourism, Restaurants, Hotels & Exhibitions</field>
+            <field name="keywords">tourism, hospitality, hotels, restaurants, exhibitions, events, سياحة, مطاعم, فنادق, معارض</field>
+        </record>
+        
+        <record id="etimad_activity_18" model="ics.etimad.activity">
+            <field name="activity_id">18</field>
+            <field name="name">المالية والتمويل والتأمين</field>
+            <field name="name_en">Finance, Funding & Insurance</field>
+            <field name="keywords">finance, financial, funding, insurance, banking, مالية, تمويل, تأمين</field>
+        </record>
+        
+        <record id="etimad_activity_19" model="ics.etimad.activity">
+            <field name="activity_id">19</field>
+            <field name="name">الخدمات الأخرى</field>
+            <field name="name_en">Other Services</field>
+            <field name="keywords">other services, miscellaneous, خدمات, أخرى</field>
+        </record>
+        
+    </data>
+</odoo>

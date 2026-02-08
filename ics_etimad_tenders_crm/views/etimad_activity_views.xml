@@ -1,0 +1,85 @@
+<odoo>
+    <record id="view_etimad_activity_tree" model="ir.ui.view">
+        <field name="name">ics.etimad.activity.tree</field>
+        <field name="model">ics.etimad.activity</field>
+        <field name="arch" type="xml">
+            <tree string="Etimad Activities">
+                <field name="activity_id"/>
+                <field name="name"/>
+                <field name="name_en"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_etimad_activity_form" model="ir.ui.view">
+        <field name="name">ics.etimad.activity.form</field>
+        <field name="model">ics.etimad.activity</field>
+        <field name="arch" type="xml">
+            <form string="Etimad Activity">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options="{'terminology': 'archive'}"/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="activity_id"/>
+                            <field name="name"/>
+                            <field name="name_en"/>
+                        </group>
+                        <group>
+                            <field name="color" widget="color_picker"/>
+                        </group>
+                    </group>
+                    <group string="Matching Keywords">
+                        <field name="keywords" placeholder="Comma-separated keywords for tender matching (Arabic and English)"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_etimad_activity_search" model="ir.ui.view">
+        <field name="name">ics.etimad.activity.search</field>
+        <field name="model">ics.etimad.activity</field>
+        <field name="arch" type="xml">
+            <search string="Search Activities">
+                <field name="name"/>
+                <field name="name_en"/>
+                <field name="activity_id"/>
+                <filter string="Active" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Activity ID" name="group_activity_id" context="{'group_by': 'activity_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_etimad_activity" model="ir.actions.act_window">
+        <field name="name">Etimad Activities</field>
+        <field name="res_model">ics.etimad.activity</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No Etimad activities found
+            </p>
+            <p>
+                These are the main business activities from Etimad portal (النشاط الأساسي).
+                They are used for smart matching of tenders to your company profile.
+            </p>
+        </field>
+    </record>
+
+    <!-- Add menu item under Configuration -->
+    <menuitem id="menu_etimad_activity"
+              name="Etimad Activities"
+              parent="menu_etimad_configuration"
+              action="action_etimad_activity"
+              sequence="20"
+              groups="base.group_system"/>
+
+</odoo>
