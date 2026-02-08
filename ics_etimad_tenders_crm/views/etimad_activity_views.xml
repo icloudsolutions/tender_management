@@ -77,7 +77,7 @@
     <!-- Add menu item under Configuration -->
     <menuitem id="menu_etimad_activity"
               name="Etimad Activities"
-              parent="menu_etimad_configuration"
+              parent="menu_etimad_config"
               action="action_etimad_activity"
               sequence="20"
               groups="base.group_system"/>
