@@ -414,6 +414,9 @@
                                     <field name="initial_guarantee_type" 
                                            invisible="not initial_guarantee_required"
                                            string="Type"/>
+                                    <field name="initial_guarantee_address"
+                                           invisible="not initial_guarantee_required"
+                                           string="Address"/>
                                     <field name="final_guarantee_required" 
                                            readonly="1"
                                            string="Final Guarantee"/>

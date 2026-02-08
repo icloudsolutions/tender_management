@@ -93,6 +93,7 @@ class EtimadTender(models.Model):
     insurance_required = fields.Boolean("Insurance Required")
     initial_guarantee_required = fields.Boolean("Initial Guarantee Required")
     initial_guarantee_type = fields.Char("Initial Guarantee Type")
+    initial_guarantee_address = fields.Text("Initial Guarantee Address")
     final_guarantee_percentage = fields.Float("Final Guarantee Pct")
     final_guarantee_required = fields.Boolean("Final Guarantee Required", compute='_compute_final_guarantee_required', store=True)
     
@@ -1062,6 +1063,34 @@ class EtimadTender(models.Model):
                 if parsed_data.get('final_guarantee_percentage'):
                     update_vals['final_guarantee_percentage'] = parsed_data['final_guarantee_percentage']
                 
+                # Tender purpose
+                if parsed_data.get('tender_purpose'):
+                    update_vals['tender_purpose'] = parsed_data['tender_purpose']
+                
+                # Document cost
+                if parsed_data.get('document_cost_amount') is not None:
+                    update_vals['document_cost_amount'] = parsed_data['document_cost_amount']
+                if parsed_data.get('document_cost_type'):
+                    update_vals['document_cost_type'] = parsed_data['document_cost_type']
+                
+                # Contract duration
+                if parsed_data.get('contract_duration'):
+                    update_vals['contract_duration'] = parsed_data['contract_duration']
+                if parsed_data.get('contract_duration_days'):
+                    update_vals['contract_duration_days'] = parsed_data['contract_duration_days']
+                
+                # Insurance
+                if parsed_data.get('insurance_required') is not None:
+                    update_vals['insurance_required'] = parsed_data['insurance_required']
+                
+                # Initial guarantee
+                if parsed_data.get('initial_guarantee_type'):
+                    update_vals['initial_guarantee_type'] = parsed_data['initial_guarantee_type']
+                if parsed_data.get('initial_guarantee_required') is not None:
+                    update_vals['initial_guarantee_required'] = parsed_data['initial_guarantee_required']
+                if parsed_data.get('initial_guarantee_address'):
+                    update_vals['initial_guarantee_address'] = parsed_data['initial_guarantee_address']
+                
                 fetched_count += 1
         except Exception as e:
             _logger.warning(f"Error fetching relations details: {e}")
@@ -1254,6 +1283,51 @@ class EtimadTender(models.Model):
                     guarantee_match = re.search(r'(\d+(?:\.\d+)?)', guarantee_str)
                     if guarantee_match:
                         parsed_data['final_guarantee_percentage'] = float(guarantee_match.group(1))
+                
+                # Extract tender purpose (الغرض من المنافسة)
+                purpose_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "الغرض من المنافسة")]/following-sibling::div[1]//span[@id="purposeSpan"]/text() | //div[contains(@class, "etd-item-title") and contains(text(), "الغرض من المنافسة")]/following-sibling::div[1]//span[@id="subPurposSapn"]/text()')
+                if purpose_elements:
+                    purpose_text = html_module.unescape(purpose_elements[0].strip())
+                    # Remove "...عرض المزيد..." or "...عرض الأقل..." text
+                    purpose_text = re.sub(r'\.\.\.عرض (المزيد|الأقل)\.\.\.', '', purpose_text).strip()
+                    parsed_data['tender_purpose'] = purpose_text
+                
+                # Extract document cost (قيمة وثائق المنافسة)
+                doc_cost_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "قيمة وثائق المنافسة")]/following-sibling::div[1]//span/text()')
+                if doc_cost_elements:
+                    doc_cost_str = html_module.unescape(doc_cost_elements[0].strip())
+                    # Extract number from "700.00" or "0.00"
+                    cost_match = re.search(r'(\d+(?:\.\d+)?)', doc_cost_str)
+                    if cost_match:
+                        cost_value = float(cost_match.group(1))
+                        parsed_data['document_cost_amount'] = cost_value
+                        parsed_data['document_cost_type'] = 'free' if cost_value == 0 else 'paid'
+                
+                # Extract contract duration (مدة العقد)
+                duration_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "مدة العقد")]/following-sibling::div[1]//span/text()')
+                if duration_elements:
+                    duration_text = html_module.unescape(duration_elements[0].strip())
+                    parsed_data['contract_duration'] = duration_text
+                    # Parse duration to days (e.g., "1 سنة" = 365 days, "6 أشهر" = 180 days)
+                    parsed_data['contract_duration_days'] = self._parse_contract_duration(duration_text)
+                
+                # Extract insurance requirement (هل التأمين من متطلبات المنافسة)
+                insurance_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "هل التأمين من متطلبات المنافسة")]/following-sibling::div[1]//span/text()')
+                if insurance_elements:
+                    insurance_text = html_module.unescape(insurance_elements[0].strip())
+                    parsed_data['insurance_required'] = 'نعم' in insurance_text or 'yes' in insurance_text.lower()
+                
+                # Extract initial guarantee type (مطلوب ضمان الإبتدائي)
+                init_guarantee_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "مطلوب ضمان الإبتدائي")]/following-sibling::div[1]//span/text()')
+                if init_guarantee_elements:
+                    init_guarantee_text = html_module.unescape(init_guarantee_elements[0].strip())
+                    parsed_data['initial_guarantee_type'] = init_guarantee_text
+                    parsed_data['initial_guarantee_required'] = 'ضمان إبتدائى' in init_guarantee_text or 'مطلوب' in init_guarantee_text
+                
+                # Extract initial guarantee address (عنوان الضمان الإبتدائى)
+                guarantee_addr_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "عنوان الضمان الإبتدائى")]/following-sibling::div[1]//span/text()')
+                if guarantee_addr_elements:
+                    parsed_data['initial_guarantee_address'] = html_module.unescape(guarantee_addr_elements[0].strip())
             else:
                 # Fallback to regex parsing if lxml not available
                 parsed_data = self._parse_relations_details_regex(html_content)
@@ -1359,6 +1433,52 @@ class EtimadTender(models.Model):
                     parsed_data['final_guarantee_percentage'] = float(guarantee_match.group(1))
                 except ValueError:
                     pass
+            
+            # Extract tender purpose (الغرض من المنافسة)
+            purpose_match = re.search(r'الغرض من المنافسة.*?<span[^>]*>\s*(.*?)\s*<', html_content, re.DOTALL)
+            if purpose_match:
+                purpose_text = re.sub(r'<[^>]+>', '', purpose_match.group(1)).strip()
+                purpose_text = re.sub(r'\.\.\.عرض (المزيد|الأقل)\.\.\.', '', purpose_text).strip()
+                if purpose_text:
+                    parsed_data['tender_purpose'] = html_module.unescape(purpose_text)
+            
+            # Extract document cost (قيمة وثائق المنافسة)
+            doc_cost_match = re.search(r'قيمة وثائق المنافسة.*?<span>\s*(\d+(?:\.\d+)?)', html_content, re.DOTALL)
+            if doc_cost_match:
+                try:
+                    cost_value = float(doc_cost_match.group(1))
+                    parsed_data['document_cost_amount'] = cost_value
+                    parsed_data['document_cost_type'] = 'free' if cost_value == 0 else 'paid'
+                except ValueError:
+                    pass
+            
+            # Extract contract duration (مدة العقد)
+            duration_match = re.search(r'مدة العقد.*?<span>\s*(.*?)\s*</span>', html_content, re.DOTALL)
+            if duration_match:
+                duration_text = re.sub(r'<[^>]+>', '', duration_match.group(1)).strip()
+                if duration_text:
+                    parsed_data['contract_duration'] = html_module.unescape(duration_text)
+                    parsed_data['contract_duration_days'] = self._parse_contract_duration(duration_text)
+            
+            # Extract insurance requirement (هل التأمين من متطلبات المنافسة)
+            insurance_match = re.search(r'هل التأمين من متطلبات المنافسة.*?<span>\s*(.*?)\s*</span>', html_content, re.DOTALL)
+            if insurance_match:
+                insurance_text = re.sub(r'<[^>]+>', '', insurance_match.group(1)).strip()
+                parsed_data['insurance_required'] = 'نعم' in insurance_text or 'yes' in insurance_text.lower()
+            
+            # Extract initial guarantee type (مطلوب ضمان الإبتدائي)
+            init_guarantee_match = re.search(r'مطلوب ضمان الإبتدائي.*?<span>\s*(.*?)\s*</span>', html_content, re.DOTALL)
+            if init_guarantee_match:
+                init_guarantee_text = re.sub(r'<[^>]+>', '', init_guarantee_match.group(1)).strip()
+                parsed_data['initial_guarantee_type'] = html_module.unescape(init_guarantee_text)
+                parsed_data['initial_guarantee_required'] = 'ضمان إبتدائى' in init_guarantee_text or 'مطلوب' in init_guarantee_text
+            
+            # Extract initial guarantee address (عنوان الضمان الإبتدائى)
+            guarantee_addr_match = re.search(r'عنوان الضمان الإبتدائى.*?<span>\s*(.*?)\s*</span>', html_content, re.DOTALL)
+            if guarantee_addr_match:
+                addr_text = re.sub(r'<[^>]+>', '', guarantee_addr_match.group(1)).strip()
+                if addr_text:
+                    parsed_data['initial_guarantee_address'] = html_module.unescape(addr_text)
             
         except Exception as e:
             _logger.error(f"Error in regex parsing: {e}")
