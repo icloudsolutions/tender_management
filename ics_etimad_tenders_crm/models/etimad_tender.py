@@ -1149,14 +1149,21 @@ class EtimadTender(models.Model):
                 'tender_status_text',
             ]
             if any(update_vals.get(field) in (None, False) for field in missing_basic_fields):
-                details_url = f"https://tenders.etimad.sa/Tender/Details/{self.tender_id_string}"
-                details_response = session.get(details_url, timeout=30)
-                if details_response.status_code == 200 and details_response.text:
-                    basic_data = self._parse_basic_details_html(details_response.text)
-                    for key, value in basic_data.items():
-                        if update_vals.get(key) in (None, False) and value not in (None, False):
-                            update_vals[key] = value
-                    fetched_count += 1
+                details_pages = [
+                    f"https://tenders.etimad.sa/Tender/Details/{self.tender_id_string}",
+                    f"https://tenders.etimad.sa/Tender/DetailsForVisitor?STenderId={self.tender_id_string}",
+                ]
+                for details_url in details_pages:
+                    details_response = session.get(details_url, timeout=30)
+                    if details_response.status_code == 200 and details_response.text:
+                        basic_data = self._parse_basic_details_html(details_response.text)
+                        for key, value in basic_data.items():
+                            if update_vals.get(key) in (None, False) and value not in (None, False):
+                                update_vals[key] = value
+                        fetched_count += 1
+                        # Stop once we successfully parsed any basic data
+                        if basic_data:
+                            break
         except Exception as e:
             _logger.warning(f"Error fetching basic details page: {e}")
             
