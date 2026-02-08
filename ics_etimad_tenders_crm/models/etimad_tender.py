@@ -1218,8 +1218,13 @@ class EtimadTender(models.Model):
                 # Extract submission method (طريقة تقديم العروض)
                 submission_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "طريقة تقديم العروض")]/following-sibling::div[1]//span/text()')
                 if submission_elements:
-                    submission_text = html_module.unescape(submission_elements[0].strip())
-                    if 'ملف واحد' in submission_text or 'معا' in submission_text:
+                    # Get all text and join, then clean
+                    submission_text = ' '.join([html_module.unescape(t.strip()) for t in submission_elements if t.strip()])
+                    submission_text = submission_text.strip()
+                    
+                    _logger.info(f"Extracted submission method text: '{submission_text}'")
+                    
+                    if 'ملف واحد' in submission_text or 'معا' in submission_text or 'معاً' in submission_text:
                         parsed_data['submission_method'] = 'single_file'
                     elif 'ملفين منفصلين' in submission_text or 'منفصل' in submission_text:
                         parsed_data['submission_method'] = 'separate_files'
@@ -1376,7 +1381,10 @@ class EtimadTender(models.Model):
             submission_match = re.search(r'طريقة تقديم العروض.*?<span>\s*(.*?)\s*</span>', html_content, re.DOTALL)
             if submission_match:
                 submission_text = html_module.unescape(re.sub(r'<[^>]+>', '', submission_match.group(1)).strip())
-                if 'ملف واحد' in submission_text or 'معا' in submission_text:
+                
+                _logger.info(f"Extracted submission method text (regex): '{submission_text}'")
+                
+                if 'ملف واحد' in submission_text or 'معا' in submission_text or 'معاً' in submission_text:
                     parsed_data['submission_method'] = 'single_file'
                 elif 'ملفين منفصلين' in submission_text or 'منفصل' in submission_text:
                     parsed_data['submission_method'] = 'separate_files'
