@@ -1996,6 +1996,16 @@ class EtimadTender(models.Model):
                     sme_text = html_module.unescape(sme_elements[0].strip()).lower()
                     parsed_data['sme_participation_allowed'] = 'نعم' in sme_text or 'yes' in sme_text or 'مسموح' in sme_text
                 
+                # Extract SME preference (تفضيل المنشآت الصغيرة والمتوسطة)
+                sme_prefer_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "تفضيل المنشآت الصغيرة")]/following-sibling::div[1]//span/text()')
+                if sme_prefer_elements:
+                    sme_prefer_text = html_module.unescape(sme_prefer_elements[0].strip())
+                    if sme_prefer_text:
+                        parsed_data['sme_participation_allowed'] = 'نعم' in sme_prefer_text or 'yes' in sme_prefer_text.lower() or 'مسموح' in sme_prefer_text
+                        sme_prefer_match = re.search(r'(\d+(?:\.\d+)?)', sme_prefer_text)
+                        if sme_prefer_match:
+                            parsed_data['sme_price_preference'] = float(sme_prefer_match.group(1))
+                
                 # Extract SME price preference
                 # Look for "الأفضلية السعرية"
                 sme_preference_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "الأفضلية السعرية")]/following-sibling::div[1]//span/text()')
@@ -2018,6 +2028,20 @@ class EtimadTender(models.Model):
                     notes_text = html_module.unescape(notes_elements[0].strip())
                     if notes_text and 'لا يوجد' not in notes_text:
                         parsed_data['local_content_notes'] = notes_text
+                
+                # Extract local content requirements (اشتراطات المحتوى المحلي)
+                requirements_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "اشتراطات المحتوى المحلي")]/following-sibling::div[1]//span/text()')
+                if requirements_elements:
+                    requirements_text = html_module.unescape(requirements_elements[0].strip())
+                    if requirements_text and 'لا يوجد' not in requirements_text:
+                        parsed_data['local_content_notes'] = requirements_text
+
+                # Extract local content mechanisms (آليات المحتوى المحلي)
+                mechanisms_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "آليات المحتوى المحلي")]/following-sibling::div[1]//span/text()')
+                if mechanisms_elements:
+                    mechanisms_text = html_module.unescape(mechanisms_elements[0].strip())
+                    if mechanisms_text and 'لا يوجد' not in mechanisms_text:
+                        parsed_data['local_content_mechanism'] = mechanisms_text
             else:
                 # Fallback to regex parsing
                 parsed_data.update(self._parse_local_content_regex(html_content))
@@ -2064,6 +2088,16 @@ class EtimadTender(models.Model):
                 sme_text = html_module.unescape(re.sub(r'<[^>]+>', '', sme_match.group(1)).strip()).lower()
                 parsed_data['sme_participation_allowed'] = 'نعم' in sme_text or 'yes' in sme_text
             
+            # Extract SME preference (تفضيل المنشآت الصغيرة والمتوسطة)
+            sme_prefer_match = re.search(r'تفضيل المنشآت الصغيرة.*?<span>\s*([^<]+?)\s*</span>', html_content, re.DOTALL)
+            if sme_prefer_match:
+                sme_prefer_text = html_module.unescape(re.sub(r'<[^>]+>', '', sme_prefer_match.group(1)).strip())
+                if sme_prefer_text:
+                    parsed_data['sme_participation_allowed'] = 'نعم' in sme_prefer_text or 'yes' in sme_prefer_text.lower() or 'مسموح' in sme_prefer_text
+                    sme_prefer_pct = re.search(r'(\d+(?:\.\d+)?)', sme_prefer_text)
+                    if sme_prefer_pct:
+                        parsed_data['sme_price_preference'] = float(sme_prefer_pct.group(1))
+            
             # Extract SME price preference
             preference_match = re.search(r'الأفضلية السعرية.*?<span>\s*(\d+(?:\.\d+)?)', html_content, re.DOTALL)
             if preference_match:
@@ -2074,6 +2108,20 @@ class EtimadTender(models.Model):
             if cert_match:
                 cert_text = html_module.unescape(re.sub(r'<[^>]+>', '', cert_match.group(1)).strip()).lower()
                 parsed_data['sme_qualification_mandatory'] = 'إلزامي' in cert_text or 'مطلوب' in cert_text
+            
+            # Extract local content requirements (اشتراطات المحتوى المحلي)
+            requirements_match = re.search(r'اشتراطات المحتوى المحلي.*?<span>\s*([^<]+?)\s*</span>', html_content, re.DOTALL)
+            if requirements_match:
+                requirements_text = html_module.unescape(re.sub(r'<[^>]+>', '', requirements_match.group(1)).strip())
+                if requirements_text and 'لا يوجد' not in requirements_text:
+                    parsed_data['local_content_notes'] = requirements_text
+            
+            # Extract local content mechanisms (آليات المحتوى المحلي)
+            mechanisms_match = re.search(r'آليات المحتوى المحلي.*?<span>\s*([^<]+?)\s*</span>', html_content, re.DOTALL)
+            if mechanisms_match:
+                mechanisms_text = html_module.unescape(re.sub(r'<[^>]+>', '', mechanisms_match.group(1)).strip())
+                if mechanisms_text and 'لا يوجد' not in mechanisms_text:
+                    parsed_data['local_content_mechanism'] = mechanisms_text
                 
         except Exception as e:
             _logger.error(f"Error in regex local content parsing: {e}")
