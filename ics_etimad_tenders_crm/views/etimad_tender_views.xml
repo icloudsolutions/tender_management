@@ -354,12 +354,6 @@
                                    nolabel="1"/>
                         </page>
                         
-                        <page string="Internal Notes" name="notes">
-                            <field name="notes" 
-                                   placeholder="Add internal notes, team comments, or action items here..."
-                                   widget="text"
-                                   nolabel="1"/>
-                        </page>
                         
                         <page string="Technical Details" name="technical">
                             <group>
