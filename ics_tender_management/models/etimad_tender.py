@@ -54,7 +54,7 @@ class EtimadTender(models.Model):
             'tender_title': self.name,
             'tender_number': self.reference_number or self.tender_number or self.tender_id_string,
             'tender_category': category,
-            'tender_type': 'single_vendor',
+            'tender_type': 'product_wise',
             'description': self.description or '',
             'etimad_tender_id': self.id,
             'etimad_link': self.tender_url,
