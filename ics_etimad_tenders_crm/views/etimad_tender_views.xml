@@ -462,19 +462,14 @@
                         <!-- Tab 3: Location &amp; Classification (مجال التصنيف وموقع التنفيذ) -->
                         <page string="3. Location &amp; Classification" name="enhanced_location">
                             <group>
-                                <group string="Execution Location">
+                                <group string="Execution Location (موقع التنفيذ)">
                                     <field name="execution_location_type"/>
                                     <field name="execution_regions" widget="text" placeholder="مناطق التنفيذ (Regions)"/>
                                     <field name="execution_cities" widget="text" placeholder="مدن التنفيذ (Cities)"/>
                                 </group>
-                                <group string="Classification">
+                                <group string="Contractor Classification (تصنيف المقاولين)">
                                     <field name="classification_field"/>
                                     <field name="classification_required"/>
-                                </group>
-                            </group>
-                            <group>
-                                <group string="Activity Details">
-                                    <field name="activity_details" widget="text" nolabel="1" placeholder="نشاط المنافسة (Tender Activity Details)"/>
                                 </group>
                             </group>
                         </page>
@@ -482,16 +477,20 @@
                         <!-- Tab 4: Work Types (أنواع الأعمال) -->
                         <page string="4. Work Types" name="enhanced_work_types">
                             <group>
-                                <group string="Supply Items">
-                                    <field name="includes_supply_items"/>
+                                <group string="Tender Activity (نشاط المنافسة)">
+                                    <field name="activity_details" widget="text" nolabel="1" 
+                                           placeholder="نشاط المنافسة (Tender Activity Details)"/>
                                 </group>
-                                <group string="Construction Works">
-                                    <field name="construction_works" widget="text" nolabel="1" 
-                                           placeholder="أعمال الإنشاء (Construction Works)"/>
+                                <group string="Supply Items (بنود توريد)">
+                                    <field name="includes_supply_items"/>
                                 </group>
                             </group>
                             <group>
-                                <group string="Maintenance &amp; Operation">
+                                <group string="Construction Works (أعمال الإنشاء)">
+                                    <field name="construction_works" widget="text" nolabel="1" 
+                                           placeholder="أعمال الإنشاء (Construction Works)"/>
+                                </group>
+                                <group string="Maintenance &amp; Operation (أعمال الصيانة والتشغيل)">
                                     <field name="maintenance_works" widget="text" nolabel="1" 
                                            placeholder="أعمال الصيانة والتشغيل (Maintenance &amp; Operation Works)"/>
                                 </group>
