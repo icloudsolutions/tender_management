@@ -146,18 +146,19 @@ class EtimadTender(models.Model):
             else:
                 record.tender_url = False
 
-    @api.depends('invitation_cost', 'buying_cost')
+    @api.depends('document_cost_amount', 'invitation_cost', 'buying_cost')
     def _compute_total_fees(self):
-        """Calculate total fees (قيمة وثائق المنافسة = Invitation Cost + Booklet Price)
+        """Calculate total fees (قيمة وثائق المنافسة)
         
-        From Etimad API:
-        - invitationCost = registration/invitation fee (e.g. 200 SAR)
-        - buyingCost = booklet/document buying cost (e.g. 500 SAR)
-        - Total shown on Etimad = invitationCost + buyingCost (e.g. 700 SAR)
-        - financialFees is a separate API field, not part of this total
+        Uses the scraped value from Etimad detail page (document_cost_amount)
+        when available, as it's the exact value shown on Etimad.
+        Falls back to invitation_cost + buying_cost from API list data.
         """
         for record in self:
-            record.total_fees = record.invitation_cost + record.buying_cost
+            if record.document_cost_amount:
+                record.total_fees = record.document_cost_amount
+            else:
+                record.total_fees = record.invitation_cost + record.buying_cost
 
     @api.depends('offers_deadline')
     def _compute_remaining_days(self):
