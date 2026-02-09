@@ -59,7 +59,10 @@ class VendorComparisonWizard(models.TransientModel):
             if total_offers == 0:
                 raise UserError(_(
                     'No vendor offers found!\n\n'
-                    'Please ensure vendors have submitted their offers before comparing.'
+                    'To compare vendors, follow these steps:\n'
+                    '1. Click "Create RFQ (Purchase Agreement)" to send requests to vendors\n'
+                    '2. Wait for vendors to submit their price offers\n'
+                    '3. Then click "Compare Vendors" to review and select the best offers'
                 ))
             
             lines = []
