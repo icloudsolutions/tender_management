@@ -1478,8 +1478,6 @@ class EtimadTender(models.Model):
                         if guarantee_match:
                             # Store as ratio for percentage widget (5.00 -> 0.05)
                             parsed_data['final_guarantee_percentage'] = float(guarantee_match.group(1)) / 100.0
-                    elif 'Opening Location' in title or 'مكان فتح العروض' in title:
-                        parsed_data['opening_location'] = value
             else:
                 # Minimal regex fallback for submission method
                 submission_match = re.search(r'طريقة تقديم العروض.*?<span>\s*(.*?)\s*</span>', html_content, re.DOTALL)
@@ -1722,11 +1720,15 @@ class EtimadTender(models.Model):
                     except ValueError:
                         pass
                 
-                # Extract opening location
-                location_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "مكان فتح العرض")]/following-sibling::div[1]//span/text()')
+                # Extract opening location (مكان فتح العروض)
+                location_elements = tree.xpath(
+                    '//div[contains(@class, "etd-item-title") and (contains(text(), "مكان فتح العرض") or contains(text(), "مكان فتح العروض") or contains(text(), "موقع فتح العروض"))]'
+                    '/following-sibling::div[1]//span/text()'
+                )
                 if location_elements:
                     location_text = html_module.unescape(location_elements[0].strip())
-                    if 'لا يوجد' not in location_text:
+                    # Skip generic values that usually belong to guarantee address
+                    if location_text and 'لا يوجد' not in location_text and location_text not in ['المشتريات', 'إدارة المشتريات']:
                         parsed_data['opening_location'] = location_text
                 
                 # Extract offer opening date (تاريخ فحص العروض) - updated xpath
@@ -1808,9 +1810,11 @@ class EtimadTender(models.Model):
                     pass
             
             # Opening location
-            location_match = re.search(r'مكان فتح العرض.*?<span>\s*([^<]+?)\s*</span>', html_content, re.DOTALL)
+            location_match = re.search(r'(?:مكان فتح العرض|مكان فتح العروض|موقع فتح العروض).*?<span>\s*([^<]+?)\s*</span>', html_content, re.DOTALL)
             if location_match:
-                parsed_data['opening_location'] = html_module.unescape(re.sub(r'<[^>]+>', '', location_match.group(1)).strip())
+                location_text = html_module.unescape(re.sub(r'<[^>]+>', '', location_match.group(1)).strip())
+                if location_text and location_text not in ['المشتريات', 'إدارة المشتريات']:
+                    parsed_data['opening_location'] = location_text
                 
         except Exception as e:
             _logger.error(f"Error in regex dates parsing: {e}")
