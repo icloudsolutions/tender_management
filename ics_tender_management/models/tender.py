@@ -138,27 +138,27 @@ class Tender(models.Model):
     
     # ========== ETIMAD-SPECIFIC FIELDS ==========
     # Etimad Identifiers
-    etimad_tender_id_integer = fields.Integer('Etimad Tender ID (Integer)', 
+    etimad_tender_id_integer = fields.Integer('Etimad Tender ID', 
         help='Internal Etimad tender ID', tracking=True)
-    etimad_tender_id_string = fields.Char('Etimad Tender ID (String)', 
+    etimad_tender_id_string = fields.Char('Etimad Tender ID String', 
         help='Etimad tender ID string used in URLs', tracking=True)
     etimad_reference_number = fields.Char('Etimad Reference Number', 
         help='Official reference number from Etimad portal', tracking=True, index=True)
     
-    # Agency Information (from Etimad)
-    etimad_agency_name = fields.Char('Agency Name (from Etimad)', 
+    # Agency Information
+    etimad_agency_name = fields.Char('Agency Name', 
         help='Original agency name as scraped from Etimad', tracking=True)
-    etimad_branch_name = fields.Char('Branch Name (from Etimad)', 
+    etimad_branch_name = fields.Char('Branch Name', 
         help='Branch name from Etimad portal')
     
-    # Tender Activity (from Etimad)
-    etimad_activity_name = fields.Char('Tender Activity (from Etimad)', 
+    # Tender Activity
+    etimad_activity_name = fields.Char('Tender Activity', 
         help='Activity name from Etimad portal', tracking=True)
     etimad_activity_id = fields.Integer('Etimad Activity ID', 
         help='Activity ID from Etimad portal')
     
-    # Dates (from Etimad)
-    etimad_published_at = fields.Datetime('Published At (Etimad)', 
+    # Dates
+    etimad_published_at = fields.Datetime('Published At', 
         help='Publication date from Etimad portal', tracking=True)
     
     

@@ -141,11 +141,11 @@ class CrmLead(models.Model):
                 'etimad_tender_id_string': etimad.tender_id_string,
                 'etimad_reference_number': etimad.reference_number,
                 
-                # Agency Information (from Etimad)
+                # Agency Information
                 'etimad_agency_name': etimad.agency_name,
                 'etimad_branch_name': etimad.branch_name,
                 
-                # Tender Activity (from Etimad)
+                # Tender Activity
                 'etimad_activity_name': etimad.activity_name,
                 'etimad_activity_id': etimad.activity_id,
                 

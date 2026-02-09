@@ -709,7 +709,7 @@
                 <separator/>
                 <!-- Status Filters -->
                 <filter string="Participating" name="filter_participating" domain="[('is_participating','=',True)]"/>
-                <filter string="Approved (Etimad)" name="filter_approved" domain="[('tender_status_approved','=',True)]"/>
+                <filter string="Approved" name="filter_approved" domain="[('tender_status_approved','=',True)]"/>
                 <filter string="With Award Results" name="filter_awarded" domain="[('award_announced','=',True)]"/>
                 <filter string="Local Content Required" name="filter_local_content" domain="[('local_content_required','=',True)]"/>
                 <filter string="SME Allowed" name="filter_sme" domain="[('sme_participation_allowed','=',True)]"/>
