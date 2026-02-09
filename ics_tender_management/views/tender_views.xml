@@ -251,17 +251,14 @@
                                     class="oe_subtotal_footer_separator"/>
                             </group>
                         </group>
+                        <separator string="Description"/>
+                        <field name="description" placeholder="Tender description and requirements..." nolabel="1"/>
                         <notebook>
                             <!-- ═══════════════════════════════════════════════════ -->
-                            <!-- Tab 1: Tender Information - Always visible         -->
-                            <!-- Basic info from Etimad + description               -->
+                            <!-- Tab 1: Tender Details - Always visible             -->
+                            <!-- Source, method, Etimad portal info                 -->
                             <!-- ═══════════════════════════════════════════════════ -->
-                            <page string="1. Tender Information" name="tender_info_tab">
-                                <group>
-                                    <group string="Description &amp; Scope">
-                                        <field name="description" placeholder="Tender description and requirements..." nolabel="1"/>
-                                    </group>
-                                </group>
+                            <page string="1. Tender Details" name="tender_info_tab">
                                 <group>
                                     <group string="Source &amp; Method">
                                         <field name="etimad_link" widget="url" string="Etimad Link"/>

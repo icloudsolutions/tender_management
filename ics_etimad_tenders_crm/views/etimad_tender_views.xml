@@ -347,33 +347,6 @@
                     
                     <!-- Detailed Information in Notebook -->
                     <notebook>
-                        <page string="Description" name="description">
-                            <field name="description" 
-                                   placeholder="Enter detailed tender description, requirements, and specifications..."
-                                   widget="text"
-                                   nolabel="1"/>
-                        </page>
-                        
-                        
-                        <page string="Technical Details" name="technical">
-                            <group>
-                                <group string="System Information">
-                                    <field name="tender_id" readonly="1"/>
-                                    <field name="tender_id_string" readonly="1"/>
-                                    <field name="activity_id" readonly="1"/>
-                                    <field name="tender_status_id" readonly="1"/>
-                                    <field name="tender_url" readonly="1" widget="url"/>
-                                </group>
-                                <group string="Status Information">
-                                    <field name="tender_status_text"/>
-                                    <field name="tender_status_approved" readonly="1"/>
-                                    <field name="is_participating" readonly="1"/>
-                                    <field name="is_favorite" readonly="1"/>
-                                    <field name="remaining_days" readonly="1"/>
-                                </group>
-                            </group>
-                        </page>
-                        
                         <!-- Tab 1: Basic Information (المعلومات الأساسية) -->
                         <page string="1. Basic Information" name="enhanced_basic_info">
                             <group>
