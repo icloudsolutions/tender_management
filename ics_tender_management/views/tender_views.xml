@@ -550,13 +550,6 @@
                                     </p>
                                 </div>
                             </page>
-
-                            <!-- ═══════════════════════════════════════════════════ -->
-                            <!-- Tab 8: Internal Notes - Always visible             -->
-                            <!-- ═══════════════════════════════════════════════════ -->
-                            <page string="8. Internal Notes" name="notes">
-                                <field name="notes" placeholder="Internal notes, communications, and observations..."/>
-                            </page>
                         </notebook>
                     </sheet>
                     <chatter/> 
