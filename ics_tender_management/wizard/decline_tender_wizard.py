@@ -13,7 +13,7 @@ class DeclineTenderWizard(models.TransientModel):
     tender_state = fields.Selection(related='tender_id.state', string='Current State', readonly=True)
 
     non_participation_reason = fields.Text(
-        'Reason for Not Participating', required=True,
+        'Reason for Not Participating',
         help='Explain why the company decided not to participate in this tender')
 
     def action_confirm_decline(self):
