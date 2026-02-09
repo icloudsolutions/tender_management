@@ -299,11 +299,11 @@
 
                             <!-- ═══════════════════════════════════════════════════ -->
                             <!-- Tab 2: Qualification & Decision                    -->
-                            <!-- Draft + Technical: booklet, site visit, inquiries, -->
-                            <!-- evaluation, participation decision, scope          -->
+                            <!-- Technical: booklet, site visit, inquiries,         -->
+                            <!-- evaluation, risk assessment, scope                 -->
                             <!-- ═══════════════════════════════════════════════════ -->
                             <page string="2. Qualification &amp; Decision" name="qualification"
-                                invisible="state in ['won', 'lost', 'cancelled']">
+                                invisible="state in ['draft', 'won', 'lost', 'cancelled']">
                                 <!-- Step 1: Buy the tender booklet -->
                                 <group>
                                     <group string="Booklet Purchase">
