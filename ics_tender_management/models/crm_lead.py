@@ -157,9 +157,9 @@ class CrmLead(models.Model):
                 'last_inquiry_date': etimad.last_enquiry_date.date() if etimad.last_enquiry_date else False,
                 
                 # Financial from Etimad
-                'tender_booklet_price': etimad.total_fees or 0.0,
+                'tender_booklet_price': etimad.document_cost_amount or 0.0,
                 'etimad_financial_fees': 0.0,
-                'estimated_project_value': etimad.total_fees or 0.0,
+                'estimated_project_value': etimad.document_cost_amount or 0.0,
                 
                 # External Source
                 'external_source': etimad.external_source or 'Etimad Portal',

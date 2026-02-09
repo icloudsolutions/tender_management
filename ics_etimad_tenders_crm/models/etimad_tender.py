@@ -53,12 +53,8 @@ class EtimadTender(models.Model):
     # Financial
     currency_id = fields.Many2one('res.currency', string='Currency', 
                                    default=lambda self: self.env.ref('base.SAR'))
-    invitation_cost = fields.Monetary("Invitation Cost", currency_field='currency_id')
-    financial_fees = fields.Monetary("Financial Fees", currency_field='currency_id')
-    buying_cost = fields.Monetary("Booklet Price", currency_field='currency_id',
-                                   help="قيمة وثائق المنافسة - Tender booklet/document cost (buyingCost from Etimad)")
-    total_fees = fields.Monetary("Total Fees", compute='_compute_total_fees', 
-                                  store=True, currency_field='currency_id')
+    document_cost_amount = fields.Monetary("Document Cost", currency_field='currency_id',
+                                            help="قيمة وثائق المنافسة - Scraped from Etimad detail page")
     estimated_amount = fields.Monetary("Estimated Amount", currency_field='currency_id')
     
     # URLs and External References
@@ -99,8 +95,6 @@ class EtimadTender(models.Model):
     final_guarantee_percentage = fields.Float("Final Guarantee Pct")
     final_guarantee_required = fields.Boolean("Final Guarantee Required", compute='_compute_final_guarantee_required', store=True)
     
-    document_cost_type = fields.Selection([('free', 'Free'), ('paid', 'Paid')], string="Document Cost Type")
-    document_cost_amount = fields.Monetary("Document Cost Amount", currency_field='currency_id')
     tender_status_text = fields.Char("Tender Status Text")
     tender_status_approved = fields.Boolean("Tender Approved", compute='_compute_tender_status_approved', store=True)
     submission_method = fields.Selection([('single_file', 'Single File'), ('separate_files', 'Separate Files'), ('electronic', 'Electronic'), ('manual', 'Manual')], string="Submission Method")
@@ -125,8 +119,6 @@ class EtimadTender(models.Model):
     award_announcement_date = fields.Date("Award Announcement Date")
     awarded_company_name = fields.Char("Awarded Company Name")
     awarded_amount = fields.Monetary("Awarded Amount", currency_field='currency_id')
-    agency_code = fields.Char("Agency Code")
-    tender_type_id = fields.Integer("Tender Type ID")
     local_content_required = fields.Boolean("Local Content Required")
     local_content_percentage = fields.Float("Local Content Pct")
     local_content_mechanism = fields.Char("Local Content Mechanism")
@@ -145,20 +137,6 @@ class EtimadTender(models.Model):
                 record.tender_url = f"https://tenders.etimad.sa/Tender/Details/{record.tender_id_string}"
             else:
                 record.tender_url = False
-
-    @api.depends('document_cost_amount', 'invitation_cost', 'buying_cost')
-    def _compute_total_fees(self):
-        """Calculate total fees (قيمة وثائق المنافسة)
-        
-        Uses the scraped value from Etimad detail page (document_cost_amount)
-        when available, as it's the exact value shown on Etimad.
-        Falls back to invitation_cost + buying_cost from API list data.
-        """
-        for record in self:
-            if record.document_cost_amount:
-                record.total_fees = record.document_cost_amount
-            else:
-                record.total_fees = record.invitation_cost + record.buying_cost
 
     @api.depends('offers_deadline')
     def _compute_remaining_days(self):
@@ -539,9 +517,6 @@ class EtimadTender(models.Model):
                 'last_enquiry_date': new_enquiry_deadline,
                 'offers_deadline': new_offers_deadline,
                 'submission_date': self._parse_date(raw_data.get('submitionDate')),
-                'invitation_cost': float(raw_data.get('invitationCost', 0) or 0),
-                'financial_fees': float(raw_data.get('financialFees', 0) or 0),
-                'buying_cost': float(raw_data.get('buyingCost', 0) or raw_data.get('condetionalBookletPrice', 0) or 0),
                 'estimated_amount': new_estimated_amount,
                 'tender_status_id': raw_data.get('tenderStatusId'),
                 'tender_status_text': (
@@ -554,8 +529,6 @@ class EtimadTender(models.Model):
                 'last_enquiry_date_hijri': raw_data.get('lastEnqueriesDateHijri'),
                 'last_offer_date_hijri': raw_data.get('lastOfferPresentationDateHijri'),
                 'description': self._generate_description(raw_data),
-                'agency_code': raw_data.get('agencyCode'),
-                'tender_type_id': raw_data.get('tenderTypeId'),
                 # Scraping metadata
                 'last_scraped_at': fields.Datetime.now(),
                 'scraping_status': 'success',
@@ -760,10 +733,6 @@ class EtimadTender(models.Model):
 - Last Enquiry: {tender_data.get('lastEnqueriesDateHijri', 'N/A')} (Hijri)
 - Last Offer: {tender_data.get('lastOfferPresentationDateHijri', 'N/A')} (Hijri)
 
-**Financial Information**
-- Invitation Cost: {tender_data.get('invitationCost', 0)} SAR
-- Financial Fees: {tender_data.get('financialFees', 0)} SAR
-
 **Time Remaining:** {tender_data.get('remainingDays', 0)} days
         """
         return desc.strip()
@@ -798,7 +767,7 @@ class EtimadTender(models.Model):
             'type': 'opportunity',
             'partner_name': self.agency_name,
             'description': self.description,
-            'expected_revenue': self.total_fees,
+            'expected_revenue': self.document_cost_amount,
             'date_deadline': self.offers_deadline,
             'priority': '2' if self.remaining_days < 7 else '1',
         }
@@ -1127,8 +1096,7 @@ class EtimadTender(models.Model):
                 # Document cost
                 if parsed_data.get('document_cost_amount') is not None:
                     update_vals['document_cost_amount'] = parsed_data['document_cost_amount']
-                if parsed_data.get('document_cost_type'):
-                    update_vals['document_cost_type'] = parsed_data['document_cost_type']
+                
                 
                 # Contract duration
                 if parsed_data.get('contract_duration'):
@@ -1403,7 +1371,6 @@ class EtimadTender(models.Model):
                     if cost_match:
                         cost_value = float(cost_match.group(1))
                         parsed_data['document_cost_amount'] = cost_value
-                        parsed_data['document_cost_type'] = 'free' if cost_value == 0 else 'paid'
                 
                 # Extract contract duration (مدة العقد)
                 duration_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "مدة العقد")]/following-sibling::div[1]//span/text()')
@@ -1475,7 +1442,6 @@ class EtimadTender(models.Model):
                         if cost_match:
                             cost_value = float(cost_match.group(1))
                             parsed_data['document_cost_amount'] = cost_value
-                            parsed_data['document_cost_type'] = 'free' if cost_value == 0 else 'paid'
                     elif 'مدة العقد' in title:
                         parsed_data['contract_duration'] = value
                         parsed_data['contract_duration_days'] = self._parse_contract_duration(value)
@@ -1620,7 +1586,6 @@ class EtimadTender(models.Model):
                 try:
                     cost_value = float(doc_cost_match.group(1))
                     parsed_data['document_cost_amount'] = cost_value
-                    parsed_data['document_cost_type'] = 'free' if cost_value == 0 else 'paid'
                 except ValueError:
                     pass
             

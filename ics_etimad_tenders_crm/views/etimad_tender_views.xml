@@ -44,7 +44,7 @@
                        string="الوقت المتبقي | Days Left"
                        decoration-danger="is_urgent" 
                        decoration-warning="remaining_days &lt; 7 and remaining_days &gt; 3"/>
-                <field name="total_fees" widget="monetary" options="{'currency_field': 'currency_id'}" optional="hide" string="Document Cost"/>
+                <field name="document_cost_amount" widget="monetary" options="{'currency_field': 'currency_id'}" optional="hide" string="Document Cost"/>
                 <field name="tender_status_text" optional="show" string="Etimad Status" widget="badge"/>
                 <field name="is_participating" widget="boolean" optional="show" string="Participating"/>
                 <field name="award_announced" widget="boolean" optional="hide" string="Awarded"/>
@@ -268,7 +268,7 @@
                     <group>
                         <group string="Financial Information" name="financial_info">
                             <field name="currency_id" invisible="1"/>
-                            <field name="total_fees" 
+                            <field name="document_cost_amount" 
                                    string="Document Cost"
                                    help="قيمة وثائق المنافسة"
                                    widget="monetary" 
@@ -368,8 +368,6 @@
                                     <field name="tender_id_string" readonly="1"/>
                                     <field name="activity_id" readonly="1"/>
                                     <field name="tender_status_id" readonly="1"/>
-                                    <field name="tender_type_id" readonly="1"/>
-                                    <field name="agency_code" readonly="1"/>
                                     <field name="tender_url" readonly="1" widget="url"/>
                                 </group>
                                 <group string="Status Information">
@@ -602,7 +600,7 @@
                 <field name="activity_name"/>
                 <field name="estimated_amount"/>
                 <field name="estimated_value_category"/>
-                <field name="total_fees"/>
+                <field name="document_cost_amount"/>
                 <field name="remaining_days"/>
                 <field name="offers_deadline"/>
                 <field name="tender_status_text"/>
