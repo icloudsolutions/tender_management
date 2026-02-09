@@ -127,7 +127,7 @@
                             invisible="state not in ['financial', 'quotation']"/>
                         <button name="action_create_purchase_orders" string="Create Purchase Order(s)"
                             type="object" class="btn-primary"
-                            invisible="state not in ['financial', 'quotation']"
+                            invisible="state != 'won'"
                             help="Single Vendor: Creates 1 PO. Product-wise: Creates multiple POs per vendor"/>
                         <button name="action_prepare_quotation" string="Prepare Quotation"
                             type="object" class="oe_highlight"
