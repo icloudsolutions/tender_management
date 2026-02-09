@@ -266,22 +266,26 @@
                     
                     <!-- Financial and CRM Information -->
                     <group>
-                        <group string="Financial Information (from Etimad API)" name="financial_info">
+                        <group string="Financial Information" name="financial_info">
                             <field name="currency_id" invisible="1"/>
                             <field name="invitation_cost" 
-                                   string="Invitation Cost (رسوم الدعوة)"
+                                   string="Invitation Cost"
+                                   help="رسوم الدعوة"
                                    widget="monetary" 
                                    options="{'currency_field': 'currency_id'}"/>
                             <field name="buying_cost" 
-                                   string="Booklet Price (قيمة الكراسة)"
+                                   string="Booklet Price"
+                                   help="قيمة الكراسة"
                                    widget="monetary" 
                                    options="{'currency_field': 'currency_id'}"/>
                             <field name="financial_fees" 
-                                   string="Financial Fees (الرسوم المالية)"
+                                   string="Financial Fees"
+                                   help="الرسوم المالية"
                                    widget="monetary" 
                                    options="{'currency_field': 'currency_id'}"/>
-                            <label for="total_fees" string="Total (قيمة وثائق المنافسة)" class="fw-bold"/>
+                            <label for="total_fees" string="Total Fees" class="fw-bold"/>
                             <field name="total_fees" 
+                                   help="قيمة وثائق المنافسة"
                                    widget="monetary" 
                                    options="{'currency_field': 'currency_id'}" 
                                    class="oe_subtotal_footer_separator fw-bold"/>
@@ -403,12 +407,12 @@
                                 </group>
                             </group>
                             <group>
-                                <group string="Submission Method (طريقة تقديم العروض)">
+                                <group string="Submission Method">
                                     <field name="submission_method"/>
                                 </group>
                             </group>
                             <group>
-                                <group string="Insurance &amp; Guarantees (الضمانات)">
+                                <group string="Insurance &amp; Guarantees">
                                     <field name="insurance_required"/>
                                     <field name="initial_guarantee_required" string="Initial Guarantee"/>
                                     <field name="initial_guarantee_type" 
@@ -462,12 +466,12 @@
                         <!-- Tab 3: Location &amp; Classification (مجال التصنيف وموقع التنفيذ) -->
                         <page string="3. Location &amp; Classification" name="enhanced_location">
                             <group>
-                                <group string="Execution Location (موقع التنفيذ)">
+                                <group string="Execution Location">
                                     <field name="execution_location_type"/>
                                     <field name="execution_regions" widget="text" placeholder="مناطق التنفيذ (Regions)"/>
                                     <field name="execution_cities" widget="text" placeholder="مدن التنفيذ (Cities)"/>
                                 </group>
-                                <group string="Contractor Classification (تصنيف المقاولين)">
+                                <group string="Contractor Classification">
                                     <field name="classification_field"/>
                                     <field name="classification_required"/>
                                 </group>
@@ -477,20 +481,20 @@
                         <!-- Tab 4: Work Types (أنواع الأعمال) -->
                         <page string="4. Work Types" name="enhanced_work_types">
                             <group>
-                                <group string="Tender Activity (نشاط المنافسة)">
+                                <group string="Tender Activity">
                                     <field name="activity_details" widget="text" nolabel="1" 
                                            placeholder="نشاط المنافسة (Tender Activity Details)"/>
                                 </group>
-                                <group string="Supply Items (بنود توريد)">
+                                <group string="Supply Items">
                                     <field name="includes_supply_items"/>
                                 </group>
                             </group>
                             <group>
-                                <group string="Construction Works (أعمال الإنشاء)">
+                                <group string="Construction Works">
                                     <field name="construction_works" widget="text" nolabel="1" 
                                            placeholder="أعمال الإنشاء (Construction Works)"/>
                                 </group>
-                                <group string="Maintenance &amp; Operation (أعمال الصيانة والتشغيل)">
+                                <group string="Maintenance &amp; Operation">
                                     <field name="maintenance_works" widget="text" nolabel="1" 
                                            placeholder="أعمال الصيانة والتشغيل (Maintenance &amp; Operation Works)"/>
                                 </group>
@@ -524,7 +528,7 @@
                         <!-- Tab 6: Local Content & SME (المحتوى المحلي والمنشآت الصغيرة) -->
                         <page string="6. Local Content &amp; SME" name="local_content">
                             <group>
-                                <group string="Local Content Requirements (متطلبات المحتوى المحلي)">
+                                <group string="Local Content Requirements">
                                     <field name="local_content_required"/>
                                 </group>
                             </group>
@@ -550,7 +554,7 @@
                                            string="Calculation Mechanism"/>
                                 </group>
                                 
-                                <group string="SME Benefits (المنشآت الصغيرة والمتوسطة)">
+                                <group string="SME Benefits">
                                     <field name="sme_participation_allowed"/>
                                     <field name="sme_price_preference" 
                                            widget="percentage"
