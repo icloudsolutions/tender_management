@@ -44,7 +44,7 @@
                        string="الوقت المتبقي | Days Left"
                        decoration-danger="is_urgent" 
                        decoration-warning="remaining_days &lt; 7 and remaining_days &gt; 3"/>
-                <field name="total_fees" widget="monetary" options="{'currency_field': 'currency_id'}" optional="hide" string="Total Fees"/>
+                <field name="total_fees" widget="monetary" options="{'currency_field': 'currency_id'}" optional="hide" string="Document Cost"/>
                 <field name="tender_status_text" optional="show" string="Etimad Status" widget="badge"/>
                 <field name="is_participating" widget="boolean" optional="show" string="Participating"/>
                 <field name="award_announced" widget="boolean" optional="hide" string="Awarded"/>
@@ -268,25 +268,14 @@
                     <group>
                         <group string="Financial Information" name="financial_info">
                             <field name="currency_id" invisible="1"/>
-                            <field name="invitation_cost" 
-                                   string="Invitation Cost"
-                                   help="رسوم الدعوة - Fixed registration fee from Etimad API (invitationCost)"
-                                   widget="monetary" 
-                                   options="{'currency_field': 'currency_id'}"/>
-                            <field name="buying_cost" 
-                                   string="Booklet Price"
-                                   help="قيمة الكراسة - Tender documents buying cost from Etimad API (buyingCost)"
-                                   widget="monetary" 
-                                   options="{'currency_field': 'currency_id'}"/>
-                            <label for="total_fees" string="Total Fees" class="fw-bold"/>
                             <field name="total_fees" 
-                                   help="قيمة وثائق المنافسة - Invitation Cost + Booklet Price"
+                                   string="Document Cost"
+                                   help="قيمة وثائق المنافسة"
                                    widget="monetary" 
-                                   options="{'currency_field': 'currency_id'}" 
-                                   class="oe_subtotal_footer_separator fw-bold"/>
+                                   options="{'currency_field': 'currency_id'}"/>
                             <field name="estimated_amount"
                                    string="Estimated Value"
-                                   help="القيمة التقديرية - Estimated tender value (not always published)"
+                                   help="القيمة التقديرية - Not always published"
                                    widget="monetary"
                                    options="{'currency_field': 'currency_id'}"/>
                         </group>
