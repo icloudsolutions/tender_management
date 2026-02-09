@@ -251,8 +251,6 @@
                                     class="oe_subtotal_footer_separator"/>
                             </group>
                         </group>
-                        <separator string="Description"/>
-                        <field name="description" placeholder="Tender description and requirements..." nolabel="1"/>
                         <notebook>
                             <!-- ═══════════════════════════════════════════════════ -->
                             <!-- Tab 1: Tender Details - Always visible             -->
