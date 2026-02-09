@@ -235,23 +235,19 @@
                                 <field name="opening_date" widget="datetime"/>
                                 <field name="is_urgent" invisible="1"/>
                             </group>
-                            <group name="financial" invisible="state == 'draft'">
-                                <field name="expected_revenue" help="القيمة التقديرية"/>
-                                <field name="total_estimated_cost" widget="monetary" 
-                                    invisible="state in ['draft', 'technical']"/>
-                                <field name="total_vendor_cost" widget="monetary"
-                                    invisible="state in ['draft', 'technical']"/>
-                                <label for="margin_percentage" string="Margin %"
-                                    invisible="state in ['draft', 'technical']"/>
-                                <div class="o_row" invisible="state in ['draft', 'technical']">
+                            <group name="financial" invisible="state in ['draft', 'technical']">
+                                <field name="expected_revenue" string="Expected Revenue" help="القيمة التقديرية"/>
+                                <field name="estimated_project_value" string="Estimated Project Value"/>
+                                <field name="total_estimated_cost" widget="monetary"/>
+                                <field name="total_vendor_cost" widget="monetary"/>
+                                <label for="margin_percentage" string="Margin %"/>
+                                <div class="o_row">
                                     <field name="margin_percentage" class="oe_inline"/>
                                     <span>%</span>
                                 </div>
-                                <field name="margin_amount" widget="monetary"
-                                    invisible="state in ['draft', 'technical']"/>
+                                <field name="margin_amount" widget="monetary"/>
                                 <field name="total_quotation_amount" widget="monetary" 
-                                    class="oe_subtotal_footer_separator"
-                                    invisible="state in ['draft', 'technical']"/>
+                                    class="oe_subtotal_footer_separator"/>
                             </group>
                         </group>
                         <notebook>
@@ -270,11 +266,7 @@
                                         <field name="etimad_link" widget="url" string="Etimad Link"/>
                                         <field name="external_source" readonly="1" invisible="not etimad_tender_id"/>
                                         <field name="tender_submission_method" string="Submission Method"/>
-                                        <field name="tender_completion_time" string="Completion Time"/>
-                                    </group>
-                                    <group string="Financial Overview">
-                                        <field name="expected_revenue" string="Estimated Value" help="القيمة التقديرية"/>
-                                        <field name="tender_booklet_price" string="Document Cost" help="قيمة وثائق المنافسة"/>
+                                        <field name="tender_completion_time" string="Completion Time (Months)"/>
                                     </group>
                                 </group>
                                 <!-- Etimad Portal Details (only when linked to Etimad) -->
@@ -314,6 +306,7 @@
                                 <!-- Step 1: Buy the tender booklet -->
                                 <group>
                                     <group string="Booklet Purchase">
+                                        <field name="tender_booklet_price" string="Document Cost" help="قيمة وثائق المنافسة"/>
                                         <field name="document_purchase_date" string="Purchase Date"/>
                                         <field name="booklet_purchased" widget="boolean_toggle"/>
                                         <field name="booklet_purchase_receipt" invisible="not booklet_purchased"
@@ -336,13 +329,12 @@
                                         <field name="documents_required_for_site" filename="documents_required_filename" invisible="not site_visit_required"/>
                                         <field name="documents_required_filename" invisible="1"/>
                                     </group>
-                                    <group string="Evaluation Criteria">
+                                    <group string="Technical Evaluation">
                                         <field name="presales_employee" widget="many2one_avatar_user" string="Presales Engineer"/>
                                         <field name="evaluation_criteria_file" filename="evaluation_criteria_filename" string="Criteria File"/>
                                         <field name="evaluation_criteria_filename" invisible="1"/>
                                         <field name="required_certifications_file" filename="required_certifications_filename" string="Required Certifications"/>
                                         <field name="required_certifications_filename" invisible="1"/>
-                                        <field name="estimated_project_value" string="Estimated Project Value"/>
                                     </group>
                                 </group>
                                 <!-- Step 3: Go/No-Go decision -->
