@@ -1089,6 +1089,12 @@ class EtimadTender(models.Model):
                 # Activity details
                 if parsed_data.get('activity_details'):
                     update_vals['activity_details'] = parsed_data['activity_details']
+                    # Also populate activity_name if it's empty (tenderActivityName is often null in API)
+                    if not self.activity_name:
+                        # Use first line of activity_details as the activity name
+                        first_activity = parsed_data['activity_details'].split('\n')[0].strip()
+                        if first_activity:
+                            update_vals['activity_name'] = first_activity[:255]
                 
                 # Supply items
                 if parsed_data.get('includes_supply_items') is not None:
