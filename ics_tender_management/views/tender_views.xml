@@ -35,7 +35,8 @@
             <field name="name">ics.tender.kanban</field>
             <field name="model">ics.tender</field>
             <field name="arch" type="xml">
-                <kanban default_group_by="stage_id" class="o_kanban_small_column" sample="1">
+                <kanban default_group_by="state" class="o_kanban_small_column" sample="1"
+                    on_create="quick_create" records_draggable="false" group_create="false" group_delete="false" group_edit="false">
                     <field name="stage_id"/>
                     <field name="color"/>
                     <field name="state"/>
