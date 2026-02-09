@@ -338,15 +338,12 @@
                                         <field name="required_certifications_filename" invisible="1"/>
                                     </group>
                                 </group>
-                                <!-- Step 3: Go/No-Go decision -->
-                                <separator string="Participation Decision"/>
+                                <!-- Step 3: Go/No-Go assessment -->
+                                <separator string="Risk Assessment"/>
                                 <group>
                                     <group>
                                         <field name="winning_probability" string="Win Probability (%)"/>
                                         <field name="client_relationship" string="Client Relationship"/>
-                                        <field name="participation_decision" widget="boolean_toggle" string="Participate?"/>
-                                        <field name="decline_reason_id" invisible="participation_decision" string="Decline Reason" readonly="1"/>
-                                        <field name="non_participation_reason" invisible="participation_decision" string="Decline Notes" readonly="1"/>
                                     </group>
                                     <group>
                                         <field name="challenges" string="Challenges &amp; Risks"/>
@@ -511,6 +508,13 @@
                                     <group>
                                         <field name="winning_reason"/>
                                         <field name="actual_revenue"/>
+                                    </group>
+                                </group>
+
+                                <group string="Decline Details" invisible="state != 'cancelled'">
+                                    <group>
+                                        <field name="decline_reason_id" string="Decline Reason" readonly="1"/>
+                                        <field name="non_participation_reason" string="Additional Notes" readonly="1"/>
                                     </group>
                                 </group>
 
