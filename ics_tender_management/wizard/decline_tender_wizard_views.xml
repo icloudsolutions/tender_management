@@ -29,14 +29,15 @@
                             <p class="mb-0">
                                 You are about to decline participation in this tender.
                                 The tender will be <strong>cancelled</strong> and the workflow will end.
-                                Please provide a detailed reason below.
                             </p>
                         </div>
 
                         <group>
+                            <field name="decline_reason_id" required="1"
+                                options="{'no_create_edit': True}"
+                                placeholder="Select a reason..."/>
                             <field name="non_participation_reason"
-                                placeholder="Enter the reason for not participating in this tender..."
-                                nolabel="1" required="1"/>
+                                placeholder="Optional additional notes..."/>
                         </group>
 
                     </sheet>

@@ -344,7 +344,8 @@
                                         <field name="winning_probability" string="Win Probability (%)"/>
                                         <field name="client_relationship" string="Client Relationship"/>
                                         <field name="participation_decision" widget="boolean_toggle" string="Participate?"/>
-                                        <field name="non_participation_reason" invisible="participation_decision" string="Reason for Not Participating"/>
+                                        <field name="decline_reason_id" invisible="participation_decision" string="Decline Reason" readonly="1"/>
+                                        <field name="non_participation_reason" invisible="participation_decision" string="Decline Notes" readonly="1"/>
                                     </group>
                                     <group>
                                         <field name="challenges" string="Challenges &amp; Risks"/>

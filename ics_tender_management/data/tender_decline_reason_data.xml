@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="decline_reason_budget" model="ics.tender.decline.reason">
+            <field name="name">Insufficient Budget / High Document Cost</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="decline_reason_capacity" model="ics.tender.decline.reason">
+            <field name="name">Lack of Technical Capacity</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <record id="decline_reason_timeline" model="ics.tender.decline.reason">
+            <field name="name">Tight Timeline / Cannot Meet Deadline</field>
+            <field name="sequence">30</field>
+        </record>
+
+        <record id="decline_reason_scope" model="ics.tender.decline.reason">
+            <field name="name">Out of Scope / Not Aligned with Business</field>
+            <field name="sequence">40</field>
+        </record>
+
+        <record id="decline_reason_location" model="ics.tender.decline.reason">
+            <field name="name">Location Not Feasible</field>
+            <field name="sequence">50</field>
+        </record>
+
+        <record id="decline_reason_competition" model="ics.tender.decline.reason">
+            <field name="name">High Competition / Low Win Probability</field>
+            <field name="sequence">60</field>
+        </record>
+
+        <record id="decline_reason_requirements" model="ics.tender.decline.reason">
+            <field name="name">Cannot Meet Qualification Requirements</field>
+            <field name="sequence">70</field>
+        </record>
+
+        <record id="decline_reason_resources" model="ics.tender.decline.reason">
+            <field name="name">Insufficient Resources / Team Unavailable</field>
+            <field name="sequence">80</field>
+        </record>
+
+        <record id="decline_reason_profitability" model="ics.tender.decline.reason">
+            <field name="name">Low Profitability / Margins Too Thin</field>
+            <field name="sequence">90</field>
+        </record>
+
+        <record id="decline_reason_other" model="ics.tender.decline.reason">
+            <field name="name">Other</field>
+            <field name="sequence">100</field>
+        </record>
+
+    </data>
+</odoo>

@@ -88,5 +88,11 @@
             action="action_tender_approval_rule"
             sequence="20"/>
 
+        <menuitem id="menu_tender_decline_reason"
+            name="Decline Reasons"
+            parent="menu_tender_config"
+            action="action_tender_decline_reason"
+            sequence="30"/>
+
     </data>
 </odoo>

@@ -279,7 +279,10 @@ class Tender(models.Model):
         ('strategic', 'Strategic Partner')
     ], string='Client Relationship')
     participation_decision = fields.Boolean('Participating in Tender', default=True)
-    non_participation_reason = fields.Text('Reasons for Non-Participation')
+    decline_reason_id = fields.Many2one('ics.tender.decline.reason', string='Decline Reason',
+        help='Predefined reason for not participating in this tender')
+    non_participation_reason = fields.Text('Decline Notes',
+        help='Additional details about the decline decision')
     
     # Document Management
     tender_documents_uploaded = fields.Boolean('Update Tender Documents', default=False)

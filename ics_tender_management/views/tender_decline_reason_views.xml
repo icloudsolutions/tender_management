@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_tender_decline_reason_list" model="ir.ui.view">
+            <field name="name">ics.tender.decline.reason.list</field>
+            <field name="model">ics.tender.decline.reason</field>
+            <field name="arch" type="xml">
+                <list string="Decline Reasons" editable="bottom">
+                    <field name="sequence" widget="handle"/>
+                    <field name="name"/>
+                    <field name="active" optional="hide"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="action_tender_decline_reason" model="ir.actions.act_window">
+            <field name="name">Decline Reasons</field>
+            <field name="res_model">ics.tender.decline.reason</field>
+            <field name="view_mode">list</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create your first decline reason
+                </p>
+                <p>
+                    Define reasons for not participating in a tender.
+                    These will be available when declining a tender.
+                </p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

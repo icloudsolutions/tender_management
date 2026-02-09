@@ -12,35 +12,43 @@ class DeclineTenderWizard(models.TransientModel):
     tender_title = fields.Char(related='tender_id.tender_title', string='Tender Title', readonly=True)
     tender_state = fields.Selection(related='tender_id.state', string='Current State', readonly=True)
 
+    decline_reason_id = fields.Many2one(
+        'ics.tender.decline.reason', string='Decline Reason',
+        help='Select the reason for not participating')
     non_participation_reason = fields.Text(
-        'Reason for Not Participating',
-        help='Explain why the company decided not to participate in this tender')
+        'Additional Notes',
+        help='Optional additional details about the decline decision')
 
     def action_confirm_decline(self):
         """Decline tender participation and cancel the tender"""
         self.ensure_one()
 
-        if not self.non_participation_reason:
-            raise UserError(_('Please provide a reason for not participating.'))
+        if not self.decline_reason_id:
+            raise UserError(_('Please select a decline reason.'))
 
         # Update tender
         self.tender_id.write({
             'participation_decision': False,
-            'non_participation_reason': self.non_participation_reason,
+            'decline_reason_id': self.decline_reason_id.id,
+            'non_participation_reason': self.non_participation_reason or '',
             'state': 'cancelled',
         })
 
         # Log the decision in chatter
         state_label = dict(self.tender_id._fields['state'].selection).get(
             self.tender_state, self.tender_state)
+        body = _(
+            '<strong>Tender Declined - Not Participating</strong><br/>'
+            '<ul>'
+            '<li><strong>Decision made at stage:</strong> %s</li>'
+            '<li><strong>Reason:</strong> %s</li>'
+        ) % (state_label, self.decline_reason_id.name)
+        if self.non_participation_reason:
+            body += _('<li><strong>Notes:</strong> %s</li>') % self.non_participation_reason
+        body += '</ul>'
+
         self.tender_id.message_post(
-            body=_(
-                '<strong>Tender Declined - Not Participating</strong><br/>'
-                '<ul>'
-                '<li><strong>Decision made at stage:</strong> %s</li>'
-                '<li><strong>Reason:</strong> %s</li>'
-                '</ul>'
-            ) % (state_label, self.non_participation_reason),
+            body=body,
             subject=_('Tender Declined'),
         )
 

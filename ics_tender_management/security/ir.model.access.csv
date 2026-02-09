@@ -33,6 +33,8 @@ access_ics_project_task_template_line_user,ics.project.task.template.line.user,m
 access_ics_project_task_template_line_manager,ics.project.task.template.line.manager,model_ics_project_task_template_line,group_tender_manager,1,1,1,1
 access_ics_tender_mark_lost_wizard_user,ics.tender.mark.lost.wizard.user,model_ics_tender_mark_lost_wizard,group_tender_user,1,1,1,1
 access_ics_tender_mark_lost_wizard_manager,ics.tender.mark.lost.wizard.manager,model_ics_tender_mark_lost_wizard,group_tender_manager,1,1,1,1
+access_ics_tender_decline_reason_user,ics.tender.decline.reason.user,model_ics_tender_decline_reason,group_tender_user,1,0,0,0
+access_ics_tender_decline_reason_manager,ics.tender.decline.reason.manager,model_ics_tender_decline_reason,group_tender_manager,1,1,1,1
 access_ics_tender_decline_wizard_user,ics.tender.decline.wizard.user,model_ics_tender_decline_wizard,group_tender_user,1,1,1,1
 access_ics_tender_decline_wizard_manager,ics.tender.decline.wizard.manager,model_ics_tender_decline_wizard,group_tender_manager,1,1,1,1
 access_ics_tender_approval_rule_user,ics.tender.approval.rule.user,model_ics_tender_approval_rule,group_tender_user,1,0,0,0

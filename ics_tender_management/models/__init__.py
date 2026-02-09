@@ -1,4 +1,5 @@
 from . import tender_stage
+from . import tender_decline_reason
 from . import tender
 from . import etimad_tender
 from . import tender_boq

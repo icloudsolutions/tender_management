@@ -160,6 +160,8 @@
         'data/tender_stage_data.xml',
         'data/mail_template_data.xml',
         'data/project_task_templates.xml',
+        'data/tender_decline_reason_data.xml',
+        'views/tender_decline_reason_views.xml',
         'views/tender_approval_rule_views.xml',
         'views/tender_menus.xml',
         'views/tender_dashboard_views.xml',
