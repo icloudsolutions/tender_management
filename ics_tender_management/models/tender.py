@@ -897,6 +897,7 @@ class Tender(models.Model):
         self.ensure_one()
         if not self.boq_line_ids:
             raise UserError(_('Please add BoQ lines before preparing quotation.'))
+        self._validate_required_approvals()
         self.write({'state': 'quotation'})
 
     def action_submit_tender(self):
@@ -905,7 +906,25 @@ class Tender(models.Model):
             raise UserError(_('Please set a Customer before submitting the tender.'))
         if not self.quotation_ids:
             raise UserError(_('Please generate a quotation before submitting the tender.'))
+        self._validate_required_approvals()
         self.write({'state': 'submitted'})
+
+    def _validate_required_approvals(self):
+        """Ensure all required approvals are completed before proceeding."""
+        missing = []
+        if self.require_direct_manager and not self.approval_direct_manager:
+            missing.append(_('Direct Manager Approval'))
+        if self.require_department_manager and not self.approval_department_manager:
+            missing.append(_('Department Manager Approval'))
+        if self.require_financial_manager and not self.approval_financial_manager:
+            missing.append(_('Financial Manager Approval'))
+        if self.require_ceo and not self.approval_ceo:
+            missing.append(_('CEO Approval'))
+
+        if missing:
+            raise UserError(
+                _('Cannot proceed without required approvals: %s') % ', '.join(missing)
+            )
 
     def action_mark_won(self):
         self.ensure_one()
