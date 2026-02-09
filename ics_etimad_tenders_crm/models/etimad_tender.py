@@ -1478,6 +1478,8 @@ class EtimadTender(models.Model):
                         if guarantee_match:
                             # Store as ratio for percentage widget (5.00 -> 0.05)
                             parsed_data['final_guarantee_percentage'] = float(guarantee_match.group(1)) / 100.0
+                    elif 'Opening Location' in title or 'مكان فتح العروض' in title:
+                        parsed_data['opening_location'] = value
             else:
                 # Minimal regex fallback for submission method
                 submission_match = re.search(r'طريقة تقديم العروض.*?<span>\s*(.*?)\s*</span>', html_content, re.DOTALL)
