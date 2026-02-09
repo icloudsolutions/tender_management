@@ -18,7 +18,8 @@ class EtimadTender(models.Model):
     )
 
     def action_create_tender_direct(self):
-        """Create ICS Tender directly from Etimad (skip CRM)"""
+        """Create ICS Tender directly from Etimad (skip CRM).
+        Fetches detailed info from Etimad first to ensure all data is available."""
         self.ensure_one()
         if self.tender_id_ics:
             return {
@@ -29,6 +30,17 @@ class EtimadTender(models.Model):
                 'view_mode': 'form',
                 'target': 'current',
             }
+
+        # Fetch detailed info from Etimad before creating tender
+        if self.tender_id_string:
+            try:
+                self._fetch_detailed_info_silent()
+            except Exception as e:
+                raise UserError(
+                    _('Failed to fetch tender details from Etimad. '
+                      'Please try again or fetch details manually first.\n\nError: %s') % str(e)
+                )
+
         tender_vals = self._prepare_tender_vals_from_etimad()
         tender = self.env['ics.tender'].create(tender_vals)
         self.tender_id_ics = tender.id

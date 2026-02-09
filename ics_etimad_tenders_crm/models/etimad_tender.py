@@ -748,7 +748,8 @@ class EtimadTender(models.Model):
             }
 
     def action_create_opportunity(self):
-        """Create CRM opportunity from tender"""
+        """Create CRM opportunity from tender.
+        Fetches detailed info from Etimad first to ensure all data is available."""
         self.ensure_one()
         
         if self.opportunity_id:
@@ -760,6 +761,13 @@ class EtimadTender(models.Model):
                 'view_mode': 'form',
                 'target': 'current',
             }
+        
+        # Fetch detailed info from Etimad before creating opportunity
+        if self.tender_id_string:
+            try:
+                self._fetch_detailed_info_silent()
+            except Exception as e:
+                _logger.warning(f"Could not fetch details before creating opportunity: {e}")
         
         # Create new opportunity
         opportunity_vals = {
