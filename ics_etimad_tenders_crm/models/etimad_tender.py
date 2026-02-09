@@ -1956,7 +1956,13 @@ class EtimadTender(models.Model):
         return parsed_data
     
     def _parse_local_content_html(self, html_content):
-        """Parse HTML content from GetLocalContentDetailsViewComponenet API"""
+        """Parse HTML content from GetLocalContentDetailsViewComponenet API
+        
+        The Etimad local content response uses various HTML structures:
+        - <span> for simple text values
+        - <ol><li> for list values (e.g., mechanisms, requirements)
+        - HTML entities (&#x...) for Arabic text
+        """
         parsed_data = {}
         
         try:
@@ -1970,95 +1976,86 @@ class EtimadTender(models.Model):
             if LXML_AVAILABLE:
                 tree = html.fromstring(html_content)
                 
-                # Extract minimum local content percentage
-                # Look for "نسبة المحتوى المحلي الدنيا" or "Minimum Local Content %"
-                percentage_elements = tree.xpath('//div[contains(@class, "etd-item-title") and (contains(text(), "نسبة المحتوى المحلي") or contains(text(), "المحتوى المحلي الدنيا"))]/following-sibling::div[1]//span/text()')
-                if percentage_elements:
-                    percentage_str = html_module.unescape(percentage_elements[0].strip())
-                    # Extract number from text like "30%" or "30 %" or "30"
-                    percentage_match = re.search(r'(\d+(?:\.\d+)?)', percentage_str)
-                    if percentage_match:
-                        parsed_data['local_content_percentage'] = float(percentage_match.group(1))
+                # Scan all list items generically for local content data
+                all_items = tree.xpath('//li[contains(@class, "list-group-item")]')
+                for item in all_items:
+                    title_parts = item.xpath('.//div[contains(@class, "etd-item-title")]//text()')
+                    title = ' '.join([t.strip() for t in title_parts if t.strip()])
+                    
+                    # Get value from span or ol/li
+                    value_parts = item.xpath('.//div[contains(@class, "etd-item-info")]//li/text()')
+                    if not value_parts:
+                        value_parts = item.xpath('.//div[contains(@class, "etd-item-info")]//span/text()')
+                    if not value_parts:
+                        value_parts = item.xpath('.//div[contains(@class, "etd-item-info")]//text()')
+                    
+                    value = '\n'.join([html_module.unescape(v.strip()) for v in value_parts if v.strip()])
+                    
+                    if not title or not value:
+                        continue
+                    
+                    _logger.info(f"Local content item: '{title}' = '{value[:100]}'")
+                    
+                    if 'نسبة المحتوى المحلي' in title and 'المستهدف' not in title:
+                        pct_match = re.search(r'(\d+(?:\.\d+)?)', value)
+                        if pct_match:
+                            parsed_data['local_content_percentage'] = float(pct_match.group(1))
+                    
+                    elif 'المستهدفة' in title or 'المستهدف' in title:
+                        pct_match = re.search(r'(\d+(?:\.\d+)?)', value)
+                        if pct_match:
+                            parsed_data['local_content_target_percentage'] = float(pct_match.group(1))
+                    
+                    elif 'وزن المحتوى المحلي' in title:
+                        pct_match = re.search(r'(\d+(?:\.\d+)?)', value)
+                        if pct_match:
+                            parsed_data['local_content_baseline_weight'] = float(pct_match.group(1))
+                    
+                    elif 'آلية احتساب' in title:
+                        if value and 'لا يوجد' not in value:
+                            parsed_data['local_content_mechanism'] = value
+                    
+                    elif 'آليات المحتوى المحلي' in title:
+                        if value and 'لا يوجد' not in value:
+                            parsed_data['local_content_mechanism'] = value
+                    
+                    elif 'الأفضلية السعرية' in title:
+                        pct_match = re.search(r'(\d+(?:\.\d+)?)', value)
+                        if pct_match:
+                            parsed_data['sme_price_preference'] = float(pct_match.group(1))
+                    
+                    elif 'شهادة المنشآت' in title:
+                        value_lower = value.lower()
+                        parsed_data['sme_qualification_mandatory'] = 'إلزامي' in value or 'مطلوب' in value or 'mandatory' in value_lower
+                    
+                    elif 'ملاحظات' in title:
+                        if value and 'لا يوجد' not in value:
+                            parsed_data['local_content_notes'] = value
                 
-                # Extract local content mechanism
-                # Look for "آلية احتساب المحتوى المحلي"
-                mechanism_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "آلية احتساب")]/following-sibling::div[1]//span/text()')
-                if mechanism_elements:
-                    mechanism_text = html_module.unescape(mechanism_elements[0].strip())
-                    if mechanism_text and 'لا يوجد' not in mechanism_text:
-                        parsed_data['local_content_mechanism'] = mechanism_text
+                # Also check H4 headers for section-level data
+                h4_elements = tree.xpath('//h4//text()')
+                h4_text = ' '.join([html_module.unescape(t.strip()) for t in h4_elements if t.strip()])
                 
-                # Extract target percentage for evaluation
-                # Look for "نسبة المحتوى المحلي المستهدفة للتقييم"
-                target_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "المستهدفة للتقييم")]/following-sibling::div[1]//span/text()')
-                if target_elements:
-                    target_str = html_module.unescape(target_elements[0].strip())
-                    target_match = re.search(r'(\d+(?:\.\d+)?)', target_str)
-                    if target_match:
-                        parsed_data['local_content_target_percentage'] = float(target_match.group(1))
+                # Check for SME preference in mechanisms list or as section
+                all_li_text = tree.xpath('//ol/li/text()')
+                all_li_values = [html_module.unescape(t.strip()) for t in all_li_text if t.strip()]
                 
-                # Extract local content weight in evaluation
-                # Look for "وزن المحتوى المحلي"
-                weight_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "وزن المحتوى المحلي")]/following-sibling::div[1]//span/text()')
-                if weight_elements:
-                    weight_str = html_module.unescape(weight_elements[0].strip())
-                    weight_match = re.search(r'(\d+(?:\.\d+)?)', weight_str)
-                    if weight_match:
-                        parsed_data['local_content_baseline_weight'] = float(weight_match.group(1))
+                for li_value in all_li_values:
+                    if 'تفضيل المنشآت الصغيرة' in li_value:
+                        parsed_data['sme_participation_allowed'] = True
+                        if not parsed_data.get('local_content_notes'):
+                            parsed_data['local_content_notes'] = li_value
+                    elif 'المنشآت الصغيرة' in li_value and ('مسموح' in li_value or 'نعم' in li_value):
+                        parsed_data['sme_participation_allowed'] = True
                 
-                # Extract SME (Small & Medium Enterprises) participation
-                # Look for "مشاركة المنشآت الصغيرة والمتوسطة"
-                sme_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "المنشآت الصغيرة")]/following-sibling::div[1]//span/text()')
-                if sme_elements:
-                    sme_text = html_module.unescape(sme_elements[0].strip()).lower()
-                    parsed_data['sme_participation_allowed'] = 'نعم' in sme_text or 'yes' in sme_text or 'مسموح' in sme_text
+                # If we found mechanisms as list items, collect them all
+                if not parsed_data.get('local_content_mechanism'):
+                    mechanism_items = tree.xpath('//div[contains(@class, "etd-item-info")]//ol/li/text()')
+                    if mechanism_items:
+                        mechanisms = [html_module.unescape(m.strip()) for m in mechanism_items if m.strip()]
+                        if mechanisms:
+                            parsed_data['local_content_mechanism'] = '\n'.join(mechanisms)
                 
-                # Extract SME preference (تفضيل المنشآت الصغيرة والمتوسطة)
-                sme_prefer_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "تفضيل المنشآت الصغيرة")]/following-sibling::div[1]//span/text()')
-                if sme_prefer_elements:
-                    sme_prefer_text = html_module.unescape(sme_prefer_elements[0].strip())
-                    if sme_prefer_text:
-                        parsed_data['sme_participation_allowed'] = 'نعم' in sme_prefer_text or 'yes' in sme_prefer_text.lower() or 'مسموح' in sme_prefer_text
-                        sme_prefer_match = re.search(r'(\d+(?:\.\d+)?)', sme_prefer_text)
-                        if sme_prefer_match:
-                            parsed_data['sme_price_preference'] = float(sme_prefer_match.group(1))
-                
-                # Extract SME price preference
-                # Look for "الأفضلية السعرية"
-                sme_preference_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "الأفضلية السعرية")]/following-sibling::div[1]//span/text()')
-                if sme_preference_elements:
-                    preference_str = html_module.unescape(sme_preference_elements[0].strip())
-                    preference_match = re.search(r'(\d+(?:\.\d+)?)', preference_str)
-                    if preference_match:
-                        parsed_data['sme_price_preference'] = float(preference_match.group(1))
-                
-                # Extract SME qualification mandatory
-                # Look for "شهادة المنشآت" or "SME Certificate"
-                sme_cert_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "شهادة المنشآت")]/following-sibling::div[1]//span/text()')
-                if sme_cert_elements:
-                    cert_text = html_module.unescape(sme_cert_elements[0].strip()).lower()
-                    parsed_data['sme_qualification_mandatory'] = 'إلزامي' in cert_text or 'mandatory' in cert_text or 'مطلوب' in cert_text
-                
-                # Collect any additional notes about local content
-                notes_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "ملاحظات")]/following-sibling::div[1]//span/text()')
-                if notes_elements:
-                    notes_text = html_module.unescape(notes_elements[0].strip())
-                    if notes_text and 'لا يوجد' not in notes_text:
-                        parsed_data['local_content_notes'] = notes_text
-                
-                # Extract local content requirements (اشتراطات المحتوى المحلي)
-                requirements_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "اشتراطات المحتوى المحلي")]/following-sibling::div[1]//span/text()')
-                if requirements_elements:
-                    requirements_text = html_module.unescape(requirements_elements[0].strip())
-                    if requirements_text and 'لا يوجد' not in requirements_text:
-                        parsed_data['local_content_notes'] = requirements_text
-
-                # Extract local content mechanisms (آليات المحتوى المحلي)
-                mechanisms_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "آليات المحتوى المحلي")]/following-sibling::div[1]//span/text()')
-                if mechanisms_elements:
-                    mechanisms_text = html_module.unescape(mechanisms_elements[0].strip())
-                    if mechanisms_text and 'لا يوجد' not in mechanisms_text:
-                        parsed_data['local_content_mechanism'] = mechanisms_text
             else:
                 # Fallback to regex parsing
                 parsed_data.update(self._parse_local_content_regex(html_content))
@@ -2073,50 +2070,66 @@ class EtimadTender(models.Model):
         return parsed_data
     
     def _parse_local_content_regex(self, html_content):
-        """Fallback regex parsing for local content"""
+        """Fallback regex parsing for local content.
+        
+        Handles both <span> values and <ol><li> list values.
+        """
         parsed_data = {'local_content_required': True}
+        
+        def _extract_value(pattern, content):
+            """Extract value following a title pattern - check span, li, and generic text"""
+            # Try <span> value
+            match = re.search(pattern + r'.*?<span>\s*([^<]+?)\s*</span>', content, re.DOTALL)
+            if match:
+                return html_module.unescape(re.sub(r'<[^>]+>', '', match.group(1)).strip())
+            # Try <li> value (list items)
+            match = re.search(pattern + r'.*?<ol>\s*(<li>.*?</li>\s*)+\s*</ol>', content, re.DOTALL)
+            if match:
+                items = re.findall(r'<li>\s*([^<]+?)\s*</li>', match.group(0))
+                return '\n'.join([html_module.unescape(item.strip()) for item in items if item.strip()])
+            return None
         
         try:
             # Extract minimum percentage
-            percentage_match = re.search(r'(?:نسبة المحتوى المحلي|المحتوى المحلي الدنيا).*?<span>\s*(\d+(?:\.\d+)?)', html_content, re.DOTALL)
+            percentage_match = re.search(r'(?:نسبة المحتوى المحلي|المحتوى المحلي الدنيا).*?(\d+(?:\.\d+)?)\s*%?', html_content, re.DOTALL)
             if percentage_match:
                 parsed_data['local_content_percentage'] = float(percentage_match.group(1))
             
-            # Extract mechanism
-            mechanism_match = re.search(r'آلية احتساب.*?<span>\s*([^<]+?)\s*</span>', html_content, re.DOTALL)
-            if mechanism_match:
-                mechanism_text = html_module.unescape(re.sub(r'<[^>]+>', '', mechanism_match.group(1)).strip())
-                if mechanism_text and 'لا يوجد' not in mechanism_text:
-                    parsed_data['local_content_mechanism'] = mechanism_text
+            # Extract mechanism - from span or ol/li
+            mechanism_text = _extract_value(r'آلي(?:ة|ات)\s*(?:احتساب\s*)?المحتوى المحلي', html_content)
+            if mechanism_text and 'لا يوجد' not in mechanism_text:
+                parsed_data['local_content_mechanism'] = mechanism_text
             
             # Extract target percentage
-            target_match = re.search(r'المستهدفة للتقييم.*?<span>\s*(\d+(?:\.\d+)?)', html_content, re.DOTALL)
+            target_match = re.search(r'المستهدف(?:ة|ه).*?(\d+(?:\.\d+)?)', html_content, re.DOTALL)
             if target_match:
                 parsed_data['local_content_target_percentage'] = float(target_match.group(1))
             
             # Extract weight
-            weight_match = re.search(r'وزن المحتوى المحلي.*?<span>\s*(\d+(?:\.\d+)?)', html_content, re.DOTALL)
+            weight_match = re.search(r'وزن المحتوى المحلي.*?(\d+(?:\.\d+)?)', html_content, re.DOTALL)
             if weight_match:
                 parsed_data['local_content_baseline_weight'] = float(weight_match.group(1))
             
-            # Extract SME participation
-            sme_match = re.search(r'المنشآت الصغيرة.*?<span>\s*([^<]+?)\s*</span>', html_content, re.DOTALL)
-            if sme_match:
-                sme_text = html_module.unescape(re.sub(r'<[^>]+>', '', sme_match.group(1)).strip()).lower()
-                parsed_data['sme_participation_allowed'] = 'نعم' in sme_text or 'yes' in sme_text
-            
-            # Extract SME preference (تفضيل المنشآت الصغيرة والمتوسطة)
-            sme_prefer_match = re.search(r'تفضيل المنشآت الصغيرة.*?<span>\s*([^<]+?)\s*</span>', html_content, re.DOTALL)
-            if sme_prefer_match:
-                sme_prefer_text = html_module.unescape(re.sub(r'<[^>]+>', '', sme_prefer_match.group(1)).strip())
-                if sme_prefer_text:
-                    parsed_data['sme_participation_allowed'] = 'نعم' in sme_prefer_text or 'yes' in sme_prefer_text.lower() or 'مسموح' in sme_prefer_text
-                    sme_prefer_pct = re.search(r'(\d+(?:\.\d+)?)', sme_prefer_text)
-                    if sme_prefer_pct:
-                        parsed_data['sme_price_preference'] = float(sme_prefer_pct.group(1))
+            # Extract SME participation / preference from li or span
+            # Check for "تفضيل المنشآت الصغيرة" in <li> items
+            sme_li_match = re.findall(r'<li>\s*([^<]*تفضيل المنشآت الصغيرة[^<]*)\s*</li>', html_content)
+            if sme_li_match:
+                parsed_data['sme_participation_allowed'] = True
+                sme_text = html_module.unescape(sme_li_match[0].strip())
+                if not parsed_data.get('local_content_notes'):
+                    parsed_data['local_content_notes'] = sme_text
+                sme_pct = re.search(r'(\d+(?:\.\d+)?)', sme_text)
+                if sme_pct:
+                    parsed_data['sme_price_preference'] = float(sme_pct.group(1))
+            else:
+                # Standard span-based SME
+                sme_match = re.search(r'المنشآت الصغيرة.*?<span>\s*([^<]+?)\s*</span>', html_content, re.DOTALL)
+                if sme_match:
+                    sme_text = html_module.unescape(re.sub(r'<[^>]+>', '', sme_match.group(1)).strip()).lower()
+                    parsed_data['sme_participation_allowed'] = 'نعم' in sme_text or 'yes' in sme_text or 'مسموح' in sme_text
             
             # Extract SME price preference
-            preference_match = re.search(r'الأفضلية السعرية.*?<span>\s*(\d+(?:\.\d+)?)', html_content, re.DOTALL)
+            preference_match = re.search(r'الأفضلية السعرية.*?(\d+(?:\.\d+)?)', html_content, re.DOTALL)
             if preference_match:
                 parsed_data['sme_price_preference'] = float(preference_match.group(1))
             
@@ -2125,20 +2138,6 @@ class EtimadTender(models.Model):
             if cert_match:
                 cert_text = html_module.unescape(re.sub(r'<[^>]+>', '', cert_match.group(1)).strip()).lower()
                 parsed_data['sme_qualification_mandatory'] = 'إلزامي' in cert_text or 'مطلوب' in cert_text
-            
-            # Extract local content requirements (اشتراطات المحتوى المحلي)
-            requirements_match = re.search(r'اشتراطات المحتوى المحلي.*?<span>\s*([^<]+?)\s*</span>', html_content, re.DOTALL)
-            if requirements_match:
-                requirements_text = html_module.unescape(re.sub(r'<[^>]+>', '', requirements_match.group(1)).strip())
-                if requirements_text and 'لا يوجد' not in requirements_text:
-                    parsed_data['local_content_notes'] = requirements_text
-            
-            # Extract local content mechanisms (آليات المحتوى المحلي)
-            mechanisms_match = re.search(r'آليات المحتوى المحلي.*?<span>\s*([^<]+?)\s*</span>', html_content, re.DOTALL)
-            if mechanisms_match:
-                mechanisms_text = html_module.unescape(re.sub(r'<[^>]+>', '', mechanisms_match.group(1)).strip())
-                if mechanisms_text and 'لا يوجد' not in mechanisms_text:
-                    parsed_data['local_content_mechanism'] = mechanisms_text
                 
         except Exception as e:
             _logger.error(f"Error in regex local content parsing: {e}")
