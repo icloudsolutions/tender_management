@@ -55,6 +55,8 @@ class EtimadTender(models.Model):
                                    default=lambda self: self.env.ref('base.SAR'))
     invitation_cost = fields.Monetary("Invitation Cost", currency_field='currency_id')
     financial_fees = fields.Monetary("Financial Fees", currency_field='currency_id')
+    buying_cost = fields.Monetary("Booklet Price", currency_field='currency_id',
+                                   help="قيمة وثائق المنافسة - Tender booklet/document cost (buyingCost from Etimad)")
     total_fees = fields.Monetary("Total Fees", compute='_compute_total_fees', 
                                   store=True, currency_field='currency_id')
     estimated_amount = fields.Monetary("Estimated Amount", currency_field='currency_id')
@@ -531,6 +533,7 @@ class EtimadTender(models.Model):
                 'submission_date': self._parse_date(raw_data.get('submitionDate')),
                 'invitation_cost': float(raw_data.get('invitationCost', 0) or 0),
                 'financial_fees': float(raw_data.get('financialFees', 0) or 0),
+                'buying_cost': float(raw_data.get('buyingCost', 0) or raw_data.get('condetionalBookletPrice', 0) or 0),
                 'estimated_amount': new_estimated_amount,
                 'tender_status_id': raw_data.get('tenderStatusId'),
                 'tender_status_text': (

@@ -157,7 +157,7 @@ class CrmLead(models.Model):
                 'last_inquiry_date': etimad.last_enquiry_date.date() if etimad.last_enquiry_date else False,
                 
                 # Financial from Etimad
-                'tender_booklet_price': etimad.invitation_cost or 0.0,
+                'tender_booklet_price': etimad.buying_cost or 0.0,
                 'etimad_financial_fees': etimad.financial_fees or 0.0,
                 'estimated_project_value': etimad.total_fees or 0.0,
                 
