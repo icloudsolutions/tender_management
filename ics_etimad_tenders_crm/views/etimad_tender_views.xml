@@ -266,17 +266,21 @@
                     
                     <!-- Financial and CRM Information -->
                     <group>
-                        <group string="Financial Information" name="financial_info">
+                        <group string="Financial Information (from Etimad API)" name="financial_info">
                             <field name="currency_id" invisible="1"/>
                             <field name="invitation_cost" 
-                                   string="Invitation Cost"
+                                   string="Invitation Cost (رسوم الدعوة)"
+                                   widget="monetary" 
+                                   options="{'currency_field': 'currency_id'}"/>
+                            <field name="buying_cost" 
+                                   string="Booklet Price (قيمة الكراسة)"
                                    widget="monetary" 
                                    options="{'currency_field': 'currency_id'}"/>
                             <field name="financial_fees" 
-                                   string="Financial Fees"
+                                   string="Financial Fees (الرسوم المالية)"
                                    widget="monetary" 
                                    options="{'currency_field': 'currency_id'}"/>
-                            <label for="total_fees" string="Total Fees" class="fw-bold"/>
+                            <label for="total_fees" string="Total (قيمة وثائق المنافسة)" class="fw-bold"/>
                             <field name="total_fees" 
                                    widget="monetary" 
                                    options="{'currency_field': 'currency_id'}" 
@@ -399,11 +403,7 @@
                                 </group>
                             </group>
                             <group>
-                                <group string="Document Cost">
-                                    <field name="document_cost_type"/>
-                                    <field name="document_cost_amount" invisible="document_cost_type != 'paid'" widget="monetary"/>
-                                </group>
-                                <group string="Submission Method">
+                                <group string="Submission Method (طريقة تقديم العروض)">
                                     <field name="submission_method"/>
                                 </group>
                             </group>
