@@ -270,25 +270,25 @@
                             <field name="currency_id" invisible="1"/>
                             <field name="invitation_cost" 
                                    string="Invitation Cost"
-                                   help="رسوم الدعوة"
+                                   help="رسوم الدعوة - Fixed registration fee from Etimad API (invitationCost)"
                                    widget="monetary" 
                                    options="{'currency_field': 'currency_id'}"/>
                             <field name="buying_cost" 
                                    string="Booklet Price"
-                                   help="قيمة الكراسة"
-                                   widget="monetary" 
-                                   options="{'currency_field': 'currency_id'}"/>
-                            <field name="financial_fees" 
-                                   string="Financial Fees"
-                                   help="الرسوم المالية"
+                                   help="قيمة الكراسة - Tender documents buying cost from Etimad API (buyingCost)"
                                    widget="monetary" 
                                    options="{'currency_field': 'currency_id'}"/>
                             <label for="total_fees" string="Total Fees" class="fw-bold"/>
                             <field name="total_fees" 
-                                   help="قيمة وثائق المنافسة"
+                                   help="قيمة وثائق المنافسة - Invitation Cost + Booklet Price"
                                    widget="monetary" 
                                    options="{'currency_field': 'currency_id'}" 
                                    class="oe_subtotal_footer_separator fw-bold"/>
+                            <field name="estimated_amount"
+                                   string="Estimated Value"
+                                   help="القيمة التقديرية - Estimated tender value (not always published)"
+                                   widget="monetary"
+                                   options="{'currency_field': 'currency_id'}"/>
                         </group>
                         
                         <group string="CRM Integration" name="crm_info">
