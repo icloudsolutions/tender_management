@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Add ICS Tender field and "Create Tender Directly" to Etimad views (when ics_tender_management is installed) -->
+    <!-- Add ICS Tender field and "Create Tender" button to Etimad views (when ics_tender_management is installed) -->
 
     <record id="view_etimad_tender_list_tender_ics" model="ir.ui.view">
         <field name="name">etimad.tender.list.tender.ics</field>
@@ -19,27 +19,27 @@
         <field name="inherit_id" ref="ics_etimad_tenders_crm.view_etimad_tender_form"/>
         <field name="arch" type="xml">
             <group name="crm_info" position="after">
-                <group string="Direct Tender Integration" name="tender_ics_group" invisible="not context.get('show_tender_integration', True)">
+                <group string="Tender Management" name="tender_ics_group" invisible="not context.get('show_tender_integration', True)">
                     <field name="tender_id_ics"
-                           string="Linked ICS Tender"
+                           string="Linked Tender"
                            options="{'no_create': True}"
                            readonly="1"/>
                     <div invisible="not tender_id_ics" class="alert alert-success mt-2">
-                        <i class="fa fa-check-circle"/> This tender is linked directly to ICS Tender Management
+                        <i class="fa fa-check-circle"/> This tender is linked to Tender Management
                     </div>
                     <div invisible="tender_id_ics" class="alert alert-info mt-2">
-                        <i class="fa fa-lightbulb-o"/> Click "Create Tender Directly" to skip CRM and preserve all data
+                        <i class="fa fa-lightbulb-o"/> Click "Create Tender" to start managing this tender
                     </div>
                 </group>
             </group>
             <button name="action_create_opportunity" position="after">
                 <button name="action_create_tender_direct"
-                        string="Create Tender Directly"
+                        string="Create Tender"
                         type="object"
-                        class="btn btn-info flex-grow-1"
+                        class="btn btn-primary flex-grow-1"
                         icon="fa-rocket"
                         invisible="tender_id_ics"
-                        title="Create ICS Tender directly (skip CRM)"/>
+                        title="Create Tender from Etimad data"/>
             </button>
         </field>
     </record>

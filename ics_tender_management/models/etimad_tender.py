@@ -1,6 +1,5 @@
-# Extension of ics.etimad.tender: add ICS Tender link and "Create ICS Tender" action.
-# This lives in ics_tender_management to break the circular dependency:
-# ics_etimad_tenders_crm no longer depends on ics_tender_management.
+# Extension of ics.etimad.tender: add Tender link and "Create Tender" action.
+# This lives in ics_tender_management to avoid circular dependency.
 
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
@@ -11,14 +10,14 @@ class EtimadTender(models.Model):
 
     tender_id_ics = fields.Many2one(
         'ics.tender',
-        string='ICS Tender',
+        string='Tender',
         readonly=True,
-        help='Direct link to ICS Tender (bypasses CRM)',
+        help='Linked Tender record',
         ondelete='set null',
     )
 
     def action_create_tender_direct(self):
-        """Create ICS Tender directly from Etimad (skip CRM).
+        """Create Tender from Etimad data.
         Fetches detailed info from Etimad first to ensure all data is available."""
         self.ensure_one()
         if self.tender_id_ics:
@@ -45,7 +44,7 @@ class EtimadTender(models.Model):
         tender = self.env['ics.tender'].create(tender_vals)
         self.tender_id_ics = tender.id
         self.message_post(
-            body=_('ICS Tender created directly: <a href="/web#id=%s&model=ics.tender">%s</a>') % (tender.id, tender.name),
+            body=_('Tender created: <a href="/web#id=%s&model=ics.tender">%s</a>') % (tender.id, tender.name),
             subject=_('Tender Created'),
         )
         return {
