@@ -209,7 +209,7 @@
                                 <field name="tender_category"/>
                                 <field name="tender_type" widget="radio"
                                     options="{'horizontal': true}"
-                                    readonly="state not in ['draft', 'technical']"/>
+                                    readonly="state not in ['draft', 'technical', 'financial']"/>
                                 <field name="etimad_tender_id" options="{'no_create': True}"/>
                                 <field name="lead_id" options="{'no_create': True}"/>
                                 <field name="partner_id" options="{'no_create_edit': True}" required="1"/>
