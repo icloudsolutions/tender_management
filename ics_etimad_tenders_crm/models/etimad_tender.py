@@ -1743,8 +1743,7 @@ class EtimadTender(models.Model):
                 )
                 if location_elements:
                     location_text = html_module.unescape(location_elements[0].strip())
-                    # Skip generic values that usually belong to guarantee address
-                    if location_text and 'لا يوجد' not in location_text and location_text not in ['المشتريات', 'إدارة المشتريات']:
+                    if location_text and 'لا يوجد' not in location_text:
                         parsed_data['opening_location'] = location_text
                 
                 # Extract offer opening date (تاريخ فحص العروض) - updated xpath
@@ -1829,7 +1828,7 @@ class EtimadTender(models.Model):
             location_match = re.search(r'(?:مكان فتح العرض|مكان فتح العروض|موقع فتح العروض).*?<span>\s*([^<]+?)\s*</span>', html_content, re.DOTALL)
             if location_match:
                 location_text = html_module.unescape(re.sub(r'<[^>]+>', '', location_match.group(1)).strip())
-                if location_text and location_text not in ['المشتريات', 'إدارة المشتريات']:
+                if location_text and 'لا يوجد' not in location_text:
                     parsed_data['opening_location'] = location_text
                 
         except Exception as e:
