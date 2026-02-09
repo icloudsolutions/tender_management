@@ -74,7 +74,6 @@ class EtimadTender(models.Model):
             'last_inquiry_date': self.last_enquiry_date.date() if self.last_enquiry_date else False,
             'expected_revenue': self.document_cost_amount or 0.0,
             'tender_booklet_price': self.document_cost_amount or 0.0,
-            'etimad_financial_fees': 0.0,
             'estimated_project_value': self.document_cost_amount or 0.0,
             'external_source': self.external_source or 'Etimad Portal',
             'etimad_tender_status_id': self.tender_status_id,

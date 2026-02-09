@@ -174,6 +174,7 @@
         'wizard/create_project_wizard_views.xml',
         'wizard/import_boq_wizard_views.xml',
         'wizard/mark_lost_wizard_views.xml',
+        'wizard/decline_tender_wizard_views.xml',
         'report/tender_report.xml',
         'report/tender_templates.xml',
     ],

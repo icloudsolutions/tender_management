@@ -161,13 +161,6 @@ class Tender(models.Model):
     etimad_published_at = fields.Datetime('Published At (Etimad)', 
         help='Publication date from Etimad portal', tracking=True)
     
-    # Financial (from Etimad)
-    etimad_financial_fees = fields.Monetary('Financial Fees (from Etimad)', 
-        currency_field='currency_id', 
-        help='Financial fees separate from invitation cost')
-    etimad_total_fees = fields.Monetary('Total Fees (from Etimad)', 
-        compute='_compute_etimad_total_fees', store=True, currency_field='currency_id',
-        help='Total fees: invitation cost + financial fees')
     
     # External Source
     external_source = fields.Char('External Source', default='Etimad Portal', readonly=True,
@@ -266,11 +259,6 @@ class Tender(models.Model):
                 tender.require_financial_manager = False
                 tender.require_ceo = False
     
-    @api.depends('tender_booklet_price', 'etimad_financial_fees')
-    def _compute_etimad_total_fees(self):
-        """Calculate total Etimad fees (invitation cost + financial fees)"""
-        for tender in self:
-            tender.etimad_total_fees = (tender.tender_booklet_price or 0.0) + (tender.etimad_financial_fees or 0.0)
     
     # Qualification Phase
     presales_employee = fields.Many2one('res.users', string='Presales Employee')
@@ -951,6 +939,25 @@ class Tender(models.Model):
             'name': _('Mark Tender as Lost'),
             'type': 'ir.actions.act_window',
             'res_model': 'ics.tender.mark.lost.wizard',
+            'view_mode': 'form',
+            'res_id': wizard.id,
+            'target': 'new',
+            'context': self.env.context,
+        }
+
+    def action_decline_tender(self):
+        """Open wizard to decline participation (not participating) with reason.
+        Available in draft, technical study, and financial study states."""
+        self.ensure_one()
+        
+        wizard = self.env['ics.tender.decline.wizard'].create({
+            'tender_id': self.id,
+        })
+        
+        return {
+            'name': _('Decline Tender - Not Participating'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'ics.tender.decline.wizard',
             'view_mode': 'form',
             'res_id': wizard.id,
             'target': 'new',

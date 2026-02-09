@@ -158,7 +158,6 @@ class CrmLead(models.Model):
                 
                 # Financial from Etimad
                 'tender_booklet_price': etimad.document_cost_amount or 0.0,
-                'etimad_financial_fees': 0.0,
                 'estimated_project_value': etimad.document_cost_amount or 0.0,
                 
                 # External Source

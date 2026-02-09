@@ -143,6 +143,10 @@
                         <button name="action_mark_lost" string="Mark as Lost"
                             type="object"
                             invisible="state not in ['submitted', 'evaluation']"/>
+                        <button name="action_decline_tender" string="Not Participating"
+                            type="object" class="btn-secondary"
+                            invisible="state not in ['draft', 'technical', 'financial']"
+                            help="Decline participation and cancel this tender"/>
                         <button name="action_create_project" string="Create Project"
                             type="object" class="oe_highlight"
                             invisible="state != 'won' or project_count > 0"/>
@@ -226,51 +230,54 @@
                         <group>
                             <group name="dates">
                                 <field name="announcement_date"/>
-                                <field name="document_purchase_date"/>
                                 <field name="submission_deadline" widget="datetime"/>
                                 <field name="days_to_deadline"/>
                                 <field name="opening_date" widget="datetime"/>
                                 <field name="is_urgent" invisible="1"/>
                             </group>
-                            <group name="financial">
-                                <field name="expected_revenue"/>
-                                <field name="total_estimated_cost" widget="monetary"/>
-                                <field name="total_vendor_cost" widget="monetary"/>
-                                <label for="margin_percentage" string="Margin %"/>
-                                <div class="o_row">
+                            <group name="financial" invisible="state == 'draft'">
+                                <field name="expected_revenue" help="القيمة التقديرية"/>
+                                <field name="total_estimated_cost" widget="monetary" 
+                                    invisible="state in ['draft', 'technical']"/>
+                                <field name="total_vendor_cost" widget="monetary"
+                                    invisible="state in ['draft', 'technical']"/>
+                                <label for="margin_percentage" string="Margin %"
+                                    invisible="state in ['draft', 'technical']"/>
+                                <div class="o_row" invisible="state in ['draft', 'technical']">
                                     <field name="margin_percentage" class="oe_inline"/>
                                     <span>%</span>
                                 </div>
-                                <field name="margin_amount" widget="monetary"/>
-                                <field name="total_quotation_amount" widget="monetary" class="oe_subtotal_footer_separator"/>
+                                <field name="margin_amount" widget="monetary"
+                                    invisible="state in ['draft', 'technical']"/>
+                                <field name="total_quotation_amount" widget="monetary" 
+                                    class="oe_subtotal_footer_separator"
+                                    invisible="state in ['draft', 'technical']"/>
                             </group>
                         </group>
                         <notebook>
-                            <!-- Phase 1: Initial Information (Draft) -->
+                            <!-- ═══════════════════════════════════════════════════ -->
+                            <!-- Tab 1: Tender Information - Always visible         -->
+                            <!-- Basic info from Etimad + description               -->
+                            <!-- ═══════════════════════════════════════════════════ -->
                             <page string="1. Tender Information" name="tender_info_tab">
                                 <group>
                                     <group string="Description &amp; Scope">
                                         <field name="description" placeholder="Tender description and requirements..." nolabel="1"/>
                                     </group>
                                 </group>
-                                <separator string="Tender Details"/>
                                 <group>
                                     <group string="Source &amp; Method">
-                                        <field name="etimad_link" widget="url"/>
-                                        <field name="external_source" invisible="not etimad_tender_id"/>
-                                        <field name="tender_completion_time"/>
-                                        <field name="tender_submission_method"/>
+                                        <field name="etimad_link" widget="url" string="Etimad Link"/>
+                                        <field name="external_source" readonly="1" invisible="not etimad_tender_id"/>
+                                        <field name="tender_submission_method" string="Submission Method"/>
+                                        <field name="tender_completion_time" string="Completion Time"/>
                                     </group>
-                                    <group string="Booklet Purchase">
-                                        <field name="tender_booklet_price"/>
-                                        <field name="etimad_financial_fees" invisible="not etimad_tender_id"/>
-                                        <field name="etimad_total_fees" invisible="not etimad_tender_id"/>
-                                        <field name="booklet_purchased"/>
-                                        <field name="booklet_purchase_receipt" invisible="not booklet_purchased"/>
-                                        <field name="booklet_purchase_request_date" invisible="not booklet_purchased"/>
-                                        <field name="booklet_purchase_date" invisible="not booklet_purchased"/>
+                                    <group string="Financial Overview">
+                                        <field name="expected_revenue" string="Estimated Value" help="القيمة التقديرية"/>
+                                        <field name="tender_booklet_price" string="Document Cost" help="قيمة وثائق المنافسة"/>
                                     </group>
                                 </group>
+                                <!-- Etimad Portal Details (only when linked to Etimad) -->
                                 <separator string="Etimad Portal Information" invisible="not etimad_tender_id"/>
                                 <group invisible="not etimad_tender_id">
                                     <group string="Etimad Identifiers">
@@ -279,92 +286,92 @@
                                         <field name="etimad_reference_number" readonly="1"/>
                                         <field name="etimad_tender_status_id" readonly="1"/>
                                     </group>
-                                    <group string="Agency Information (from Etimad)">
+                                    <group string="Agency Information">
                                         <field name="etimad_agency_name" readonly="1"/>
                                         <field name="etimad_branch_name" readonly="1"/>
                                     </group>
                                 </group>
                                 <group invisible="not etimad_tender_id">
-                                    <group string="Tender Activity (from Etimad)">
+                                    <group string="Tender Activity">
                                         <field name="etimad_activity_name" readonly="1"/>
                                         <field name="etimad_activity_id" readonly="1"/>
                                     </group>
-                                    <group string="Dates (from Etimad)">
+                                    <group string="Etimad Dates">
                                         <field name="etimad_published_at" widget="datetime" readonly="1"/>
                                         <field name="etimad_last_enquiry_date_hijri" readonly="1"/>
                                         <field name="etimad_last_offer_date_hijri" readonly="1"/>
                                     </group>
                                 </group>
-                                <group>
-                                    <group string="Site Visit">
-                                        <field name="site_visit_required"/>
-                                        <field name="site_visit_date" widget="datetime" invisible="not site_visit_required"/>
-                                        <field name="documents_required_for_site" filename="documents_required_filename" invisible="not site_visit_required"/>
-                                        <field name="documents_required_filename" invisible="1"/>
-                                    </group>
-                                    <group string="Inquiries">
-                                        <field name="last_inquiry_date"/>
-                                        <field name="required_inquiries"/>
-                                    </group>
-                                </group>
                             </page>
 
-                            <!-- Phase 2: Qualification (Draft/Technical) -->
+                            <!-- ═══════════════════════════════════════════════════ -->
+                            <!-- Tab 2: Qualification & Decision                    -->
+                            <!-- Draft + Technical: booklet, site visit, inquiries, -->
+                            <!-- evaluation, participation decision, scope          -->
+                            <!-- ═══════════════════════════════════════════════════ -->
                             <page string="2. Qualification &amp; Decision" name="qualification"
                                 invisible="state in ['won', 'lost', 'cancelled']">
+                                <!-- Step 1: Buy the tender booklet -->
                                 <group>
-                                    <group string="Tender Information">
-                                        <field name="tender_completion_time"/>
-                                        <field name="tender_submission_method"/>
-                                        <field name="tender_booklet_price"/>
-                                    </group>
                                     <group string="Booklet Purchase">
-                                        <field name="booklet_purchased"/>
-                                        <field name="booklet_purchase_receipt" invisible="not booklet_purchased"/>
-                                        <field name="booklet_purchase_request_date" invisible="not booklet_purchased"/>
-                                        <field name="booklet_purchase_date" invisible="not booklet_purchased"/>
+                                        <field name="document_purchase_date" string="Purchase Date"/>
+                                        <field name="booklet_purchased" widget="boolean_toggle"/>
+                                        <field name="booklet_purchase_receipt" invisible="not booklet_purchased"
+                                            string="Receipt"/>
+                                        <field name="booklet_purchase_request_date" invisible="not booklet_purchased"
+                                            string="Request Date"/>
+                                        <field name="booklet_purchase_date" invisible="not booklet_purchased"
+                                            string="Confirmed Date"/>
+                                    </group>
+                                    <group string="Inquiries">
+                                        <field name="last_inquiry_date" string="Last Inquiry Date"/>
+                                        <field name="required_inquiries" string="Required Inquiries"/>
                                     </group>
                                 </group>
+                                <!-- Step 2: Site visit if required -->
                                 <group>
                                     <group string="Site Visit">
-                                        <field name="site_visit_required"/>
+                                        <field name="site_visit_required" widget="boolean_toggle"/>
                                         <field name="site_visit_date" widget="datetime" invisible="not site_visit_required"/>
                                         <field name="documents_required_for_site" filename="documents_required_filename" invisible="not site_visit_required"/>
                                         <field name="documents_required_filename" invisible="1"/>
                                     </group>
-                                    <group string="Inquiries">
-                                        <field name="last_inquiry_date"/>
-                                        <field name="required_inquiries"/>
+                                    <group string="Evaluation Criteria">
+                                        <field name="presales_employee" widget="many2one_avatar_user" string="Presales Engineer"/>
+                                        <field name="evaluation_criteria_file" filename="evaluation_criteria_filename" string="Criteria File"/>
+                                        <field name="evaluation_criteria_filename" invisible="1"/>
+                                        <field name="required_certifications_file" filename="required_certifications_filename" string="Required Certifications"/>
+                                        <field name="required_certifications_filename" invisible="1"/>
+                                        <field name="estimated_project_value" string="Estimated Project Value"/>
                                     </group>
                                 </group>
+                                <!-- Step 3: Go/No-Go decision -->
+                                <separator string="Participation Decision"/>
                                 <group>
-                                    <group string="Evaluation">
-                                        <field name="presales_employee" widget="many2one_avatar_user"/>
-                                        <field name="evaluation_criteria_file" filename="evaluation_criteria_filename"/>
-                                        <field name="evaluation_criteria_filename" invisible="1"/>
-                                        <field name="required_certifications_file" filename="required_certifications_filename"/>
-                                        <field name="required_certifications_filename" invisible="1"/>
-                                        <field name="estimated_project_value"/>
+                                    <group>
+                                        <field name="winning_probability" string="Win Probability (%)"/>
+                                        <field name="client_relationship" string="Client Relationship"/>
+                                        <field name="participation_decision" widget="boolean_toggle" string="Participate?"/>
+                                        <field name="non_participation_reason" invisible="participation_decision" string="Reason for Not Participating"/>
                                     </group>
-                                    <group string="Participation Decision">
-                                        <field name="winning_probability"/>
-                                        <field name="client_relationship"/>
-                                        <field name="participation_decision"/>
-                                        <field name="non_participation_reason" invisible="participation_decision"/>
-                                        <field name="challenges"/>
+                                    <group>
+                                        <field name="challenges" string="Challenges &amp; Risks"/>
                                     </group>
                                 </group>
                                 <separator string="Project Scope of Work"/>
-                                <field name="project_scope_of_work" placeholder="Detailed project scope..."/>
+                                <field name="project_scope_of_work" placeholder="Detailed project scope of work..."/>
                             </page>
 
-                            <!-- Phase 3: Team & Suppliers Setup (Technical) -->
+                            <!-- ═══════════════════════════════════════════════════ -->
+                            <!-- Tab 3: Team & Suppliers                            -->
+                            <!-- Technical study: assign team, identify suppliers    -->
+                            <!-- ═══════════════════════════════════════════════════ -->
                             <page string="3. Team &amp; Suppliers" name="team_suppliers"
                                 invisible="state in ['draft', 'won', 'lost', 'cancelled']">
                                 <group>
                                     <group string="Responsible Team">
-                                        <field name="tender_employee" widget="many2one_avatar_user"/>
-                                        <field name="sales_representative" widget="many2one_avatar_user"/>
+                                        <field name="tender_employee" widget="many2one_avatar_user" string="Tender Manager"/>
+                                        <field name="sales_representative" widget="many2one_avatar_user" string="Sales Representative"/>
                                     </group>
                                     <group string="Selected Suppliers">
                                         <field name="selected_suppliers_ids" widget="many2many_tags" options="{'no_create_edit': True}"/>
@@ -397,7 +404,10 @@
                                 </field>
                             </page>
 
-                            <!-- Phase 4: Bill of Quantities (Technical/Financial) -->
+                            <!-- ═══════════════════════════════════════════════════ -->
+                            <!-- Tab 4: Bill of Quantities                          -->
+                            <!-- Technical/Financial: pricing and vendor selection   -->
+                            <!-- ═══════════════════════════════════════════════════ -->
                             <page string="4. Bill of Quantities" name="boq"
                                 invisible="state in ['draft', 'won', 'lost', 'cancelled']">
                                 <field name="boq_line_ids">
@@ -415,7 +425,10 @@
                                 </field>
                             </page>
 
-                            <!-- Phase 5: Approvals & Documents (Quotation) -->
+                            <!-- ═══════════════════════════════════════════════════ -->
+                            <!-- Tab 5: Approvals & Documents                       -->
+                            <!-- Financial/Quotation: approvals before submission    -->
+                            <!-- ═══════════════════════════════════════════════════ -->
                             <page string="5. Approvals &amp; Documents" name="approvals"
                                 invisible="state in ['draft', 'technical', 'won', 'lost', 'cancelled']">
                                 <div class="alert alert-info" role="alert" invisible="not require_direct_manager and not require_department_manager and not require_financial_manager and not require_ceo">
@@ -455,7 +468,10 @@
                                 </group>
                             </page>
 
-                            <!-- Phase 6: Offer Results & Evaluation (Submitted/Evaluation) -->
+                            <!-- ═══════════════════════════════════════════════════ -->
+                            <!-- Tab 6: Offer Results & Evaluation                  -->
+                            <!-- Submitted/Evaluation: track offer outcomes         -->
+                            <!-- ═══════════════════════════════════════════════════ -->
                             <page string="6. Offer Results &amp; Evaluation" name="offer_results"
                                 invisible="state in ['draft', 'technical', 'financial', 'quotation', 'won', 'lost', 'cancelled']">
                                 <group>
@@ -484,7 +500,10 @@
                                 </group>
                             </page>
 
-                            <!-- Phase 7: Final Outcome (Won/Lost/Cancelled) -->
+                            <!-- ═══════════════════════════════════════════════════ -->
+                            <!-- Tab 7: Final Outcome                               -->
+                            <!-- Won/Lost/Cancelled: award, loss reason, appeal     -->
+                            <!-- ═══════════════════════════════════════════════════ -->
                             <page string="7. Final Outcome" name="outcome"
                                 invisible="state not in ['won', 'lost', 'cancelled']">
                                 <group string="Award Details" invisible="state != 'won'">
@@ -508,7 +527,7 @@
                                     </group>
                                 </group>
 
-                                <group string="Appeal Workflow (حق الإعتراض)" invisible="state != 'lost'">
+                                <group string="Appeal Workflow" invisible="state != 'lost'">
                                     <group>
                                         <field name="appeal_submitted" widget="boolean_toggle"/>
                                         <field name="appeal_submission_date" invisible="not appeal_submitted"/>
@@ -527,19 +546,16 @@
                                     </group>
                                 </group>
                                 <div class="alert alert-info" role="alert" invisible="state != 'lost' or appeal_submitted">
-                                    <strong>💡 حق الإعتراض متاح</strong>
                                     <p class="mb-0">
-                                        لديك الحق في تقديم إعتراض على نتيجة المنافسة. 
-                                        قد يتم قبول الإعتراض إذا كانت الأسباب وجيهة.
-                                    </p>
-                                    <p class="mb-0 mt-2">
-                                        <strong>You have the right to appeal.</strong>
+                                        You have the right to appeal the tender result.
                                         Click the checkbox above to start the appeal process.
                                     </p>
                                 </div>
                             </page>
 
-                            <!-- Phase 8: Internal Notes -->
+                            <!-- ═══════════════════════════════════════════════════ -->
+                            <!-- Tab 8: Internal Notes - Always visible             -->
+                            <!-- ═══════════════════════════════════════════════════ -->
                             <page string="8. Internal Notes" name="notes">
                                 <field name="notes" placeholder="Internal notes, communications, and observations..."/>
                             </page>
