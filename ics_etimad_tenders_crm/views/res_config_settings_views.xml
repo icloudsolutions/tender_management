@@ -13,8 +13,8 @@
                         <setting id="etimad_auto_sync_setting" help="Automatically fetch new tenders from Etimad platform">
                             <field name="etimad_auto_sync"/>
                             <div class="content-group" invisible="not etimad_auto_sync">
-                                <div class="alert alert-info mt16" role="alert">
-                                    <i class="fa fa-info-circle"/> These settings control how often and how many tenders are fetched from Etimad portal.
+                                <div class="alert alert-info mt16" role="status">
+                                    <i class="fa fa-info-circle" title="Information"/> These settings control how often and how many tenders are fetched from Etimad portal.
                                     Changes will be applied to the scheduled sync job immediately after saving.
                                 </div>
                                 <div class="row mt16">
@@ -43,8 +43,8 @@
                                 </div>
                             </div>
                             <div class="content-group" invisible="etimad_auto_sync">
-                                <div class="alert alert-warning mt16" role="alert">
-                                    <i class="fa fa-exclamation-triangle"/> Auto sync is disabled. Tenders must be fetched manually using the "Manual Sync Now" button below.
+                                <div class="alert alert-warning mt16" role="status">
+                                    <i class="fa fa-exclamation-triangle" title="Warning"/> Auto sync is disabled. Tenders must be fetched manually using the "Manual Sync Now" button below.
                                 </div>
                             </div>
                         </setting>
@@ -67,7 +67,7 @@
                     
                     <!-- Smart Matching Settings -->
                     <block title="Smart Matching Configuration" name="etimad_matching_settings">
-                        <setting id="etimad_matching_enable" help="Calculate matching scores based on your company profile">
+                        <setting id="etimad_matching_enable" help="Calculate matching scores based on your company profile. If you see 'invalid fields: Document, Spreadsheet, Folder', use: Etimad Tenders → Configuration → Smart Matching (Preferred Activities) instead.">
                             <field name="etimad_enable_matching"/>
                             <div class="content-group" invisible="not etimad_enable_matching">
                                 <div class="row mt16">

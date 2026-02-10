@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_etimad_config_wizard_form" model="ir.ui.view">
+        <field name="name">ics.etimad.config.wizard.form</field>
+        <field name="model">ics.etimad.config.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Smart Matching Configuration">
+                <group>
+                    <group string="Smart Matching">
+                        <field name="etimad_enable_matching"/>
+                        <field name="etimad_preferred_activities_ids"
+                               widget="many2many_tags"
+                               options="{'color_field': 'color', 'no_create': True}"
+                               invisible="not etimad_enable_matching"/>
+                        <field name="etimad_preferred_categories" placeholder="supply, maintenance, services" invisible="not etimad_enable_matching"/>
+                        <field name="etimad_preferred_agencies" placeholder="Ministry of Health, Saudi Aramco" invisible="not etimad_enable_matching"/>
+                        <field name="etimad_min_preparation_days" invisible="not etimad_enable_matching"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_save" string="Save" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_etimad_config_wizard" model="ir.actions.act_window">
+        <field name="name">Smart Matching (Preferred Activities)</field>
+        <field name="res_model">ics.etimad.config.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_etimad_config_smart_matching"
+              name="Smart Matching (Preferred Activities)"
+              parent="menu_etimad_config"
+              action="action_etimad_config_wizard"
+              sequence="5"
+              groups="base.group_system"/>
+</odoo>
