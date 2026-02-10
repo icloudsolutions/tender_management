@@ -27,21 +27,21 @@
                 </header>
                 
                 <field name="is_favorite" widget="boolean_favorite" nolabel="1"/>
-                <field name="reference_number" string="المرجع | Reference"/>
-                <field name="name" string="اسم المنافسة | Tender Name"/>
-                <field name="agency_name" string="الجهة | Agency"/>
-                <field name="etimad_tender_type" string="النوع | Type"/>
-                <field name="activity_name" string="النشاط | Activity" optional="hide"/>
-                <field name="estimated_amount" widget="monetary" options="{'currency_field': 'currency_id'}" optional="show" string="القيمة التقديرية | Est. Value"/>
+                <field name="reference_number" string="Reference"/>
+                <field name="name" string="Tender Name"/>
+                <field name="agency_name" string="Agency"/>
+                <field name="etimad_tender_type" string="Type"/>
+                <field name="activity_name" string="Activity" optional="hide"/>
+                <field name="estimated_amount" widget="monetary" options="{'currency_field': 'currency_id'}" optional="show" string="Est. Value"/>
                 <field name="estimated_value_category" widget="badge" optional="show" string="Value Category"
                        decoration-info="estimated_value_category == 'small'"
                        decoration-primary="estimated_value_category == 'medium'"
                        decoration-success="estimated_value_category == 'large'"
                        decoration-danger="estimated_value_category == 'mega'"/>
                 <field name="matching_score" widget="progressbar" optional="show" string="Match %" />
-                <field name="offers_deadline" string="آخر موعد للتقديم | Deadline"/>
+                <field name="offers_deadline" string="Deadline"/>
                 <field name="remaining_days" 
-                       string="الوقت المتبقي | Days Left"
+                       string="Days Left"
                        decoration-danger="is_urgent" 
                        decoration-warning="remaining_days &lt; 7 and remaining_days &gt; 3"/>
                 <field name="document_cost_amount" widget="monetary" options="{'currency_field': 'currency_id'}" optional="hide" string="Document Cost"/>

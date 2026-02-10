@@ -25,6 +25,10 @@ class EtimadTender(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _rec_name = "name"
     _order = "published_at desc"
+    _sql_constraints = [
+        ('reference_number_unique', 'UNIQUE(reference_number)',
+         'Reference number must be unique! A tender with this reference already exists.'),
+    ]
     
     # Basic Information
     name = fields.Char("Tender Name", required=True, tracking=True)
