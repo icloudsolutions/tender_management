@@ -978,12 +978,25 @@ class Tender(models.Model):
             'context': {'default_tender_id': self.id},
         }
 
-    def action_create_purchase_agreement(self):
+    def action_request_supplier_quotations(self):
+        """Request quotation prices from potential suppliers during financial study.
+        
+        Creates a Purchase Agreement (Call for Tenders) with BoQ items,
+        then the user can create quotation requests for each potential supplier
+        from the Purchase Agreement form.
+        
+        Workflow:
+        1. Click this button → creates Purchase Agreement with BoQ products
+        2. Open the Purchase Agreement → click "New Quotation" for each supplier
+        3. Enter/receive supplier prices in each quotation
+        4. Click "Sync Supplier Prices" to import prices as vendor offers
+        5. Click "Compare Suppliers" to select the best offers
+        """
         self.ensure_one()
         if not self.boq_line_ids:
-            raise UserError(_('Please add BoQ lines before creating a purchase agreement.'))
+            raise UserError(_('Please add BoQ lines before requesting supplier quotations.'))
 
-        # Use "Purchase Tender" type (not Blanket Order) to avoid open order warnings
+        # Use "Purchase Tender" type (Call for Tenders) for collecting supplier quotes
         type_id = False
         if 'purchase.requisition.type' in self.env:
             # Prefer Purchase Tender type
@@ -1009,7 +1022,7 @@ class Tender(models.Model):
         if 'user_id' in available_fields:
             vals['user_id'] = self.user_id.id
             
-        # Add ordering_date if field exists (might not exist in some versions)
+        # Add ordering_date if field exists
         if 'ordering_date' in available_fields:
             vals['ordering_date'] = fields.Date.today()
             
@@ -1043,14 +1056,38 @@ class Tender(models.Model):
                 
             line_model.create(line_vals)
 
+        # Auto-create draft quotation requests for potential suppliers
+        potential_suppliers = self.potential_suppliers_ids.filtered(
+            lambda s: s.status in ('potential', 'invited') and s.partner_id
+        )
+        if potential_suppliers:
+            for supplier in potential_suppliers:
+                try:
+                    # Create a draft RFQ for each potential supplier
+                    po_vals = {
+                        'partner_id': supplier.partner_id.id,
+                        'requisition_id': requisition.id,
+                        'origin': self.name,
+                    }
+                    self.env['purchase.order'].create(po_vals)
+                    # Mark supplier as invited
+                    supplier.write({'status': 'invited'})
+                except Exception:
+                    # Skip if there's an issue creating PO for this supplier
+                    continue
+
         return {
-            'name': _('Purchase Agreement'),
+            'name': _('Supplier Quotation Request'),
             'type': 'ir.actions.act_window',
             'res_model': 'purchase.requisition',
             'view_mode': 'form',
             'res_id': requisition.id,
             'target': 'current',
         }
+
+    def action_create_purchase_agreement(self):
+        """Backward compatibility alias."""
+        return self.action_request_supplier_quotations()
 
     def action_view_purchase_agreements(self):
         self.ensure_one()
@@ -1085,21 +1122,19 @@ class Tender(models.Model):
             'context': {'default_tender_id': self.id, 'default_partner_id': self.partner_id.id},
         }
 
-    def action_sync_vendor_offers(self):
-        """Import vendor offers from Purchase Orders linked through Purchase Agreements.
+    def action_sync_supplier_prices(self):
+        """Import supplier prices from quotation requests into vendor offers.
         
-        Workflow:
-        1. Create Purchase Agreement from tender (populates products from BoQ)
-        2. From the Purchase Agreement, create RFQs for each vendor
-        3. Enter/receive vendor prices in each RFQ (Purchase Order)
-        4. Click this button to sync those prices back as vendor offers
+        During financial study, the user sends quotation requests to potential
+        suppliers via Purchase Agreement. Suppliers respond with their prices.
+        This action imports those prices as vendor offers on BoQ lines for comparison.
         """
         self.ensure_one()
         
         if not self.requisition_ids:
             raise UserError(_(
-                'No Purchase Agreements found!\n\n'
-                'Please first click "Create RFQ (Purchase Agreement)" to create one.'
+                'No quotation requests found!\n\n'
+                'Please first click "Request Supplier Quotations" to send requests to suppliers.'
             ))
         
         if not self.boq_line_ids:
@@ -1110,29 +1145,29 @@ class Tender(models.Model):
         updated_count = 0
         skipped_count = 0
         
-        # Get all Purchase Orders linked to this tender's Purchase Agreements
-        purchase_orders = self.env['purchase.order'].search([
+        # Get all supplier quotation requests (draft POs from Purchase Agreements)
+        supplier_quotations = self.env['purchase.order'].search([
             ('requisition_id', 'in', self.requisition_ids.ids),
             ('state', '!=', 'cancel'),
         ])
         
-        if not purchase_orders:
+        if not supplier_quotations:
             raise UserError(_(
-                'No Purchase Orders (RFQs) found!\n\n'
-                'To get vendor offers:\n'
-                '1. Open the Purchase Agreement\n'
-                '2. Click "New Quotation" to create an RFQ for each vendor\n'
-                '3. Enter the vendor\'s quoted prices in each RFQ\n'
-                '4. Then come back here and click "Sync Vendor Offers"'
+                'No supplier quotation requests found!\n\n'
+                'To collect supplier prices:\n'
+                '1. Open the Purchase Agreement (Supplier Quotation Request)\n'
+                '2. Click "New Quotation" to create a request for each supplier\n'
+                '3. Enter each supplier\'s quoted prices\n'
+                '4. Then come back here and click "Sync Supplier Prices"'
             ))
         
-        for po in purchase_orders:
-            vendor = po.partner_id
-            if not vendor:
+        for sq in supplier_quotations:
+            supplier = sq.partner_id
+            if not supplier:
                 continue
                 
-            for po_line in po.order_line:
-                product = po_line.product_id
+            for sq_line in sq.order_line:
+                product = sq_line.product_id
                 if not product:
                     continue
                 
@@ -1145,13 +1180,13 @@ class Tender(models.Model):
                     continue
                 boq_line = boq_line[0]
                 
-                # Check if offer already exists for this vendor + BoQ line
+                # Check if offer already exists for this supplier + BoQ line
                 existing_offer = VendorOffer.search([
                     ('boq_line_id', '=', boq_line.id),
-                    ('vendor_id', '=', vendor.id),
+                    ('vendor_id', '=', supplier.id),
                 ], limit=1)
                 
-                unit_price = po_line.price_unit
+                unit_price = sq_line.price_unit
                 if unit_price <= 0:
                     skipped_count += 1
                     continue
@@ -1161,45 +1196,51 @@ class Tender(models.Model):
                     if existing_offer.unit_price != unit_price:
                         existing_offer.write({
                             'unit_price': unit_price,
-                            'purchase_order_id': po.id,
+                            'purchase_order_id': sq.id,
                         })
                         updated_count += 1
                 else:
-                    # Create new vendor offer
+                    # Create new vendor offer from supplier quotation
                     VendorOffer.create({
                         'boq_line_id': boq_line.id,
-                        'vendor_id': vendor.id,
+                        'vendor_id': supplier.id,
                         'unit_price': unit_price,
-                        'purchase_order_id': po.id,
+                        'purchase_order_id': sq.id,
                     })
                     created_count += 1
         
-        message = _('Vendor Offers Sync Complete!\n\n'
-                    '• Created: %d new offers\n'
-                    '• Updated: %d existing offers\n'
-                    '• Skipped: %d lines (no matching BoQ or zero price)') % (
-                        created_count, updated_count, skipped_count)
+        # Update potential supplier statuses
+        for sq in supplier_quotations:
+            supplier_rec = self.potential_suppliers_ids.filtered(
+                lambda s: s.partner_id.id == sq.partner_id.id
+            )
+            if supplier_rec and supplier_rec.status == 'invited':
+                supplier_rec.write({'status': 'responded'})
         
         if created_count == 0 and updated_count == 0:
             raise UserError(_(
-                'No offers to sync!\n\n'
+                'No supplier prices to sync!\n\n'
                 'Make sure:\n'
-                '• Purchase Orders have been created from the Purchase Agreement\n'
-                '• Vendor prices have been entered in the PO lines\n'
-                '• PO products match the BoQ products'
+                '• Quotation requests have been created for suppliers\n'
+                '• Supplier prices have been entered in the quotation lines\n'
+                '• Quotation products match the BoQ products'
             ))
         
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
-                'title': _('Vendor Offers Synced'),
+                'title': _('Supplier Prices Synced'),
                 'message': _('%d created, %d updated') % (created_count, updated_count),
                 'type': 'success',
                 'sticky': False,
                 'next': {'type': 'ir.actions.act_window_close'},
             }
         }
+
+    def action_sync_vendor_offers(self):
+        """Backward compatibility alias."""
+        return self.action_sync_supplier_prices()
 
     def action_compare_vendors(self):
         self.ensure_one()

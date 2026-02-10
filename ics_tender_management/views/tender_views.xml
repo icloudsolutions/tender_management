@@ -119,20 +119,21 @@
                         <button name="action_start_financial_study" string="Start Financial Study"
                             type="object" class="oe_highlight"
                             invisible="state != 'technical'"/>
-                        <button name="action_create_purchase_agreement" string="Create RFQ (Purchase Agreement)"
+                        <button name="action_request_supplier_quotations" string="Request Supplier Quotations"
                             type="object" class="oe_highlight"
-                            invisible="state not in ['financial', 'quotation']"/>
-                        <button name="action_sync_vendor_offers" string="Sync Vendor Offers"
+                            invisible="state not in ['financial', 'quotation']"
+                            title="Send quotation requests to potential suppliers to collect their prices"/>
+                        <button name="action_sync_supplier_prices" string="Sync Supplier Prices"
                             type="object" class="btn-secondary"
                             invisible="state not in ['financial', 'quotation']"
-                            title="Import vendor prices from Purchase Orders into vendor offers"/>
-                        <button name="action_compare_vendors" string="Compare Vendors"
+                            title="Import supplier prices from quotation requests into vendor offers for comparison"/>
+                        <button name="action_compare_vendors" string="Compare Suppliers"
                             type="object"
                             invisible="state not in ['financial', 'quotation']"/>
-                        <button name="action_create_purchase_orders" string="Create Purchase Order(s)"
+                        <button name="action_create_purchase_orders" string="Create Purchase Orders"
                             type="object" class="btn-primary"
                             invisible="state != 'won'"
-                            help="Single Vendor: Creates 1 PO. Product-wise: Creates multiple POs per vendor"/>
+                            help="Create actual purchase orders to selected vendors for project execution"/>
                         <button name="action_prepare_quotation" string="Prepare Quotation"
                             type="object" class="oe_highlight"
                             invisible="state != 'financial'"/>
@@ -180,7 +181,7 @@
                             </button>
                             <button name="action_view_purchase_agreements" type="object"
                                 class="oe_stat_button" icon="fa-shopping-cart">
-                                <field name="requisition_count" widget="statinfo" string="RFQs"/>
+                                <field name="requisition_count" widget="statinfo" string="Supplier Quotes"/>
                             </button>
                             <button name="action_view_quotations" type="object"
                                 class="oe_stat_button" icon="fa-file-text-o">
