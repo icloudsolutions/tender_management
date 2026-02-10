@@ -12,82 +12,66 @@ class ProjectProject(models.Model):
 
     sale_order_id = fields.Many2one('sale.order', string='Sales Order')
 
-    @api.model_create_multi
-    def create(self, vals_list):
-        """Override to fix missing documents_project folder before project creation.
+    def _create_missing_folders(self):
+        """Override to handle missing documents_project folder gracefully.
         
-        The documents_project enterprise module expects the XML record
-        'documents_project.document_project_folder' to exist. If it was deleted,
-        project creation fails with ValueError. We fix this in two ways:
-        1. Try to recreate the folder and clear the ORM cache
-        2. If that fails, disable use_documents to prevent the crash
+        The documents_project enterprise module's _create_missing_folders() calls
+        self.env.ref('documents_project.document_project_folder') which crashes
+        with ValueError if that XML record was deleted from the database.
+        
+        This override catches that specific error, recreates the folder,
+        and retries. If recreation fails, it skips folder creation silently.
         """
-        if self._is_document_folder_missing():
-            fixed = self._fix_document_project_folder()
-            if not fixed:
-                # Fallback: disable use_documents to prevent crash
-                _logger.warning(
-                    "Could not fix missing documents_project folder. "
-                    "Disabling use_documents for new projects."
-                )
-                if isinstance(vals_list, dict):
-                    vals_list['use_documents'] = False
-                else:
-                    for vals in vals_list:
-                        vals['use_documents'] = False
-        return super().create(vals_list)
-
-    @api.model
-    def _is_document_folder_missing(self):
-        """Check if documents_project folder XML ID is missing."""
-        if 'documents.folder' not in self.env:
-            return False
-        imd = self.env['ir.model.data'].sudo().search([
-            ('module', '=', 'documents_project'),
-            ('name', '=', 'document_project_folder'),
-        ], limit=1)
-        if not imd:
-            return True
-        # Also check if the actual folder record still exists
-        if not self.env['documents.folder'].sudo().browse(imd.res_id).exists():
-            # XML ID exists but points to deleted folder - remove stale reference
-            imd.unlink()
-            return True
-        return False
-
-    @api.model
-    def _fix_document_project_folder(self):
-        """Recreate the missing documents_project folder and clear ORM cache."""
         try:
-            _logger.warning(
-                "Missing 'documents_project.document_project_folder'. "
-                "Attempting to recreate..."
-            )
-            folder = self.env['documents.folder'].sudo().create({
-                'name': 'Projects',
-            })
-            self.env['ir.model.data'].sudo().create({
-                'name': 'document_project_folder',
-                'module': 'documents_project',
-                'model': 'documents.folder',
-                'res_id': folder.id,
-                'noupdate': True,
-            })
-            # Flush writes to database so env.ref() can find them
-            self.env.flush_all()
-            # Clear ORM cache so env.ref() doesn't return stale "not found"
-            self.env.registry.clear_cache()
+            return super()._create_missing_folders()
+        except ValueError as e:
+            if 'documents_project.document_project_folder' not in str(e):
+                raise  # Re-raise if it's a different ValueError
             
-            _logger.info(
-                "Successfully recreated 'documents_project.document_project_folder' "
-                "(folder ID: %s)", folder.id
+            _logger.warning(
+                "Missing 'documents_project.document_project_folder' record. "
+                "Attempting to recreate and retry..."
             )
-            return True
-        except Exception as e:
-            _logger.error(
-                "Failed to recreate documents_project folder: %s", e
-            )
-            return False
+            
+            # Try to recreate the folder
+            try:
+                if 'documents.folder' in self.env:
+                    folder = self.env['documents.folder'].sudo().create({
+                        'name': 'Projects',
+                    })
+                    # Remove any stale ir.model.data entry first
+                    self.env['ir.model.data'].sudo().search([
+                        ('module', '=', 'documents_project'),
+                        ('name', '=', 'document_project_folder'),
+                    ]).unlink()
+                    # Create fresh XML ID
+                    self.env['ir.model.data'].sudo().create({
+                        'name': 'document_project_folder',
+                        'module': 'documents_project',
+                        'model': 'documents.folder',
+                        'res_id': folder.id,
+                        'noupdate': True,
+                    })
+                    self.env.flush_all()
+                    self.env.registry.clear_cache()
+                    
+                    _logger.info(
+                        "Recreated 'documents_project.document_project_folder' "
+                        "(folder ID: %s). Retrying folder creation...", folder.id
+                    )
+                    # Retry the original method
+                    try:
+                        return super()._create_missing_folders()
+                    except Exception:
+                        _logger.warning(
+                            "Retry of _create_missing_folders still failed. "
+                            "Skipping document folder creation for projects."
+                        )
+            except Exception as create_err:
+                _logger.error(
+                    "Failed to recreate documents_project folder: %s. "
+                    "Skipping document folder creation.", create_err
+                )
 
     def action_view_tender(self):
         self.ensure_one()
