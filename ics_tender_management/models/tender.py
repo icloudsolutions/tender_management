@@ -996,23 +996,37 @@ class Tender(models.Model):
         if not self.boq_line_ids:
             raise UserError(_('Please add BoQ lines before requesting supplier quotations.'))
 
-        # Use "Purchase Tender" type (Call for Tenders) for collecting supplier quotes
-        type_id = False
-        if 'purchase.requisition.type' in self.env:
-            # Prefer Purchase Tender type
-            type_obj = self.env['purchase.requisition.type'].search([
-                ('name', 'ilike', 'tender')
-            ], limit=1)
-            if not type_obj:
-                # Fallback to any available type
-                type_obj = self.env['purchase.requisition.type'].search([], limit=1)
-            type_id = type_obj.id if type_obj else False
-
         # Build vals dict with only fields that exist in the model
         requisition_model = self.env['purchase.requisition']
         available_fields = requisition_model._fields.keys()
         
         vals = {}
+        
+        # IMPORTANT: Use "Purchase Tender" type (not "Blanket Order")
+        # Blanket Order restricts one open agreement per vendor and shows warnings.
+        # Purchase Tender allows multiple vendors and is designed for Call for Tenders.
+        if 'type_id' in available_fields and 'purchase.requisition.type' in self.env:
+            # Search by quantity_copy='copy' which identifies "Purchase Tender" type
+            type_obj = self.env['purchase.requisition.type'].search([
+                ('quantity_copy', '=', 'copy')
+            ], limit=1)
+            if not type_obj:
+                # Fallback: search by name
+                type_obj = self.env['purchase.requisition.type'].search([
+                    ('name', 'ilike', 'tender')
+                ], limit=1)
+            if not type_obj:
+                # Create "Purchase Tender" type if it doesn't exist
+                type_obj = self.env['purchase.requisition.type'].create({
+                    'name': 'Call for Tenders',
+                    'quantity_copy': 'copy',
+                    'exclusive': 'multiple',
+                })
+            vals['type_id'] = type_obj.id
+        
+        # Set exclusive='multiple' directly if field exists (allows multiple RFQs)
+        if 'exclusive' in available_fields:
+            vals['exclusive'] = 'multiple'
         
         # Add tender_id if field exists
         if 'tender_id' in available_fields:
@@ -1029,10 +1043,6 @@ class Tender(models.Model):
         # Add schedule_date if field exists
         if 'schedule_date' in available_fields and self.submission_deadline:
             vals['schedule_date'] = self.submission_deadline.date()
-        
-        # Add type_id if we found one
-        if type_id and 'type_id' in available_fields:
-            vals['type_id'] = type_id
 
         requisition = requisition_model.create(vals)
 
