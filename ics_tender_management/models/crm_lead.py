@@ -1,3 +1,4 @@
+from markupsafe import Markup
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
@@ -91,7 +92,7 @@ class CrmLead(models.Model):
         
         # Log in CRM
         self.message_post(
-            body=_('Tender created: <a href="/web#id=%s&model=ics.tender">%s</a>') % (tender.id, tender.name),
+            body=Markup(_('Tender created: <a href="/web#id=%s&model=ics.tender">%s</a>')) % (tender.id, tender.name),
             subject=_('Tender Created')
         )
         

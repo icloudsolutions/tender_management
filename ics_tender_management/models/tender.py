@@ -1,3 +1,4 @@
+from markupsafe import Markup
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError, ValidationError
 from datetime import datetime, timedelta
@@ -401,7 +402,7 @@ class Tender(models.Model):
             
             # Log the sync in CRM
             self.lead_id.message_post(
-                body=_('Stage synchronized from Tender: <a href="/web#id=%s&model=ics.tender">%s</a><br/>Tender State: %s') % (
+                body=Markup(_('Stage synchronized from Tender: <a href="/web#id=%s&model=ics.tender">%s</a><br/>Tender State: %s')) % (
                     self.id, self.name, dict(self._fields['state'].selection).get(self.state)
                 ),
                 subject=_('Tender Stage Update')

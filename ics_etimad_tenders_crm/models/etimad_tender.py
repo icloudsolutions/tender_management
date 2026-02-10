@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from markupsafe import Markup
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError, ValidationError
 import requests
@@ -589,7 +590,7 @@ class EtimadTender(models.Model):
                     # Post to chatter
                     existing.sudo().write(vals)
                     existing.message_post(
-                        body=f"<strong><i class=\"fa fa-refresh\"/> Etimad Tender Updated</strong><br/><br/>{'<br/>'.join(changes)}",
+                        body=Markup("<strong><i class='fa fa-refresh'/> Etimad Tender Updated</strong><br/><br/>%s") % Markup('<br/>').join(changes),
                         subject='Etimad Update Detected',
                         message_type='notification',
                         subtype_xmlid='mail.mt_note',
@@ -620,14 +621,14 @@ class EtimadTender(models.Model):
                         
                         # Post notification to chatter
                         new_tender.message_post(
-                            body="<i class='fa fa-download'/> Detailed information automatically fetched from Etimad portal",
+                            body=Markup("<i class='fa fa-download'/> Detailed information automatically fetched from Etimad portal"),
                             message_type='notification',
                             subtype_xmlid='mail.mt_note',
                         )
                     except Exception as e:
                         _logger.warning(f"Could not auto-fetch details for {vals['name'][:50]}: {e}")
                         new_tender.message_post(
-                            body=f"<i class='fa fa-exclamation-triangle'/> Could not auto-fetch details: {str(e)}",
+                            body=Markup("<i class='fa fa-exclamation-triangle'/> Could not auto-fetch details: %s") % str(e),
                             message_type='notification',
                             subtype_xmlid='mail.mt_note',
                         )
@@ -789,7 +790,7 @@ class EtimadTender(models.Model):
         
         # Log activity
         self.message_post(
-            body=_('Opportunity created: <a href="/web#id=%s&model=crm.lead">%s</a>') % (opportunity.id, opportunity.name),
+            body=Markup(_('Opportunity created: <a href="/web#id=%s&model=crm.lead">%s</a>')) % (opportunity.id, opportunity.name),
             subject=_('Opportunity Created')
         )
         
@@ -948,7 +949,7 @@ class EtimadTender(models.Model):
         self.ensure_one()
         self.is_participating = not self.is_participating
         if self.is_participating:
-            self.message_post(body=_('<i class="fa fa-check"/> Marked as participating in this tender'))
+            self.message_post(body=Markup(_('<i class="fa fa-check"/> Marked as participating in this tender')))
         else:
             self.message_post(body=_('Unmarked as participating'))
     

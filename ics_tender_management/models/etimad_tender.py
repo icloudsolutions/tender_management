@@ -1,6 +1,7 @@
 # Extension of ics.etimad.tender: add Tender link and "Create Tender" action.
 # This lives in ics_tender_management to avoid circular dependency.
 
+from markupsafe import Markup
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
@@ -44,7 +45,7 @@ class EtimadTender(models.Model):
         tender = self.env['ics.tender'].create(tender_vals)
         self.tender_id_ics = tender.id
         self.message_post(
-            body=_('Tender created: <a href="/web#id=%s&model=ics.tender">%s</a>') % (tender.id, tender.name),
+            body=Markup(_('Tender created: <a href="/web#id=%s&model=ics.tender">%s</a>')) % (tender.id, tender.name),
             subject=_('Tender Created'),
         )
         return {

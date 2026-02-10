@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from markupsafe import Markup
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
@@ -37,15 +38,15 @@ class DeclineTenderWizard(models.TransientModel):
         # Log the decision in chatter
         state_label = dict(self.tender_id._fields['state'].selection).get(
             self.tender_state, self.tender_state)
-        body = _(
+        body = Markup(
             '<strong>Tender Declined - Not Participating</strong><br/>'
             '<ul>'
             '<li><strong>Decision made at stage:</strong> %s</li>'
             '<li><strong>Reason:</strong> %s</li>'
         ) % (state_label, self.decline_reason_id.name)
         if self.non_participation_reason:
-            body += _('<li><strong>Notes:</strong> %s</li>') % self.non_participation_reason
-        body += '</ul>'
+            body += Markup('<li><strong>Notes:</strong> %s</li>') % self.non_participation_reason
+        body += Markup('</ul>')
 
         self.tender_id.message_post(
             body=body,
