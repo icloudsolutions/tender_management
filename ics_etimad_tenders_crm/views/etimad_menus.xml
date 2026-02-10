@@ -126,10 +126,6 @@
             sequence="100"
             groups="base.group_system"/>
 
-    <menuitem id="menu_etimad_settings"
-            name="Settings"
-            parent="menu_etimad_config"
-            sequence="10"
-            groups="base.group_system"/>
+    <!-- Settings now opens the dedicated Etimad config form (see etimad_config_wizard_views.xml) -->
 
 </odoo>
