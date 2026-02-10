@@ -66,39 +66,20 @@
                     </block>
                     
                     <!-- Smart Matching Settings -->
+                    <!-- Preferred Activities, Categories, Agencies are configured via the dedicated wizard
+                         to avoid 'Invalid fields: Document, Spreadsheet, Folder' error from Documents module.
+                         Use: Etimad Tenders → Configuration → Smart Matching (Preferred Activities) -->
                     <block title="Smart Matching Configuration" name="etimad_matching_settings">
-                        <setting id="etimad_matching_enable" help="Calculate matching scores based on your company profile. If you see 'invalid fields: Document, Spreadsheet, Folder', use: Etimad Tenders → Configuration → Smart Matching (Preferred Activities) instead.">
+                        <setting id="etimad_matching_enable" help="Calculate matching scores based on your company profile">
                             <field name="etimad_enable_matching"/>
-                            <div class="content-group" invisible="not etimad_enable_matching">
-                                <div class="row mt16">
-                                    <label for="etimad_preferred_activities_ids" class="col-lg-3 o_light_label" string="Preferred Activities"/>
-                                    <field name="etimad_preferred_activities_ids" 
-                                           widget="many2many_tags" 
-                                           options="{'color_field': 'color', 'no_create': True}"
-                                           class="o_field_many2many_tags"
-                                           placeholder="Select activities from Etimad classification..."/>
-                                </div>
-                                <div class="row mt16">
-                                    <label for="etimad_preferred_categories" class="col-lg-3 o_light_label" string="Primary Business"/>
-                                    <field name="etimad_preferred_categories" 
-                                           placeholder="supply, maintenance, services"
-                                           class="o_field_char"/>
-                                    <div class="text-muted ml-2">
-                                        Options: supply, services, construction, maintenance, consulting
-                                    </div>
-                                </div>
-                                <div class="row mt16">
-                                    <label for="etimad_preferred_agencies" class="col-lg-3 o_light_label" string="Preferred Agencies"/>
-                                    <field name="etimad_preferred_agencies" 
-                                           placeholder="Ministry of Health, General Authority for Transport, Saudi Aramco"
-                                           class="o_field_char"/>
-                                </div>
-                            </div>
                         </setting>
                         
-                        <setting id="etimad_preparation_time" help="Minimum days needed to prepare tender submissions">
-                            <label for="etimad_min_preparation_days" string="Min Preparation Days"/>
-                            <field name="etimad_min_preparation_days" class="oe_inline"/>
+                        <setting id="etimad_matching_config" string="Preferred Activities, Business Categories &amp; Agencies" help="Configure matching preferences via the dedicated form (avoids conflicts with other modules)">
+                            <button name="%(ics_etimad_tenders_crm.action_etimad_config_wizard)d"
+                                    string="Configure Smart Matching"
+                                    type="action"
+                                    class="btn-primary"
+                                    icon="fa-cogs"/>
                         </setting>
                         
                         <setting id="etimad_recalc_scores">
