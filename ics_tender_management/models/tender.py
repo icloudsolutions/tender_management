@@ -1085,6 +1085,122 @@ class Tender(models.Model):
             'context': {'default_tender_id': self.id, 'default_partner_id': self.partner_id.id},
         }
 
+    def action_sync_vendor_offers(self):
+        """Import vendor offers from Purchase Orders linked through Purchase Agreements.
+        
+        Workflow:
+        1. Create Purchase Agreement from tender (populates products from BoQ)
+        2. From the Purchase Agreement, create RFQs for each vendor
+        3. Enter/receive vendor prices in each RFQ (Purchase Order)
+        4. Click this button to sync those prices back as vendor offers
+        """
+        self.ensure_one()
+        
+        if not self.requisition_ids:
+            raise UserError(_(
+                'No Purchase Agreements found!\n\n'
+                'Please first click "Create RFQ (Purchase Agreement)" to create one.'
+            ))
+        
+        if not self.boq_line_ids:
+            raise UserError(_('No BoQ lines found in this tender.'))
+        
+        VendorOffer = self.env['ics.tender.vendor.offer']
+        created_count = 0
+        updated_count = 0
+        skipped_count = 0
+        
+        # Get all Purchase Orders linked to this tender's Purchase Agreements
+        purchase_orders = self.env['purchase.order'].search([
+            ('requisition_id', 'in', self.requisition_ids.ids),
+            ('state', '!=', 'cancel'),
+        ])
+        
+        if not purchase_orders:
+            raise UserError(_(
+                'No Purchase Orders (RFQs) found!\n\n'
+                'To get vendor offers:\n'
+                '1. Open the Purchase Agreement\n'
+                '2. Click "New Quotation" to create an RFQ for each vendor\n'
+                '3. Enter the vendor\'s quoted prices in each RFQ\n'
+                '4. Then come back here and click "Sync Vendor Offers"'
+            ))
+        
+        for po in purchase_orders:
+            vendor = po.partner_id
+            if not vendor:
+                continue
+                
+            for po_line in po.order_line:
+                product = po_line.product_id
+                if not product:
+                    continue
+                
+                # Find matching BoQ line by product
+                boq_line = self.boq_line_ids.filtered(
+                    lambda l: l.product_id.id == product.id
+                )
+                if not boq_line:
+                    skipped_count += 1
+                    continue
+                boq_line = boq_line[0]
+                
+                # Check if offer already exists for this vendor + BoQ line
+                existing_offer = VendorOffer.search([
+                    ('boq_line_id', '=', boq_line.id),
+                    ('vendor_id', '=', vendor.id),
+                ], limit=1)
+                
+                unit_price = po_line.price_unit
+                if unit_price <= 0:
+                    skipped_count += 1
+                    continue
+                
+                if existing_offer:
+                    # Update existing offer if price changed
+                    if existing_offer.unit_price != unit_price:
+                        existing_offer.write({
+                            'unit_price': unit_price,
+                            'purchase_order_id': po.id,
+                        })
+                        updated_count += 1
+                else:
+                    # Create new vendor offer
+                    VendorOffer.create({
+                        'boq_line_id': boq_line.id,
+                        'vendor_id': vendor.id,
+                        'unit_price': unit_price,
+                        'purchase_order_id': po.id,
+                    })
+                    created_count += 1
+        
+        message = _('Vendor Offers Sync Complete!\n\n'
+                    '• Created: %d new offers\n'
+                    '• Updated: %d existing offers\n'
+                    '• Skipped: %d lines (no matching BoQ or zero price)') % (
+                        created_count, updated_count, skipped_count)
+        
+        if created_count == 0 and updated_count == 0:
+            raise UserError(_(
+                'No offers to sync!\n\n'
+                'Make sure:\n'
+                '• Purchase Orders have been created from the Purchase Agreement\n'
+                '• Vendor prices have been entered in the PO lines\n'
+                '• PO products match the BoQ products'
+            ))
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Vendor Offers Synced'),
+                'message': _('%d created, %d updated') % (created_count, updated_count),
+                'type': 'success',
+                'sticky': False,
+                'next': {'type': 'ir.actions.act_window_close'},
+            }
+        }
+
     def action_compare_vendors(self):
         self.ensure_one()
         return {

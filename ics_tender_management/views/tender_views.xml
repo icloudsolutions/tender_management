@@ -122,6 +122,10 @@
                         <button name="action_create_purchase_agreement" string="Create RFQ (Purchase Agreement)"
                             type="object" class="oe_highlight"
                             invisible="state not in ['financial', 'quotation']"/>
+                        <button name="action_sync_vendor_offers" string="Sync Vendor Offers"
+                            type="object" class="btn-secondary"
+                            invisible="state not in ['financial', 'quotation']"
+                            title="Import vendor prices from Purchase Orders into vendor offers"/>
                         <button name="action_compare_vendors" string="Compare Vendors"
                             type="object"
                             invisible="state not in ['financial', 'quotation']"/>
