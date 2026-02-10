@@ -18,43 +18,76 @@ class ProjectProject(models.Model):
         
         The documents_project enterprise module expects the XML record
         'documents_project.document_project_folder' to exist. If it was deleted,
-        project creation fails with ValueError. This recreates it if missing.
+        project creation fails with ValueError. We fix this in two ways:
+        1. Try to recreate the folder and clear the ORM cache
+        2. If that fails, disable use_documents to prevent the crash
         """
-        self._ensure_document_project_folder()
+        if self._is_document_folder_missing():
+            fixed = self._fix_document_project_folder()
+            if not fixed:
+                # Fallback: disable use_documents to prevent crash
+                _logger.warning(
+                    "Could not fix missing documents_project folder. "
+                    "Disabling use_documents for new projects."
+                )
+                if isinstance(vals_list, dict):
+                    vals_list['use_documents'] = False
+                else:
+                    for vals in vals_list:
+                        vals['use_documents'] = False
         return super().create(vals_list)
 
     @api.model
-    def _ensure_document_project_folder(self):
-        """Recreate the documents_project folder if it was deleted."""
+    def _is_document_folder_missing(self):
+        """Check if documents_project folder XML ID is missing."""
         if 'documents.folder' not in self.env:
-            return  # documents module not installed
+            return False
+        imd = self.env['ir.model.data'].sudo().search([
+            ('module', '=', 'documents_project'),
+            ('name', '=', 'document_project_folder'),
+        ], limit=1)
+        if not imd:
+            return True
+        # Also check if the actual folder record still exists
+        if not self.env['documents.folder'].sudo().browse(imd.res_id).exists():
+            # XML ID exists but points to deleted folder - remove stale reference
+            imd.unlink()
+            return True
+        return False
+
+    @api.model
+    def _fix_document_project_folder(self):
+        """Recreate the missing documents_project folder and clear ORM cache."""
         try:
-            self.env.ref('documents_project.document_project_folder')
-        except ValueError:
             _logger.warning(
-                "Missing XML record 'documents_project.document_project_folder'. "
-                "Recreating the folder to fix project creation."
+                "Missing 'documents_project.document_project_folder'. "
+                "Attempting to recreate..."
             )
-            try:
-                folder = self.env['documents.folder'].sudo().create({
-                    'name': 'Projects',
-                })
-                self.env['ir.model.data'].sudo().create({
-                    'name': 'document_project_folder',
-                    'module': 'documents_project',
-                    'model': 'documents.folder',
-                    'res_id': folder.id,
-                    'noupdate': True,
-                })
-                _logger.info(
-                    "Successfully recreated 'documents_project.document_project_folder' "
-                    "(folder ID: %s)", folder.id
-                )
-            except Exception as e:
-                _logger.error(
-                    "Failed to recreate documents_project folder: %s. "
-                    "You may need to reinstall the documents_project module.", e
-                )
+            folder = self.env['documents.folder'].sudo().create({
+                'name': 'Projects',
+            })
+            self.env['ir.model.data'].sudo().create({
+                'name': 'document_project_folder',
+                'module': 'documents_project',
+                'model': 'documents.folder',
+                'res_id': folder.id,
+                'noupdate': True,
+            })
+            # Flush writes to database so env.ref() can find them
+            self.env.flush_all()
+            # Clear ORM cache so env.ref() doesn't return stale "not found"
+            self.env.registry.clear_cache()
+            
+            _logger.info(
+                "Successfully recreated 'documents_project.document_project_folder' "
+                "(folder ID: %s)", folder.id
+            )
+            return True
+        except Exception as e:
+            _logger.error(
+                "Failed to recreate documents_project folder: %s", e
+            )
+            return False
 
     def action_view_tender(self):
         self.ensure_one()
