@@ -241,9 +241,9 @@ class EtimadTender(models.Model):
             preferred_categories_str = params.get_param('ics_etimad_tenders_crm.etimad_preferred_categories', '')
             min_prep_days = int(params.get_param('ics_etimad_tenders_crm.etimad_min_preparation_days', '7') or 7)
             
-            # Get preferred activities from Many2many field (new approach)
-            config_settings = self.env['res.config.settings'].sudo().search([], limit=1)
-            preferred_activities_records = config_settings.etimad_preferred_activities_ids if config_settings else self.env['ics.etimad.activity']
+            # Get preferred activities from res.company (persisted Many2many)
+            company = self.env.company
+            preferred_activities_records = company.sudo().etimad_preferred_activities_ids
             
             # Fallback to legacy comma-separated field if no activities selected
             preferred_activities_legacy = params.get_param('ics_etimad_tenders_crm.etimad_preferred_activities', '')

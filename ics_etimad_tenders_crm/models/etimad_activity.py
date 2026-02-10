@@ -1,4 +1,4 @@
-from odoo import models, fields
+from odoo import models, fields, api
 
 
 class EtimadActivity(models.Model):
@@ -43,13 +43,11 @@ class EtimadActivity(models.Model):
         ('activity_id_unique', 'UNIQUE(activity_id)', 'Activity ID must be unique!')
     ]
     
-    def name_get(self):
-        """Display both Arabic and English names if available"""
-        result = []
+    @api.depends('name', 'name_en')
+    def _compute_display_name(self):
+        """Display both Arabic and English names if available (Odoo 18 compatible)"""
         for record in self:
             if record.name_en:
-                name = f"{record.name} - {record.name_en}"
+                record.display_name = f"{record.name} - {record.name_en}"
             else:
-                name = record.name
-            result.append((record.id, name))
-        return result
+                record.display_name = record.name or ''

@@ -1,6 +1,6 @@
-# Update ics_tender_management & ics_etimad_tenders_crm on Odoo 18 test server
+# Update ics_tender_management, ics_etimad_tenders_crm & project_tasks_from_templates on Odoo 18 test server
 # Repo: https://github.com/icloudsolutions/tender_management
-# Triggers: push to main (only when ics_tender_management or ics_etimad_tenders_crm change)
+# Triggers: push to main (when any of the 3 modules change)
 # Server: 38.242.237.64 → /root/libya/dev-18/addons (existing addons updated in place)
 
 name: Deploy to Odoo Test Server
@@ -11,13 +11,14 @@ on:
     paths:
       - 'ics_tender_management/**'
       - 'ics_etimad_tenders_crm/**'
+      - 'project_tasks_from_templates/**'
       - '.github/workflows/deploy.yml'
   workflow_dispatch:
 
 env:
   DEPLOY_PATH: /root/libya/dev-18
   ADDONS_DIR: addons
-  MODULES: ics_etimad_tenders_crm,ics_tender_management
+  MODULES: ics_etimad_tenders_crm,ics_tender_management,project_tasks_from_templates
 
 jobs:
   deploy:
@@ -37,12 +38,11 @@ jobs:
       - name: Deploy addons (rsync)
         run: |
           RSYNC_RSH="ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new -p ${{ secrets.DEPLOY_SSH_PORT || 22 }}"
-          rsync -avz --delete -e "$RSYNC_RSH" \
-            ics_tender_management/ \
-            ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ env.DEPLOY_PATH }}/${{ env.ADDONS_DIR }}/ics_tender_management/
-          rsync -avz --delete -e "$RSYNC_RSH" \
-            ics_etimad_tenders_crm/ \
-            ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ env.DEPLOY_PATH }}/${{ env.ADDONS_DIR }}/ics_etimad_tenders_crm/
+          for MODULE in ics_etimad_tenders_crm ics_tender_management project_tasks_from_templates; do
+            rsync -avz --delete -e "$RSYNC_RSH" \
+              ${MODULE}/ \
+              ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ env.DEPLOY_PATH }}/${{ env.ADDONS_DIR }}/${MODULE}/
+          done
 
       - name: Restart Odoo container
         run: |

@@ -2,6 +2,34 @@ from odoo import models, fields, api
 from odoo.exceptions import ValidationError
 
 
+class ResCompanyEtimad(models.Model):
+    """Extend res.company to store Etimad Many2many settings persistently.
+    
+    Many2many fields cannot use config_parameter on res.config.settings
+    (transient model). We store them on res.company instead and use
+    related fields on res.config.settings.
+    """
+    _inherit = 'res.company'
+
+    etimad_preferred_activities_ids = fields.Many2many(
+        'ics.etimad.activity',
+        'etimad_company_activity_rel',
+        'company_id',
+        'activity_id',
+        string="Preferred Activities",
+        help="Company's main business activities from Etimad classification."
+    )
+
+    etimad_notification_user_ids = fields.Many2many(
+        'res.users',
+        'etimad_company_notification_users_rel',
+        'company_id',
+        'user_id',
+        string="Notification Recipients",
+        help="Users who will receive tender notifications."
+    )
+
+
 class ResConfigSettings(models.TransientModel):
     _inherit = "res.config.settings"
 
@@ -87,11 +115,10 @@ class ResConfigSettings(models.TransientModel):
         help="List of preferred agency names (comma-separated). Tenders from these agencies get higher match scores."
     )
     
+    # Many2many stored on res.company for persistence (transient model cannot persist M2M)
     etimad_preferred_activities_ids = fields.Many2many(
-        'ics.etimad.activity',
-        'etimad_config_activity_rel',
-        'config_id',
-        'activity_id',
+        related='company_id.etimad_preferred_activities_ids',
+        readonly=False,
         string="Preferred Activities",
         help="Select your company's main business activities from Etimad classification. Tenders matching these activities will get higher scores."
     )
@@ -148,11 +175,10 @@ class ResConfigSettings(models.TransientModel):
         help="Send notification for tenders with deadline ≤3 days"
     )
     
+    # Many2many stored on res.company for persistence (transient model cannot persist M2M)
     etimad_notification_user_ids = fields.Many2many(
-        'res.users',
-        'etimad_notification_users_rel',
-        'setting_id',
-        'user_id',
+        related='company_id.etimad_notification_user_ids',
+        readonly=False,
         string="Notification Recipients",
         help="Users who will receive tender notifications"
     )
@@ -255,8 +281,10 @@ class ResConfigSettings(models.TransientModel):
         res = super(ResConfigSettings, self).set_values()
         
         # Update cron job interval when scraping settings are saved
-        if any(field in self._fields for field in ['etimad_auto_sync', 'etimad_sync_interval']):
+        try:
             self.env['ics.etimad.tender'].sudo().update_cron_interval()
+        except Exception:
+            pass  # Silently fail if cron update fails
         
         return res
     
