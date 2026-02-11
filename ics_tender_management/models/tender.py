@@ -468,36 +468,47 @@ class Tender(models.Model):
         return probability_mapping.get(self.state, 20)
     
     def _auto_create_project(self):
-        """Automatically create project from won tender with task template
+        """Automatically create project from won tender with task template.
         
         Template selection priority:
-        1. Exact category match (supply/maintenance/etc.)
-        2. General template (no category)
-        3. Use project_tasks_from_templates module if available
+        1. Category mapping (Configuration → Category Template Mapping): external or ICS
+        2. ICS template by exact category match
+        3. ICS general template (no category)
+        4. project_tasks_from_templates by name search (fallback)
         """
         self.ensure_one()
         
-        # Priority 1: Find exact category match
-        template = self.env['ics.project.task.template'].search([
-            ('tender_category', '=', self.tender_category),
-            ('active', '=', True)
+        # Priority 1: Settings mapping (Tender Category → Template)
+        template = self.env['ics.project.task.template'].browse()
+        mapping = self.env['ics.tender.category.template.mapping'].search([
+            ('tender_category', '=', self.tender_category)
         ], limit=1)
-        
-        # Priority 2: If no category-specific template, get general template
+        if mapping:
+            if mapping.use_external_template and mapping.external_template_id and 'project.task.template' in self.env:
+                external = self.env['project.task.template'].browse(mapping.external_template_id)
+                if external.exists():
+                    return self._create_project_with_template_module(external)
+            if mapping.ics_template_id and mapping.ics_template_id.active:
+                template = mapping.ics_template_id
+        if not template:
+            # Priority 2: ICS template by exact category match
+            template = self.env['ics.project.task.template'].search([
+                ('tender_category', '=', self.tender_category),
+                ('active', '=', True)
+            ], limit=1)
+        # Priority 3: ICS general template (no category)
         if not template:
             template = self.env['ics.project.task.template'].search([
                 ('tender_category', '=', False),
                 ('active', '=', True)
             ], limit=1)
         
-        # Priority 3: Try project_tasks_from_templates module if available
+        # Priority 4: project_tasks_from_templates by name search
         if not template and 'project.task.template' in self.env:
-            # Check if project_tasks_from_templates module is installed
             project_template = self.env['project.task.template'].search([
                 ('name', 'ilike', self.tender_category)
             ], limit=1)
             if project_template:
-                # Use project_tasks_from_templates module
                 return self._create_project_with_template_module(project_template)
         
         # Create project

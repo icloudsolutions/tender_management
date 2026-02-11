@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- One mapping record per tender category; user can set ICS or external template on each -->
+        <record id="category_mapping_supply" model="ics.tender.category.template.mapping">
+            <field name="tender_category">supply</field>
+        </record>
+        <record id="category_mapping_services" model="ics.tender.category.template.mapping">
+            <field name="tender_category">services</field>
+        </record>
+        <record id="category_mapping_construction" model="ics.tender.category.template.mapping">
+            <field name="tender_category">construction</field>
+        </record>
+        <record id="category_mapping_maintenance" model="ics.tender.category.template.mapping">
+            <field name="tender_category">maintenance</field>
+        </record>
+        <record id="category_mapping_consulting" model="ics.tender.category.template.mapping">
+            <field name="tender_category">consulting</field>
+        </record>
+        <record id="category_mapping_other" model="ics.tender.category.template.mapping">
+            <field name="tender_category">other</field>
+        </record>
+    </data>
+</odoo>

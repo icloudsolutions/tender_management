@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="view_tender_category_template_mapping_list" model="ir.ui.view">
+            <field name="name">ics.tender.category.template.mapping.list</field>
+            <field name="model">ics.tender.category.template.mapping</field>
+            <field name="arch" type="xml">
+                <list string="Category Template Mapping" create="1" delete="1" edit="1">
+                    <field name="tender_category"/>
+                    <field name="ics_template_id"/>
+                    <field name="use_external_template"/>
+                    <field name="external_template_name"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_tender_category_template_mapping_form" model="ir.ui.view">
+            <field name="name">ics.tender.category.template.mapping.form</field>
+            <field name="model">ics.tender.category.template.mapping</field>
+            <field name="arch" type="xml">
+                <form string="Tender Category → Project Template">
+                    <sheet>
+                        <group>
+                            <group string="Tender Category">
+                                <field name="tender_category"/>
+                            </group>
+                        </group>
+                        <group string="Template to use when a tender with this category is won">
+                            <group string="ICS Task Template">
+                                <field name="ics_template_id" 
+                                    options="{'no_create': True}"
+                                    domain="[('active', '=', True)]"/>
+                            </group>
+                            <group string="External Template (project_tasks_from_templates)">
+                                <field name="use_external_template" widget="boolean_toggle"/>
+                                <field name="external_template_name" readonly="1"/>
+                                <div class="mt-2">
+                                    <button name="action_choose_external_template" 
+                                        string="Choose External Template" 
+                                        type="object" 
+                                        class="btn-secondary"
+                                        invisible="not use_external_template"
+                                        title="Select a template from Project → Configuration → Task Templates"/>
+                                    <button name="action_clear_external_template" 
+                                        string="Clear" 
+                                        type="object" 
+                                        class="btn-link"
+                                        invisible="not use_external_template or not external_template_id"/>
+                                </div>
+                            </group>
+                        </group>
+                        <div class="alert alert-info" role="alert">
+                            <strong>Priority:</strong> If <strong>Use External Template</strong> is set and a template is chosen, it is used for auto-created projects. Otherwise the <strong>ICS Task Template</strong> is used. Create external templates in <strong>Project → Configuration → Task Templates</strong> (when project_tasks_from_templates is installed).
+                        </div>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_tender_category_template_mapping" model="ir.actions.act_window">
+            <field name="name">Category → Project Template</field>
+            <field name="res_model">ics.tender.category.template.mapping</field>
+            <field name="view_mode">list,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Set which project template to use per tender category
+                </p>
+                <p>
+                    When a tender is <strong>won</strong>, a project is auto-created. Here you map each <strong>Tender Category</strong> to either an <strong>ICS Task Template</strong> or an <strong>External Template</strong> from the project_tasks_from_templates app.
+                </p>
+                <p>
+                    Create one record per category (Supply, Services, Maintenance, etc.). Leave a category without a mapping to use the default ICS templates or name-based fallback.
+                </p>
+            </field>
+        </record>
+
+        <record id="view_tender_category_template_choose_wizard_form" model="ir.ui.view">
+            <field name="name">ics.tender.category.template.choose.wizard.form</field>
+            <field name="model">ics.tender.category.template.choose.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Select External Template">
+                    <group>
+                        <field name="mapping_id" invisible="1"/>
+                        <field name="external_template_id" widget="selection"/>
+                    </group>
+                    <footer>
+                        <button name="action_confirm" string="Use this template" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+    </data>
+</odoo>

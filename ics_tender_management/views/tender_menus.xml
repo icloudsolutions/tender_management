@@ -94,5 +94,11 @@
             action="action_tender_decline_reason"
             sequence="30"/>
 
+        <menuitem id="menu_tender_category_template_mapping"
+            name="Category → Project Template"
+            parent="menu_tender_config"
+            action="action_tender_category_template_mapping"
+            sequence="40"/>
+
     </data>
 </odoo>
