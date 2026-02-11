@@ -486,18 +486,36 @@
                             <page string="6. Offer Results &amp; Evaluation" name="offer_results"
                                 invisible="state in ['draft', 'technical', 'financial', 'quotation', 'won', 'lost', 'cancelled']">
                                 
-                                <!-- Evaluation Tracking (visible in evaluation state) -->
+                                <!-- ── Status Banner ── -->
+                                <div class="alert alert-info" role="status" invisible="state != 'submitted'">
+                                    <strong><i class="fa fa-paper-plane"/> Tender Submitted</strong> — Awaiting customer to start evaluation. 
+                                    Record offer opening dates as they become available.
+                                </div>
                                 <div class="alert alert-warning" role="status" invisible="state != 'evaluation'">
-                                    <strong><i class="fa fa-clock-o" title="Evaluation"/> Under Evaluation</strong>
+                                    <strong><i class="fa fa-clock-o"/> Under Evaluation</strong>
                                     <span invisible="evaluation_days == 0"> — <field name="evaluation_days" class="oe_inline"/> days since evaluation started</span>
                                 </div>
                                 
+                                <!-- ── Section 1: Offer Opening (Submitted + Evaluation) ── -->
+                                <group string="Offer Opening">
+                                    <group>
+                                        <field name="offer_opening_date" widget="datetime"/>
+                                        <field name="financial_offer_opening_date" widget="datetime"/>
+                                    </group>
+                                    <group>
+                                        <field name="competing_companies_file" filename="competing_companies_filename"/>
+                                        <field name="competing_companies_filename" invisible="1"/>
+                                    </group>
+                                </group>
+                                
+                                <!-- ── Section 2: Evaluation Tracking (Evaluation only) ── -->
+                                <separator string="Evaluation Progress" invisible="state != 'evaluation'"/>
                                 <group invisible="state != 'evaluation'">
-                                    <group string="Evaluation Timeline">
+                                    <group string="Timeline">
                                         <field name="evaluation_start_date" readonly="1"/>
                                         <field name="expected_result_date"/>
                                     </group>
-                                    <group string="Clarification">
+                                    <group string="Clarification Request">
                                         <field name="clarification_requested" widget="boolean_toggle"/>
                                         <field name="clarification_response_date" invisible="not clarification_requested"/>
                                         <field name="clarification_submitted" widget="boolean_toggle" invisible="not clarification_requested"/>
@@ -507,28 +525,28 @@
                                     <field name="evaluation_notes" placeholder="Track evaluation updates, clarification responses, negotiations..."/>
                                 </group>
                                 
-                                <separator string="Offer Details"/>
-                                <group>
-                                    <group string="Offer Opening Dates">
-                                        <field name="offer_opening_date" widget="datetime"/>
-                                        <field name="financial_offer_opening_date" widget="datetime"/>
-                                        <field name="competing_companies_file" filename="competing_companies_filename"/>
-                                        <field name="competing_companies_filename" invisible="1"/>
-                                    </group>
-                                    <group string="Technical Offer Status">
+                                <!-- ── Section 3: Offer Acceptance (Evaluation only) ── -->
+                                <separator string="Offer Acceptance" invisible="state != 'evaluation'"/>
+                                <group invisible="state != 'evaluation'">
+                                    <group string="Technical Offer">
                                         <field name="offer_accepted" widget="boolean_toggle"/>
                                         <field name="offer_rejection_reason" invisible="offer_accepted"/>
                                     </group>
-                                </group>
-                                <group>
-                                    <group string="Financial Offer Status">
+                                    <group string="Financial Offer">
                                         <field name="financial_offer_accepted" widget="boolean_toggle"/>
                                         <field name="financial_offer_rejection_reason" invisible="financial_offer_accepted"/>
                                     </group>
-                                    <group string="Extensions &amp; Negotiations">
+                                </group>
+                                
+                                <!-- ── Section 4: Extensions & Negotiations (Both states) ── -->
+                                <separator string="Extensions &amp; Negotiations"/>
+                                <group>
+                                    <group>
                                         <field name="offer_extension_requested" widget="boolean_toggle"/>
                                         <field name="extension_awarded" widget="boolean_toggle" invisible="not offer_extension_requested"/>
                                         <field name="extension_rejection_reason" invisible="extension_awarded or not offer_extension_requested"/>
+                                    </group>
+                                    <group>
                                         <field name="discount_requested" widget="boolean_toggle"/>
                                     </group>
                                 </group>
