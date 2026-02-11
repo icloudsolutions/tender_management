@@ -608,10 +608,15 @@
                                         <field name="appeal_response_notes"/>
                                     </group>
                                 </group>
-                                <div class="alert alert-info" role="alert" invisible="state != 'lost' or appeal_submitted">
+                                <div class="alert alert-success" role="alert" invisible="state != 'lost' or appeal_status != 'accepted'">
+                                    <strong><i class="fa fa-check-circle"/> Appeal accepted</strong>
+                                    <p class="mb-2 mt-2">The tender can be re-opened for re-evaluation. Click the button below to move it back to <strong>Under Evaluation</strong>, then use Mark as Won or Mark as Lost when the new result is known.</p>
+                                    <button name="action_reopen_after_appeal_accepted" string="Re-open Tender (Appeal Accepted)" type="object" class="btn-success"/>
+                                </div>
+                                <div class="alert alert-info" role="alert" invisible="state != 'lost' or appeal_submitted or appeal_status == 'accepted'">
                                     <p class="mb-0">
                                         You have the right to appeal the tender result.
-                                        Click the checkbox above to start the appeal process.
+                                        Check <strong>Appeal Submitted</strong> above to record your appeal, then track the response. If the appeal is accepted, you can re-open the tender for re-evaluation.
                                     </p>
                                 </div>
                             </page>

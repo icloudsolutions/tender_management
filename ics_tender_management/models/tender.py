@@ -870,6 +870,34 @@ class Tender(models.Model):
             date_deadline=fields.Date.today()
         )
 
+    def action_reopen_after_appeal_accepted(self):
+        """Re-open tender for re-evaluation when appeal has been accepted.
+        
+        Moves state from 'lost' back to 'evaluation' so the customer can
+        re-evaluate and you can later mark as Won or Lost again.
+        """
+        self.ensure_one()
+        if self.state != 'lost':
+            raise UserError(_('Only lost tenders can be re-opened after appeal.'))
+        if self.appeal_status != 'accepted':
+            raise UserError(_(
+                'Only tenders with "Appeal Accepted" can be re-opened.\n\n'
+                'Set Appeal Status to "Appeal Accepted" first.'
+            ))
+        self.write({'state': 'evaluation'})
+        self.message_post(
+            body=Markup(_(
+                '<strong><i class="fa fa-refresh"/> Tender re-opened after appeal accepted</strong><br/><br/>'
+                'The tender is back under evaluation. You can track the new outcome and '
+                'use <strong>Mark as Won</strong> or <strong>Mark as Lost</strong> when the result is known.'
+            )),
+            subject=_('Tender re-opened (appeal accepted)'),
+            message_type='notification',
+            subtype_xmlid='mail.mt_note',
+            body_is_html=True,
+        )
+        return True
+
     @api.depends('submission_deadline')
     def _compute_days_to_deadline(self):
         today = fields.Datetime.now()
