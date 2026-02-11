@@ -85,12 +85,14 @@ class Tender(models.Model):
         compute='_compute_totals', store=True, currency_field='currency_id')
 
     requisition_ids = fields.One2many('purchase.requisition', 'tender_id',
-        string='Purchase Agreements (RFQs)')
+        string='Purchase Agreements (Legacy)')
     requisition_count = fields.Integer('Purchase Agreements', compute='_compute_requisition_count')
 
     purchase_order_ids = fields.One2many('purchase.order', 'tender_id',
         string='Purchase Orders')
     purchase_order_count = fields.Integer('Purchase Orders', compute='_compute_purchase_order_count')
+    rfq_count = fields.Integer('RFQs', compute='_compute_rfq_count',
+        help='Number of pre-win Requests for Quotation sent to suppliers')
 
     quotation_ids = fields.One2many('sale.order', 'tender_id', string='Quotations')
     quotation_count = fields.Integer('Quotations', compute='_compute_quotation_count')
@@ -906,10 +908,21 @@ class Tender(models.Model):
         for tender in self:
             tender.requisition_count = len(tender.requisition_ids)
 
-    @api.depends('purchase_order_ids')
+    @api.depends('purchase_order_ids', 'purchase_order_ids.is_tender_rfq')
     def _compute_purchase_order_count(self):
         for tender in self:
-            tender.purchase_order_count = len(tender.purchase_order_ids)
+            # Count only post-win Purchase Orders (not pre-win RFQs)
+            tender.purchase_order_count = len(
+                tender.purchase_order_ids.filtered(lambda po: not po.is_tender_rfq)
+            )
+
+    @api.depends('purchase_order_ids', 'purchase_order_ids.is_tender_rfq')
+    def _compute_rfq_count(self):
+        for tender in self:
+            # Count only pre-win RFQs sent to suppliers
+            tender.rfq_count = len(
+                tender.purchase_order_ids.filtered(lambda po: po.is_tender_rfq)
+            )
 
     @api.depends('quotation_ids')
     def _compute_quotation_count(self):
@@ -1062,119 +1075,122 @@ class Tender(models.Model):
         }
 
     def action_request_supplier_quotations(self):
-        """Request quotation prices from potential suppliers during financial study.
+        """Create direct RFQs for potential suppliers to collect their prices.
         
-        Creates a Purchase Agreement (Call for Tenders) with BoQ items,
-        then the user can create quotation requests for each potential supplier
-        from the Purchase Agreement form.
+        Creates one draft Request for Quotation (purchase.order) per potential
+        supplier, each containing all BoQ products. This is a pre-win activity
+        to gather supplier prices before preparing the tender quotation.
         
         Workflow:
-        1. Click this button → creates Purchase Agreement with BoQ products
-        2. Open the Purchase Agreement → click "New Quotation" for each supplier
-        3. Enter/receive supplier prices in each quotation
+        1. Click this button → creates one draft RFQ per potential supplier
+        2. Send/print RFQs to suppliers (standard Odoo flow)
+        3. Enter supplier prices as they respond
         4. Click "Sync Supplier Prices" to import prices as vendor offers
         5. Click "Compare Suppliers" to select the best offers
         """
         self.ensure_one()
         if not self.boq_line_ids:
             raise UserError(_('Please add BoQ lines before requesting supplier quotations.'))
-
-        # Build vals dict with only fields that exist in the model
-        requisition_model = self.env['purchase.requisition']
-        available_fields = requisition_model._fields.keys()
         
-        vals = {}
-        
-        # IMPORTANT: Use "Purchase Tender" type (not "Blanket Order")
-        # Blanket Order restricts one open agreement per vendor and shows warnings.
-        # Purchase Tender allows multiple vendors and is designed for Call for Tenders.
-        if 'type_id' in available_fields and 'purchase.requisition.type' in self.env:
-            # Search by quantity_copy='copy' which identifies "Purchase Tender" type
-            type_obj = self.env['purchase.requisition.type'].search([
-                ('quantity_copy', '=', 'copy')
-            ], limit=1)
-            if not type_obj:
-                # Fallback: search by name
-                type_obj = self.env['purchase.requisition.type'].search([
-                    ('name', 'ilike', 'tender')
-                ], limit=1)
-            if not type_obj:
-                # Create "Purchase Tender" type if it doesn't exist
-                type_obj = self.env['purchase.requisition.type'].create({
-                    'name': 'Call for Tenders',
-                    'quantity_copy': 'copy',
-                    'exclusive': 'multiple',
-                })
-            vals['type_id'] = type_obj.id
-        
-        # Set exclusive='multiple' directly if field exists (allows multiple RFQs)
-        if 'exclusive' in available_fields:
-            vals['exclusive'] = 'multiple'
-        
-        # Add tender_id if field exists
-        if 'tender_id' in available_fields:
-            vals['tender_id'] = self.id
-            
-        # Add user_id if field exists
-        if 'user_id' in available_fields:
-            vals['user_id'] = self.user_id.id
-            
-        # Add ordering_date if field exists
-        if 'ordering_date' in available_fields:
-            vals['ordering_date'] = fields.Date.today()
-            
-        # Add schedule_date if field exists
-        if 'schedule_date' in available_fields and self.submission_deadline:
-            vals['schedule_date'] = self.submission_deadline.date()
-
-        requisition = requisition_model.create(vals)
-
-        # Create requisition lines from BoQ
-        line_model = self.env['purchase.requisition.line']
-        line_fields = line_model._fields.keys()
-
-        for boq_line in self.boq_line_ids:
-            line_vals = {
-                'requisition_id': requisition.id,
-                'product_id': boq_line.product_id.id,
-            }
-            
-            # Add optional fields if they exist
-            if 'product_qty' in line_fields:
-                line_vals['product_qty'] = boq_line.quantity
-            if 'product_uom_id' in line_fields:
-                line_vals['product_uom_id'] = boq_line.uom_id.id
-            if 'price_unit' in line_fields:
-                line_vals['price_unit'] = boq_line.estimated_cost / boq_line.quantity if boq_line.quantity else 0
-                
-            line_model.create(line_vals)
-
-        # Auto-create draft quotation requests for potential suppliers
+        # Get potential suppliers
         potential_suppliers = self.potential_suppliers_ids.filtered(
             lambda s: s.status in ('potential', 'invited') and s.partner_id
         )
-        if potential_suppliers:
-            for supplier in potential_suppliers:
-                try:
-                    # Create a draft RFQ for each potential supplier
-                    po_vals = {
-                        'partner_id': supplier.partner_id.id,
-                        'requisition_id': requisition.id,
-                        'origin': self.name,
+        if not potential_suppliers:
+            raise UserError(_(
+                'No potential suppliers found!\n\n'
+                'Please add potential suppliers in the "Team & Suppliers" tab first.'
+            ))
+        
+        # Check for existing RFQs to avoid duplicates
+        existing_rfqs = self.purchase_order_ids.filtered(
+            lambda po: po.is_tender_rfq and po.state != 'cancel'
+        )
+        existing_supplier_ids = existing_rfqs.mapped('partner_id').ids
+        
+        # Filter out suppliers that already have an RFQ
+        new_suppliers = potential_suppliers.filtered(
+            lambda s: s.partner_id.id not in existing_supplier_ids
+        )
+        if not new_suppliers:
+            raise UserError(_(
+                'RFQs already exist for all potential suppliers.\n\n'
+                'You can view them using the "RFQs" stat button above.'
+            ))
+        
+        po_model = self.env['purchase.order']
+        po_fields = po_model._fields.keys()
+        pol_model = self.env['purchase.order.line']
+        pol_fields = pol_model._fields.keys()
+        
+        created_rfqs = self.env['purchase.order']
+        
+        for supplier in new_suppliers:
+            # Build RFQ header
+            po_vals = {
+                'partner_id': supplier.partner_id.id,
+                'is_tender_rfq': True,
+            }
+            if 'tender_id' in po_fields:
+                po_vals['tender_id'] = self.id
+            if 'origin' in po_fields:
+                po_vals['origin'] = self.name
+            if 'date_order' in po_fields:
+                po_vals['date_order'] = fields.Datetime.now()
+            if 'notes' in po_fields:
+                po_vals['notes'] = _('RFQ for tender: %s') % self.tender_title
+            
+            try:
+                rfq = po_model.create(po_vals)
+                
+                # Add BoQ products as order lines
+                for boq_line in self.boq_line_ids:
+                    line_vals = {
+                        'order_id': rfq.id,
+                        'product_id': boq_line.product_id.id,
                     }
-                    self.env['purchase.order'].create(po_vals)
-                    # Mark supplier as invited
-                    supplier.write({'status': 'invited'})
-                except Exception:
-                    # Skip if there's an issue creating PO for this supplier
-                    continue
-
+                    if 'name' in pol_fields:
+                        line_vals['name'] = boq_line.name
+                    if 'product_qty' in pol_fields:
+                        line_vals['product_qty'] = boq_line.quantity
+                    if 'product_uom' in pol_fields:
+                        line_vals['product_uom'] = boq_line.uom_id.id
+                    if 'price_unit' in pol_fields:
+                        line_vals['price_unit'] = 0  # Supplier will fill in their price
+                    if 'date_planned' in pol_fields:
+                        line_vals['date_planned'] = self.submission_deadline or fields.Datetime.now()
+                    
+                    pol_model.create(line_vals)
+                
+                created_rfqs |= rfq
+                # Mark supplier as invited
+                supplier.write({'status': 'invited'})
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).warning(
+                    'Failed to create RFQ for supplier %s: %s', supplier.partner_id.name, e
+                )
+                continue
+        
+        if not created_rfqs:
+            raise UserError(_('Failed to create any RFQs. Please check the potential suppliers.'))
+        
+        # Show the created RFQs
+        if len(created_rfqs) == 1:
+            return {
+                'name': _('Request for Quotation'),
+                'type': 'ir.actions.act_window',
+                'res_model': 'purchase.order',
+                'view_mode': 'form',
+                'res_id': created_rfqs.id,
+                'target': 'current',
+            }
         return {
-            'name': _('Supplier Quotation Request'),
+            'name': _('Requests for Quotation'),
             'type': 'ir.actions.act_window',
-            'res_model': 'purchase.requisition',
-            'view_mode': 'form',
-            'res_id': requisition.id,
+            'res_model': 'purchase.order',
+            'view_mode': 'list,form',
+            'domain': [('id', 'in', created_rfqs.ids)],
             'target': 'current',
         }
 
@@ -1182,7 +1198,21 @@ class Tender(models.Model):
         """Backward compatibility alias."""
         return self.action_request_supplier_quotations()
 
+    def action_view_rfqs(self):
+        """View pre-win RFQs sent to suppliers for price collection."""
+        self.ensure_one()
+        rfqs = self.purchase_order_ids.filtered(lambda po: po.is_tender_rfq)
+        return {
+            'name': _('Requests for Quotation'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'purchase.order',
+            'view_mode': 'list,form',
+            'domain': [('id', 'in', rfqs.ids)],
+            'context': {'default_tender_id': self.id, 'default_is_tender_rfq': True},
+        }
+
     def action_view_purchase_agreements(self):
+        """Legacy: View purchase agreements (kept for backward compatibility)."""
         self.ensure_one()
         return {
             'name': _('Purchase Agreements'),
@@ -1216,51 +1246,48 @@ class Tender(models.Model):
         }
 
     def action_sync_supplier_prices(self):
-        """Import supplier prices from quotation requests into vendor offers.
+        """Import supplier prices from RFQs into vendor offers for comparison.
         
-        During financial study, the user sends quotation requests to potential
-        suppliers via Purchase Agreement. Suppliers respond with their prices.
-        This action imports those prices as vendor offers on BoQ lines for comparison.
+        Reads prices from the direct RFQs (purchase.order with is_tender_rfq=True)
+        created by "Request Supplier Quotations" and imports them as vendor offers
+        on BoQ lines for supplier comparison.
         """
         self.ensure_one()
         
-        if not self.requisition_ids:
-            raise UserError(_(
-                'No quotation requests found!\n\n'
-                'Please first click "Request Supplier Quotations" to send requests to suppliers.'
-            ))
-        
         if not self.boq_line_ids:
             raise UserError(_('No BoQ lines found in this tender.'))
+        
+        # Get pre-win RFQs (direct RFQs to suppliers)
+        supplier_rfqs = self.purchase_order_ids.filtered(
+            lambda po: po.is_tender_rfq and po.state != 'cancel'
+        )
+        
+        # Fallback: also check legacy Purchase Agreement-linked POs
+        if not supplier_rfqs and self.requisition_ids:
+            supplier_rfqs = self.env['purchase.order'].search([
+                ('requisition_id', 'in', self.requisition_ids.ids),
+                ('state', '!=', 'cancel'),
+            ])
+        
+        if not supplier_rfqs:
+            raise UserError(_(
+                'No RFQs found!\n\n'
+                'Please first click "Request Supplier Quotations" to create RFQs '
+                'for your potential suppliers, then enter their prices.'
+            ))
         
         VendorOffer = self.env['ics.tender.vendor.offer']
         created_count = 0
         updated_count = 0
         skipped_count = 0
         
-        # Get all supplier quotation requests (draft POs from Purchase Agreements)
-        supplier_quotations = self.env['purchase.order'].search([
-            ('requisition_id', 'in', self.requisition_ids.ids),
-            ('state', '!=', 'cancel'),
-        ])
-        
-        if not supplier_quotations:
-            raise UserError(_(
-                'No supplier quotation requests found!\n\n'
-                'To collect supplier prices:\n'
-                '1. Open the Purchase Agreement (Supplier Quotation Request)\n'
-                '2. Click "New Quotation" to create a request for each supplier\n'
-                '3. Enter each supplier\'s quoted prices\n'
-                '4. Then come back here and click "Sync Supplier Prices"'
-            ))
-        
-        for sq in supplier_quotations:
-            supplier = sq.partner_id
+        for rfq in supplier_rfqs:
+            supplier = rfq.partner_id
             if not supplier:
                 continue
                 
-            for sq_line in sq.order_line:
-                product = sq_line.product_id
+            for rfq_line in rfq.order_line:
+                product = rfq_line.product_id
                 if not product:
                     continue
                 
@@ -1279,33 +1306,31 @@ class Tender(models.Model):
                     ('vendor_id', '=', supplier.id),
                 ], limit=1)
                 
-                unit_price = sq_line.price_unit
+                unit_price = rfq_line.price_unit
                 if unit_price <= 0:
                     skipped_count += 1
                     continue
                 
                 if existing_offer:
-                    # Update existing offer if price changed
                     if existing_offer.unit_price != unit_price:
                         existing_offer.write({
                             'unit_price': unit_price,
-                            'purchase_order_id': sq.id,
+                            'purchase_order_id': rfq.id,
                         })
                         updated_count += 1
                 else:
-                    # Create new vendor offer from supplier quotation
                     VendorOffer.create({
                         'boq_line_id': boq_line.id,
                         'vendor_id': supplier.id,
                         'unit_price': unit_price,
-                        'purchase_order_id': sq.id,
+                        'purchase_order_id': rfq.id,
                     })
                     created_count += 1
         
         # Update potential supplier statuses
-        for sq in supplier_quotations:
+        for rfq in supplier_rfqs:
             supplier_rec = self.potential_suppliers_ids.filtered(
-                lambda s: s.partner_id.id == sq.partner_id.id
+                lambda s: s.partner_id.id == rfq.partner_id.id
             )
             if supplier_rec and supplier_rec.status == 'invited':
                 supplier_rec.write({'status': 'responded'})
@@ -1314,9 +1339,9 @@ class Tender(models.Model):
             raise UserError(_(
                 'No supplier prices to sync!\n\n'
                 'Make sure:\n'
-                '• Quotation requests have been created for suppliers\n'
-                '• Supplier prices have been entered in the quotation lines\n'
-                '• Quotation products match the BoQ products'
+                '• RFQs have been created for suppliers\n'
+                '• Supplier prices have been entered in the RFQ lines\n'
+                '• RFQ products match the BoQ products'
             ))
         
         return {

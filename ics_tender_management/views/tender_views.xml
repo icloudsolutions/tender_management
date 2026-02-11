@@ -183,9 +183,10 @@
                                 class="oe_stat_button" icon="fa-list-ol">
                                 <field name="boq_count" widget="statinfo" string="BoQ Lines"/>
                             </button>
-                            <button name="action_view_purchase_agreements" type="object"
-                                class="oe_stat_button" icon="fa-shopping-cart">
-                                <field name="requisition_count" widget="statinfo" string="Supplier Quotes"/>
+                            <button name="action_view_rfqs" type="object"
+                                class="oe_stat_button" icon="fa-envelope-o"
+                                invisible="rfq_count == 0">
+                                <field name="rfq_count" widget="statinfo" string="RFQs"/>
                             </button>
                             <button name="action_view_quotations" type="object"
                                 class="oe_stat_button" icon="fa-file-text-o">
