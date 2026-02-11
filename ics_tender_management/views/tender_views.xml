@@ -127,6 +127,10 @@
                             type="object" class="btn-secondary"
                             invisible="state not in ['financial', 'quotation']"
                             title="Import supplier prices from quotation requests into vendor offers for comparison"/>
+                        <button name="action_compare_rfqs" string="Compare RFQs"
+                            type="object" class="btn-secondary"
+                            invisible="state not in ['financial', 'quotation'] or rfq_count &lt; 2"
+                            title="Open Odoo's native comparison page to compare supplier prices side-by-side"/>
                         <button name="action_compare_vendors" string="Compare Suppliers"
                             type="object"
                             invisible="state not in ['financial', 'quotation']"/>

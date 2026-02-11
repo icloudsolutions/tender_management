@@ -1175,6 +1175,17 @@ class Tender(models.Model):
         if not created_rfqs:
             raise UserError(_('Failed to create any RFQs. Please check the potential suppliers.'))
         
+        # Link RFQs as Purchase Alternatives (Odoo native feature)
+        # This enables "Compare Product Lines" from any RFQ's Alternatives tab
+        all_rfqs = existing_rfqs | created_rfqs
+        if len(all_rfqs) > 1 and 'alternative_po_ids' in po_fields:
+            for rfq in all_rfqs:
+                # Link each RFQ to all others as alternatives
+                other_rfqs = all_rfqs - rfq
+                rfq.write({
+                    'alternative_po_ids': [(4, other.id) for other in other_rfqs]
+                })
+        
         # Show the created RFQs
         if len(created_rfqs) == 1:
             return {
@@ -1209,6 +1220,49 @@ class Tender(models.Model):
             'view_mode': 'list,form',
             'domain': [('id', 'in', rfqs.ids)],
             'context': {'default_tender_id': self.id, 'default_is_tender_rfq': True},
+        }
+
+    def action_compare_rfqs(self):
+        """Open Odoo's native Compare Product Lines page for all tender RFQs.
+        
+        Leverages Purchase Alternatives feature to compare supplier prices
+        side-by-side with green highlighting on best prices.
+        """
+        self.ensure_one()
+        rfqs = self.purchase_order_ids.filtered(
+            lambda po: po.is_tender_rfq and po.state != 'cancel'
+        )
+        if not rfqs:
+            raise UserError(_(
+                'No RFQs found!\n\n'
+                'Please first click "Request Supplier Quotations" to create RFQs for suppliers.'
+            ))
+        
+        if len(rfqs) < 2:
+            raise UserError(_(
+                'At least 2 RFQs are needed to compare.\n\n'
+                'Add more potential suppliers and click "Request Supplier Quotations" again.'
+            ))
+        
+        # Collect all order line IDs from these RFQs
+        order_line_ids = rfqs.mapped('order_line').ids
+        
+        if not order_line_ids:
+            raise UserError(_(
+                'No product lines found in the RFQs.\n\n'
+                'Make sure suppliers have entered their prices.'
+            ))
+        
+        # Open Odoo's native Compare Order Lines view
+        return {
+            'name': _('Compare Supplier RFQs'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'purchase.order.line',
+            'view_mode': 'list',
+            'domain': [('id', 'in', order_line_ids)],
+            'context': {
+                'search_default_groupby_product': True,
+            },
         }
 
     def action_view_purchase_agreements(self):
