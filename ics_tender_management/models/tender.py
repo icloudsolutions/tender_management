@@ -271,6 +271,29 @@ class Tender(models.Model):
     estimated_project_value = fields.Monetary('Estimated Project Value', currency_field='currency_id')
     required_inquiries = fields.Text('Required Inquiries/Questions')
     
+    # Under Evaluation Tracking
+    evaluation_start_date = fields.Date('Evaluation Start Date',
+        help='Date when customer started evaluating the tender', tracking=True)
+    expected_result_date = fields.Date('Expected Result Date',
+        help='Expected date for the customer to announce the result', tracking=True)
+    evaluation_days = fields.Integer('Days in Evaluation',
+        compute='_compute_evaluation_days',
+        help='Number of days the tender has been under evaluation')
+    evaluation_notes = fields.Text('Evaluation Notes',
+        help='Track clarification requests, negotiations, and evaluation updates')
+    clarification_requested = fields.Boolean('Clarification Requested', default=False,
+        help='Customer has requested clarification on the offer')
+    clarification_response_date = fields.Date('Clarification Response Deadline')
+    clarification_submitted = fields.Boolean('Clarification Submitted', default=False)
+    
+    @api.depends('evaluation_start_date')
+    def _compute_evaluation_days(self):
+        for tender in self:
+            if tender.evaluation_start_date and tender.state == 'evaluation':
+                tender.evaluation_days = (fields.Date.today() - tender.evaluation_start_date).days
+            else:
+                tender.evaluation_days = 0
+    
     # Evaluation Phase
     challenges = fields.Text('Challenges')
     winning_probability = fields.Float('Winning Probability', help='Probability percentage (0-100)')
@@ -761,21 +784,39 @@ class Tender(models.Model):
         """Activities during evaluation phase"""
         self.ensure_one()
         
+        # Use expected result date as deadline, or 14 days from now
+        deadline = self.expected_result_date or (
+            fields.Date.today() + timedelta(days=14)
+        )
+        
         self.activity_schedule(
             'mail.mail_activity_data_todo',
-            summary=_('Monitor Evaluation & Prepare Response'),
+            summary=_('Monitor Evaluation & Follow Up'),
             note=_(
-                '<strong>Evaluation Phase:</strong><br/>'
+                '<strong>Under Evaluation - Action Items:</strong><br/>'
                 '<ul>'
-                '<li>Monitor customer evaluation progress</li>'
-                '<li>Respond to clarification requests</li>'
-                '<li>Prepare for negotiations if needed</li>'
-                '<li>Track competitor information</li>'
-                '<li>Stay ready for final presentations</li>'
+                '<li>Contact customer to confirm evaluation timeline</li>'
+                '<li>Respond promptly to any clarification requests</li>'
+                '<li>Prepare for negotiations or presentations if needed</li>'
+                '<li>Track competitor information and market feedback</li>'
+                '<li>Follow up with customer if no response by expected date</li>'
                 '</ul>'
             ),
             user_id=self.user_id.id,
-            date_deadline=fields.Date.today()
+            date_deadline=deadline,
+        )
+        
+        # Schedule a follow-up reminder 7 days from now
+        self.activity_schedule(
+            'mail.mail_activity_data_todo',
+            summary=_('Follow Up: Check Evaluation Status'),
+            note=_(
+                '<strong>Follow-Up Reminder:</strong><br/>'
+                'Contact the customer to check the evaluation status and '
+                'ask if they need any additional information or clarification.'
+            ),
+            user_id=self.user_id.id,
+            date_deadline=fields.Date.today() + timedelta(days=7),
         )
     
     def _trigger_appeal_option(self):
@@ -901,6 +942,27 @@ class Tender(models.Model):
             raise UserError(_('Please generate a quotation before submitting the tender.'))
         self._validate_required_approvals()
         self.write({'state': 'submitted'})
+
+    def action_start_evaluation(self):
+        """Move tender to Under Evaluation stage.
+        
+        This represents the customer starting their evaluation.
+        Records the evaluation start date and schedules follow-up activities.
+        """
+        self.ensure_one()
+        if self.state != 'submitted':
+            raise UserError(_('Only submitted tenders can be moved to evaluation.'))
+        
+        vals = {
+            'state': 'evaluation',
+            'evaluation_start_date': fields.Date.today(),
+        }
+        
+        # Set offer opening date if not already set
+        if not self.offer_opening_date:
+            vals['offer_opening_date'] = fields.Datetime.now()
+        
+        self.write(vals)
 
     def _validate_required_approvals(self):
         """Ensure all required approvals are completed before proceeding."""

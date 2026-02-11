@@ -143,6 +143,10 @@
                         <button name="action_submit_tender" string="Submit Tender"
                             type="object" class="oe_highlight"
                             invisible="state != 'quotation'"/>
+                        <button name="action_start_evaluation" string="Start Evaluation"
+                            type="object" class="oe_highlight"
+                            invisible="state != 'submitted'"
+                            title="Customer has started evaluating the tender"/>
                         <button name="action_mark_won" string="Mark as Won"
                             type="object" class="oe_highlight"
                             invisible="state not in ['submitted', 'evaluation']"/>
@@ -465,6 +469,29 @@
                             <!-- ═══════════════════════════════════════════════════ -->
                             <page string="6. Offer Results &amp; Evaluation" name="offer_results"
                                 invisible="state in ['draft', 'technical', 'financial', 'quotation', 'won', 'lost', 'cancelled']">
+                                
+                                <!-- Evaluation Tracking (visible in evaluation state) -->
+                                <div class="alert alert-warning" role="status" invisible="state != 'evaluation'">
+                                    <strong><i class="fa fa-clock-o" title="Evaluation"/> Under Evaluation</strong>
+                                    <span invisible="evaluation_days == 0"> — <field name="evaluation_days" class="oe_inline"/> days since evaluation started</span>
+                                </div>
+                                
+                                <group invisible="state != 'evaluation'">
+                                    <group string="Evaluation Timeline">
+                                        <field name="evaluation_start_date" readonly="1"/>
+                                        <field name="expected_result_date"/>
+                                    </group>
+                                    <group string="Clarification">
+                                        <field name="clarification_requested" widget="boolean_toggle"/>
+                                        <field name="clarification_response_date" invisible="not clarification_requested"/>
+                                        <field name="clarification_submitted" widget="boolean_toggle" invisible="not clarification_requested"/>
+                                    </group>
+                                </group>
+                                <group invisible="state != 'evaluation'">
+                                    <field name="evaluation_notes" placeholder="Track evaluation updates, clarification responses, negotiations..."/>
+                                </group>
+                                
+                                <separator string="Offer Details"/>
                                 <group>
                                     <group string="Offer Opening Dates">
                                         <field name="offer_opening_date" widget="datetime"/>
