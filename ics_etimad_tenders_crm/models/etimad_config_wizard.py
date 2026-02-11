@@ -191,3 +191,14 @@ class EtimadConfigWizard(models.TransientModel):
                 'sticky': False,
             },
         }
+
+    def action_open_matching_rules(self):
+        """Open Dynamic Matching Rules configuration."""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Dynamic Matching Rules',
+            'res_model': 'ics.etimad.matching.rule',
+            'view_mode': 'list,form',
+            'context': {'default_active': True},
+        }

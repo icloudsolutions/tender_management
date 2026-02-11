@@ -72,7 +72,15 @@ class EtimadTender(models.Model):
     # CRM Integration
     opportunity_id = fields.Many2one('crm.lead', string="Opportunity", tracking=True)
     opportunity_count = fields.Integer("Opportunities", compute='_compute_opportunity_count')
-    
+    assigned_user_id = fields.Many2one(
+        'res.users', string="Assigned To", tracking=True,
+        help="User assigned by smart matching rules or manually."
+    )
+    dynamic_match_reasons = fields.Text(
+        "Dynamic Match Reasons",
+        help="Reasons added by matching rules (in addition to computed match score reasons)."
+    )
+
     # Additional Info
     description = fields.Text("Description")
     notes = fields.Text("Internal Notes")
@@ -176,6 +184,59 @@ class EtimadTender(models.Model):
         """Count related opportunities"""
         for record in self:
             record.opportunity_count = 1 if record.opportunity_id else 0
+
+    def _apply_matching_rules(self):
+        """Apply active dynamic matching rules to tenders. Only runs if smart matching is enabled."""
+        if not self or self.env.context.get('skip_matching_rules'):
+            return
+        params = self.env['ir.config_parameter'].sudo()
+        if params.get_param('ics_etimad_tenders_crm.etimad_enable_matching', 'True') != 'True':
+            return
+        Rule = self.env['ics.etimad.matching.rule'].sudo()
+        rules = Rule.search([('active', '=', True)], order='sequence, id')
+        if not rules:
+            return
+        for tender in self:
+            updates = {}
+            for rule in rules:
+                try:
+                    rule_updates = rule._get_action_updates(tender)
+                    if rule_updates:
+                        for k, v in rule_updates.items():
+                            if k not in updates:
+                                updates[k] = v
+                            elif k in ('notes', 'dynamic_match_reasons') and updates[k]:
+                                updates[k] = f"{updates[k]}\n{v}".strip()
+                except Exception as e:
+                    _logger.warning('Matching rule "%s" failed for tender %s: %s', rule.name, tender.id, e)
+            if updates:
+                tender.with_context(skip_matching_rules=True).write(updates)
+
+    def action_apply_matching_rules(self):
+        """Re-run dynamic matching rules on selected tenders (manual trigger)."""
+        count = len(self)
+        self._apply_matching_rules()
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Matching Rules Applied'),
+                'message': _('Rules applied to %s tender(s).') % count,
+                'type': 'success',
+                'sticky': False,
+            },
+        }
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        tenders = super().create(vals_list)
+        tenders._apply_matching_rules()
+        return tenders
+
+    def write(self, vals):
+        res = super().write(vals)
+        self._apply_matching_rules()
+        return res
 
     is_urgent = fields.Boolean("Urgent", compute='_compute_is_urgent', store=True)
     is_hot_tender = fields.Boolean("Hot Tender", compute='_compute_is_hot_tender', store=True)

@@ -61,6 +61,7 @@
         "views/etimad_menus.xml",
         "views/etimad_activity_views.xml",
         "views/etimad_tender_views.xml",
+        "views/etimad_matching_rule_views.xml",
         "views/etimad_config_wizard_views.xml",
         "views/res_config_settings_views.xml",
     ],

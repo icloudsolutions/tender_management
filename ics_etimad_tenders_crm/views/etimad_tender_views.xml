@@ -24,6 +24,12 @@
                             class="btn-secondary"
                             icon="fa-refresh"
                             title="Fetch 150 tenders (3 pages) from Etimad portal"/>
+                    <button name="action_apply_matching_rules"
+                            string="Apply Matching Rules"
+                            type="object"
+                            class="btn-secondary"
+                            icon="fa-magic"
+                            title="Re-run dynamic matching rules on selected tenders"/>
                 </header>
                 
                 <field name="is_favorite" widget="boolean_favorite" nolabel="1"/>
@@ -49,6 +55,7 @@
                 <field name="is_participating" widget="boolean" optional="show" string="Participating"/>
                 <field name="award_announced" widget="boolean" optional="hide" string="Awarded"/>
                 <field name="opportunity_id" optional="show" string="Opportunity"/>
+                <field name="assigned_user_id" optional="show" string="Assigned To"/>
                 <field name="deadline_extended" widget="boolean" optional="show" string="Extended"/>
                 <field name="scraping_status" widget="badge" optional="hide" string="Data Status"
                        decoration-success="scraping_status == 'success'"
@@ -284,6 +291,8 @@
                             <field name="opportunity_id" 
                                    string="Linked Opportunity"
                                    options="{'no_create': True}"/>
+                            <field name="assigned_user_id" string="Assigned To"/>
+                            <field name="dynamic_match_reasons" invisible="not dynamic_match_reasons" placeholder="Set by matching rules"/>
                             <div invisible="not opportunity_id" class="alert alert-info mt-2" role="status">
                                 <i class="fa fa-info-circle" title="Information"/> This tender is linked to a CRM opportunity
                             </div>
@@ -342,6 +351,12 @@
                                     icon="fa-plus-circle"
                                     invisible="opportunity_id"
                                     title="Create a CRM opportunity from this tender"/>
+                            <button name="action_apply_matching_rules"
+                                    string="Apply Matching Rules"
+                                    type="object"
+                                    class="btn btn-secondary flex-grow-1"
+                                    icon="fa-magic"
+                                    title="Re-run dynamic matching rules on this tender"/>
                         </div>
                     </group>
                     
@@ -577,6 +592,7 @@
                 <field name="is_hot_tender"/>
                 <field name="matching_score"/>
                 <field name="opportunity_id"/>
+                <field name="assigned_user_id"/>
                 <field name="currency_id"/>
                 
                 <templates>

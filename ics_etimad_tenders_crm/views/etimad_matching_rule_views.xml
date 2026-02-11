@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_etimad_matching_rule_tree" model="ir.ui.view">
+        <field name="name">ics.etimad.matching.rule.tree</field>
+        <field name="model">ics.etimad.matching.rule</field>
+        <field name="arch" type="xml">
+            <list string="Matching Rules" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="field_name"/>
+                <field name="operator"/>
+                <field name="value_char"/>
+                <field name="value_float"/>
+                <field name="action_type"/>
+                <field name="user_id" optional="show"/>
+                <field name="active" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_etimad_matching_rule_form" model="ir.ui.view">
+        <field name="name">ics.etimad.matching.rule.form</field>
+        <field name="model">ics.etimad.matching.rule</field>
+        <field name="arch" type="xml">
+            <form string="Matching Rule">
+                <sheet>
+                    <div class="oe_button_box" name="button_box"/>
+                    <group>
+                        <group string="Rule">
+                            <field name="name" placeholder="e.g. High value IT tenders"/>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Condition" name="condition">
+                            <group>
+                                <group string="When">
+                                    <field name="field_name"/>
+                                    <field name="operator"/>
+                                    <field name="value_char" invisible="operator in ('is_empty', 'is_not_empty')"/>
+                                    <field name="value_float" invisible="operator not in ('gt', 'gte', 'lt', 'lte')"/>
+                                </group>
+                                <group string="Help">
+                                    <div class="text-muted">
+                                        <p><strong>Text:</strong> Contains, Equals, Starts With, Regex, In List (comma-separated).</p>
+                                        <p><strong>Numbers:</strong> Use Value (number) for Greater/Less than.</p>
+                                        <p><strong>In List:</strong> Put comma-separated values in Value (text).</p>
+                                    </div>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Action" name="action">
+                            <group>
+                                <group string="Then">
+                                    <field name="action_type"/>
+                                    <field name="user_id" invisible="action_type != 'assign_user'"/>
+                                    <field name="action_value_char" invisible="action_type not in ('add_note', 'add_reason')"
+                                           placeholder="Note text or reason text"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_etimad_matching_rules" model="ir.actions.act_window">
+        <field name="name">Dynamic Matching Rules</field>
+        <field name="res_model">ics.etimad.matching.rule</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'default_active': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create rules to auto-assign users, mark favorites, or add notes when tenders match conditions.
+            </p>
+            <p>
+                Rules run on tender create/update when Smart Matching is enabled in Settings.
+                Use <strong>Sequence</strong> to control order; first matching rule wins per action type.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_etimad_matching_rules"
+              name="Dynamic Matching Rules"
+              parent="menu_etimad_config"
+              action="action_etimad_matching_rules"
+              sequence="5"/>
+</odoo>

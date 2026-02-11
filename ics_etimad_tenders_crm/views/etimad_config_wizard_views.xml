@@ -62,8 +62,13 @@
                                         <button name="action_recalculate_match_scores"
                                                 string="Recalculate All Match Scores"
                                                 type="object"
-                                                class="btn-secondary"
+                                                class="btn-secondary me-2"
                                                 icon="fa-refresh"/>
+                                        <button name="action_open_matching_rules"
+                                                string="Manage Dynamic Rules"
+                                                type="object"
+                                                class="btn-secondary"
+                                                icon="fa-list-alt"/>
                                     </div>
                                 </group>
                             </group>
