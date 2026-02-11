@@ -783,7 +783,7 @@ class EtimadTender(models.Model):
             'type': 'opportunity',
             'partner_name': self.agency_name,
             'description': self.description,
-            'expected_revenue': self.document_cost_amount,
+            'expected_revenue': self.estimated_amount or 0.0,
             'date_deadline': self.offers_deadline,
             'priority': '2' if self.remaining_days < 7 else '1',
         }
