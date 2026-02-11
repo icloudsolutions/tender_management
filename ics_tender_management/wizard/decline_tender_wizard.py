@@ -51,6 +51,7 @@ class DeclineTenderWizard(models.TransientModel):
         self.tender_id.message_post(
             body=body,
             subject=_('Tender Declined'),
+            body_is_html=True,
         )
 
         return {

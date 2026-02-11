@@ -405,7 +405,8 @@ class Tender(models.Model):
                 body=Markup(_('Stage synchronized from Tender: <a href="/web#id=%s&model=ics.tender">%s</a><br/>Tender State: %s')) % (
                     self.id, self.name, dict(self._fields['state'].selection).get(self.state)
                 ),
-                subject=_('Tender Stage Update')
+                subject=_('Tender Stage Update'),
+                body_is_html=True,
             )
     
     def _get_crm_stage_mapping(self):

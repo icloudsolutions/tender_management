@@ -594,6 +594,7 @@ class EtimadTender(models.Model):
                         subject='Etimad Update Detected',
                         message_type='notification',
                         subtype_xmlid='mail.mt_note',
+                        body_is_html=True,
                     )
                     
                     # Create activity for deadline extension (important!)
@@ -624,6 +625,7 @@ class EtimadTender(models.Model):
                             body=Markup("<i class='fa fa-download'/> Detailed information automatically fetched from Etimad portal"),
                             message_type='notification',
                             subtype_xmlid='mail.mt_note',
+                            body_is_html=True,
                         )
                     except Exception as e:
                         _logger.warning(f"Could not auto-fetch details for {vals['name'][:50]}: {e}")
@@ -631,6 +633,7 @@ class EtimadTender(models.Model):
                             body=Markup("<i class='fa fa-exclamation-triangle'/> Could not auto-fetch details: %s") % str(e),
                             message_type='notification',
                             subtype_xmlid='mail.mt_note',
+                            body_is_html=True,
                         )
                 
                 return True
@@ -791,7 +794,8 @@ class EtimadTender(models.Model):
         # Log activity
         self.message_post(
             body=Markup(_('Opportunity created: <a href="/web#id=%s&model=crm.lead">%s</a>')) % (opportunity.id, opportunity.name),
-            subject=_('Opportunity Created')
+            subject=_('Opportunity Created'),
+            body_is_html=True,
         )
         
         return {
@@ -949,7 +953,7 @@ class EtimadTender(models.Model):
         self.ensure_one()
         self.is_participating = not self.is_participating
         if self.is_participating:
-            self.message_post(body=Markup(_('<i class="fa fa-check"/> Marked as participating in this tender')))
+            self.message_post(body=Markup(_('<i class="fa fa-check"/> Marked as participating in this tender')), body_is_html=True)
         else:
             self.message_post(body=_('Unmarked as participating'))
     

@@ -47,6 +47,7 @@ class EtimadTender(models.Model):
         self.message_post(
             body=Markup(_('Tender created: <a href="/web#id=%s&model=ics.tender">%s</a>')) % (tender.id, tender.name),
             subject=_('Tender Created'),
+            body_is_html=True,
         )
         return {
             'type': 'ir.actions.act_window',
