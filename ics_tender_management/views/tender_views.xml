@@ -599,11 +599,7 @@
                                         <field name="appeal_reason" invisible="not appeal_submitted"/>
                                     </group>
                                     <group invisible="not appeal_submitted">
-                                        <field name="appeal_status" widget="badge" 
-                                            decoration-info="appeal_status == 'pending'"
-                                            decoration-success="appeal_status == 'accepted'"
-                                            decoration-danger="appeal_status == 'rejected'"
-                                            decoration-muted="appeal_status == 'withdrawn'"/>
+                                        <field name="appeal_status"/>
                                         <field name="appeal_response_date"/>
                                         <field name="appeal_response_notes"/>
                                     </group>
