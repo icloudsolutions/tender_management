@@ -627,10 +627,18 @@ class Tender(models.Model):
         
         project = self.env['project.project'].create(project_vals)
         
-        # Use project_tasks_from_templates module to create tasks
-        if 'project.task.template' in self.env and template:
-            # Create tasks from template using the module's method
-            template.with_context(default_project_id=project.id).create_tasks()
+        # Use project_tasks_from_templates (or similar) if the template has a task-creation method
+        if template:
+            try:
+                if hasattr(template, 'create_tasks'):
+                    template.with_context(default_project_id=project.id).create_tasks()
+                elif hasattr(template, 'create_tasks_from_template'):
+                    template.with_context(default_project_id=project.id).create_tasks_from_template()
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).warning(
+                    'Could not create tasks from external template %s: %s', template, e
+                )
         
         return project
     
