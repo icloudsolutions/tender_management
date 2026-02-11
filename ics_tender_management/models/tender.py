@@ -88,6 +88,10 @@ class Tender(models.Model):
         string='Purchase Agreements (RFQs)')
     requisition_count = fields.Integer('Purchase Agreements', compute='_compute_requisition_count')
 
+    purchase_order_ids = fields.One2many('purchase.order', 'tender_id',
+        string='Purchase Orders')
+    purchase_order_count = fields.Integer('Purchase Orders', compute='_compute_purchase_order_count')
+
     quotation_ids = fields.One2many('sale.order', 'tender_id', string='Quotations')
     quotation_count = fields.Integer('Quotations', compute='_compute_quotation_count')
 
@@ -618,18 +622,26 @@ class Tender(models.Model):
         return project
     
     def _auto_generate_purchase_orders(self):
-        """Automatically generate purchase orders for vendors when tender is won"""
+        """Automatically generate purchase orders for vendors when tender is won.
+        Skips if POs already exist for this tender."""
         self.ensure_one()
         
         if not self.boq_line_ids:
             return  # No BoQ lines, nothing to purchase
         
+        # Guard: don't create POs if they already exist
+        if self.purchase_order_count > 0:
+            return
+        
+        # Only auto-create if vendors are selected on BoQ lines
+        lines_with_vendor = self.boq_line_ids.filtered(lambda l: l.selected_vendor_id)
+        if not lines_with_vendor:
+            return  # No vendors selected, skip auto-creation
+        
         # Check tender type
         if self.tender_type == 'single_vendor':
-            # Single vendor for all products
             self._create_single_purchase_order()
         elif self.tender_type == 'product_wise':
-            # Multiple vendors (one per product)
             self._create_multiple_purchase_orders()
     
     def _trigger_state_activities(self, old_state, new_state):
@@ -894,6 +906,11 @@ class Tender(models.Model):
         for tender in self:
             tender.requisition_count = len(tender.requisition_ids)
 
+    @api.depends('purchase_order_ids')
+    def _compute_purchase_order_count(self):
+        for tender in self:
+            tender.purchase_order_count = len(tender.purchase_order_ids)
+
     @api.depends('quotation_ids')
     def _compute_quotation_count(self):
         for tender in self:
@@ -983,6 +1000,8 @@ class Tender(models.Model):
 
     def action_mark_won(self):
         self.ensure_one()
+        if self.state != 'evaluation':
+            raise UserError(_('Only tenders under evaluation can be marked as won.'))
         self.write({'state': 'won'})
         if self.lead_id:
             # Mark CRM opportunity as won with context to bypass lock
@@ -1351,6 +1370,17 @@ class Tender(models.Model):
             'domain': [('tender_id', '=', self.id)],
         }
 
+    def action_view_purchase_orders(self):
+        self.ensure_one()
+        return {
+            'name': _('Purchase Orders'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'purchase.order',
+            'view_mode': 'list,form',
+            'domain': [('tender_id', '=', self.id)],
+            'context': {'default_tender_id': self.id},
+        }
+
     def action_view_attachments(self):
         self.ensure_one()
         return {
@@ -1367,6 +1397,17 @@ class Tender(models.Model):
 
     def action_create_purchase_orders(self):
         self.ensure_one()
+        
+        # Check if POs already exist for this tender
+        existing_pos = self.env['purchase.order'].search_count([
+            ('tender_id', '=', self.id),
+            ('state', '!=', 'cancel'),
+        ])
+        if existing_pos:
+            raise UserError(_(
+                'Purchase Orders already exist for this tender (%d active PO(s)).\n\n'
+                'To create new ones, first cancel the existing Purchase Orders.'
+            ) % existing_pos)
 
         if self.tender_type == 'single_vendor':
             return self._create_single_purchase_order()

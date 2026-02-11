@@ -132,7 +132,7 @@
                             invisible="state not in ['financial', 'quotation']"/>
                         <button name="action_create_purchase_orders" string="Create Purchase Orders"
                             type="object" class="btn-primary"
-                            invisible="state != 'won'"
+                            invisible="state != 'won' or purchase_order_count > 0"
                             help="Create actual purchase orders to selected vendors for project execution"/>
                         <button name="action_prepare_quotation" string="Prepare Quotation"
                             type="object" class="oe_highlight"
@@ -149,7 +149,7 @@
                             title="Customer has started evaluating the tender"/>
                         <button name="action_mark_won" string="Mark as Won"
                             type="object" class="oe_highlight"
-                            invisible="state not in ['submitted', 'evaluation']"/>
+                            invisible="state != 'evaluation'"/>
                         <button name="action_mark_lost" string="Mark as Lost"
                             type="object"
                             invisible="state not in ['submitted', 'evaluation']"/>
@@ -191,6 +191,11 @@
                                 class="oe_stat_button" icon="fa-file-text-o">
                                 <field name="quotation_count" widget="statinfo" string="Quotations"/>
                             </button>
+                            <button name="action_view_purchase_orders" type="object"
+                                class="oe_stat_button" icon="fa-shopping-cart"
+                                invisible="purchase_order_count == 0">
+                                <field name="purchase_order_count" widget="statinfo" string="Purchase Orders"/>
+                            </button>
                             <button name="action_view_projects" type="object"
                                 class="oe_stat_button" icon="fa-tasks"
                                 invisible="project_count == 0">
@@ -218,15 +223,18 @@
                         </div>
                         <group>
                             <group name="tender_info">
-                                <field name="tender_number"/>
-                                <field name="tender_title"/>
-                                <field name="tender_category"/>
+                                <field name="tender_number" readonly="state in ['won', 'lost', 'cancelled']"/>
+                                <field name="tender_title" readonly="state in ['won', 'lost', 'cancelled']"/>
+                                <field name="tender_category" readonly="state in ['won', 'lost', 'cancelled']"/>
                                 <field name="tender_type" widget="radio"
                                     options="{'horizontal': true}"
                                     readonly="state not in ['draft', 'technical', 'financial']"/>
-                                <field name="etimad_tender_id" options="{'no_create': True}"/>
-                                <field name="lead_id" options="{'no_create': True}"/>
-                                <field name="partner_id" options="{'no_create_edit': True}" required="1"/>
+                                <field name="etimad_tender_id" options="{'no_create': True}"
+                                    readonly="state in ['won', 'lost', 'cancelled']"/>
+                                <field name="lead_id" options="{'no_create': True}"
+                                    readonly="state in ['won', 'lost', 'cancelled']"/>
+                                <field name="partner_id" options="{'no_create_edit': True}" required="1"
+                                    readonly="state in ['won', 'lost', 'cancelled']"/>
                             </group>
                             <group name="tender_management">
                                 <field name="user_id" widget="many2one_avatar_user"/>
@@ -239,20 +247,23 @@
                         </group>
                         <group>
                             <group name="dates">
-                                <field name="announcement_date"/>
-                                <field name="submission_deadline" widget="datetime"/>
+                                <field name="announcement_date" readonly="state in ['won', 'lost', 'cancelled']"/>
+                                <field name="submission_deadline" widget="datetime" readonly="state in ['won', 'lost', 'cancelled']"/>
                                 <field name="days_to_deadline"/>
-                                <field name="opening_date" widget="datetime"/>
+                                <field name="opening_date" widget="datetime" readonly="state in ['won', 'lost', 'cancelled']"/>
                                 <field name="is_urgent" invisible="1"/>
                             </group>
                             <group name="financial" invisible="state in ['draft', 'technical']">
-                                <field name="expected_revenue" string="Expected Revenue" help="القيمة التقديرية"/>
-                                <field name="estimated_project_value" string="Estimated Project Value"/>
+                                <field name="expected_revenue" string="Expected Revenue" help="القيمة التقديرية"
+                                    readonly="state in ['won', 'lost', 'cancelled']"/>
+                                <field name="estimated_project_value" string="Estimated Project Value"
+                                    readonly="state in ['won', 'lost', 'cancelled']"/>
                                 <field name="total_estimated_cost" widget="monetary"/>
                                 <field name="total_vendor_cost" widget="monetary"/>
                                 <label for="margin_percentage" string="Margin %"/>
                                 <div class="o_row">
-                                    <field name="margin_percentage" class="oe_inline"/>
+                                    <field name="margin_percentage" class="oe_inline"
+                                        readonly="state in ['won', 'lost', 'cancelled']"/>
                                     <span>%</span>
                                 </div>
                                 <field name="margin_amount" widget="monetary"/>
