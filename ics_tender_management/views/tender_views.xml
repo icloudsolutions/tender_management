@@ -139,7 +139,11 @@
                             invisible="state != 'financial'"/>
                         <button name="action_generate_quotation" string="Generate Sales Quotation"
                             type="object" class="oe_highlight"
-                            invisible="state != 'quotation'"/>
+                            invisible="state != 'quotation' or quotation_count > 0"/>
+                        <button name="action_regenerate_quotation" string="Update Sales Quotation"
+                            type="object" class="btn-secondary"
+                            invisible="state != 'quotation' or quotation_count == 0"
+                            title="Update the existing sales quotation with current BoQ and margins"/>
                         <button name="action_submit_tender" string="Submit Tender"
                             type="object" class="oe_highlight"
                             invisible="state != 'quotation'"/>

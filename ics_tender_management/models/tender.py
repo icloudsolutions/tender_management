@@ -1225,6 +1225,13 @@ class Tender(models.Model):
 
     def action_generate_quotation(self):
         self.ensure_one()
+        # Guard: don't create duplicate quotations
+        existing = self.quotation_ids.filtered(lambda q: q.state != 'cancel')
+        if existing:
+            raise UserError(_(
+                'A Sales Quotation already exists for this tender (%s).\n\n'
+                'Use "Update Sales Quotation" to refresh it with current data.'
+            ) % existing[0].name)
         return {
             'name': _('Generate Quotation'),
             'type': 'ir.actions.act_window',
@@ -1232,6 +1239,40 @@ class Tender(models.Model):
             'view_mode': 'form',
             'target': 'new',
             'context': {'default_tender_id': self.id},
+        }
+
+    def action_regenerate_quotation(self):
+        """Update the existing sales quotation with current BoQ data and margins.
+        
+        Instead of creating a new quotation, this updates the existing one
+        by removing old lines and recreating them from current BoQ.
+        """
+        self.ensure_one()
+        existing = self.quotation_ids.filtered(lambda q: q.state != 'cancel')
+        if not existing:
+            # No existing quotation — fall through to generate
+            return self.action_generate_quotation()
+        
+        quotation = existing[0]
+        
+        # Only allow update on draft/sent quotations
+        if quotation.state not in ('draft', 'sent'):
+            raise UserError(_(
+                'Cannot update quotation "%s" because it is in "%s" state.\n\n'
+                'Only draft or sent quotations can be updated.'
+            ) % (quotation.name, quotation.state))
+        
+        # Open wizard with regenerate context
+        return {
+            'name': _('Update Sales Quotation'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'ics.tender.quotation.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_tender_id': self.id,
+                'regenerate_quotation_id': quotation.id,
+            },
         }
 
     def action_view_quotations(self):

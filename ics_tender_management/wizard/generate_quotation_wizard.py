@@ -94,6 +94,15 @@ class GenerateQuotationWizard(models.TransientModel):
         if self.margin_percentage < 0:
             raise UserError(_('Margin percentage cannot be negative.'))
 
+        # Check if we're updating an existing quotation
+        regenerate_id = self._context.get('regenerate_quotation_id')
+        if regenerate_id:
+            return self._update_existing_quotation(regenerate_id)
+
+        return self._create_new_quotation()
+
+    def _create_new_quotation(self):
+        """Create a new sales quotation from the tender BoQ."""
         # Build quotation vals with only available fields
         so_model = self.env['sale.order']
         so_fields = so_model._fields.keys()
@@ -119,29 +128,7 @@ class GenerateQuotationWizard(models.TransientModel):
             quotation_vals['team_id'] = self.tender_id.team_id.id
 
         quotation = so_model.create(quotation_vals)
-
-        # Create sale order lines with dynamic field checking
-        sol_model = self.env['sale.order.line']
-        sol_fields = sol_model._fields.keys()
-
-        for preview_line in self.line_preview_ids:
-            sol_vals = {
-                'order_id': quotation.id,
-            }
-            
-            # Add optional fields if they exist
-            if 'product_id' in sol_fields and preview_line.product_id:
-                sol_vals['product_id'] = preview_line.product_id.id
-            if 'name' in sol_fields and preview_line.name:
-                sol_vals['name'] = preview_line.name
-            if 'product_uom_qty' in sol_fields:
-                sol_vals['product_uom_qty'] = preview_line.quantity
-            if 'product_uom' in sol_fields and preview_line.uom_id:
-                sol_vals['product_uom'] = preview_line.uom_id.id
-            if 'price_unit' in sol_fields:
-                sol_vals['price_unit'] = preview_line.unit_price
-                
-            sol_model.create(sol_vals)
+        self._create_quotation_lines(quotation)
 
         self.tender_id.write({
             'state': 'quotation',
@@ -156,6 +143,67 @@ class GenerateQuotationWizard(models.TransientModel):
             'res_id': quotation.id,
             'target': 'current',
         }
+
+    def _update_existing_quotation(self, quotation_id):
+        """Update an existing quotation: remove old lines, recreate from current BoQ."""
+        quotation = self.env['sale.order'].browse(quotation_id)
+        if not quotation.exists():
+            return self._create_new_quotation()
+
+        so_fields = quotation._fields.keys()
+
+        # Update header fields
+        update_vals = {}
+        if 'validity_date' in so_fields:
+            update_vals['validity_date'] = self.validity_date
+        if 'payment_term_id' in so_fields and self.payment_term_id:
+            update_vals['payment_term_id'] = self.payment_term_id.id
+        if 'pricelist_id' in so_fields and self.pricelist_id:
+            update_vals['pricelist_id'] = self.pricelist_id.id
+        if 'note' in so_fields and self.notes:
+            update_vals['note'] = self.notes
+        if update_vals:
+            quotation.write(update_vals)
+
+        # Remove existing lines and recreate
+        quotation.order_line.unlink()
+        self._create_quotation_lines(quotation)
+
+        self.tender_id.write({
+            'margin_percentage': self.margin_percentage,
+        })
+
+        return {
+            'name': _('Sales Quotation'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'sale.order',
+            'view_mode': 'form',
+            'res_id': quotation.id,
+            'target': 'current',
+        }
+
+    def _create_quotation_lines(self, quotation):
+        """Create sale order lines from preview lines."""
+        sol_model = self.env['sale.order.line']
+        sol_fields = sol_model._fields.keys()
+
+        for preview_line in self.line_preview_ids:
+            sol_vals = {
+                'order_id': quotation.id,
+            }
+            
+            if 'product_id' in sol_fields and preview_line.product_id:
+                sol_vals['product_id'] = preview_line.product_id.id
+            if 'name' in sol_fields and preview_line.name:
+                sol_vals['name'] = preview_line.name
+            if 'product_uom_qty' in sol_fields:
+                sol_vals['product_uom_qty'] = preview_line.quantity
+            if 'product_uom' in sol_fields and preview_line.uom_id:
+                sol_vals['product_uom'] = preview_line.uom_id.id
+            if 'price_unit' in sol_fields:
+                sol_vals['price_unit'] = preview_line.unit_price
+                
+            sol_model.create(sol_vals)
 
 
 class QuotationLinePreview(models.TransientModel):
