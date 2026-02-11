@@ -627,13 +627,16 @@ class Tender(models.Model):
         
         project = self.env['project.project'].create(project_vals)
         
-        # Use project_tasks_from_templates (or similar) if the template has a task-creation method
+        # Create tasks and subtasks from external template via project_tasks_from_templates API
         if template:
             try:
-                if hasattr(template, 'create_tasks'):
-                    template.with_context(default_project_id=project.id).create_tasks()
-                elif hasattr(template, 'create_tasks_from_template'):
-                    template.with_context(default_project_id=project.id).create_tasks_from_template()
+                if hasattr(project, 'project_template_id'):
+                    project.sudo().write({'project_template_id': template.id})
+                    if hasattr(project, 'action_create_project_from_template'):
+                        project.sudo().action_create_project_from_template()
+                else:
+                    # Fallback: copy template.task_ids (and child_ids) to project.task manually
+                    self._copy_external_template_tasks_to_project(template, project)
             except Exception as e:
                 import logging
                 logging.getLogger(__name__).warning(
@@ -642,6 +645,42 @@ class Tender(models.Model):
         
         return project
     
+    def _copy_external_template_tasks_to_project(self, template, project):
+        """Copy tasks and subtasks from external project.task.template to project.
+        Used when project_tasks_from_templates does not expose project_template_id on project.
+        Expects template to have task_ids (project.sub.task) with child_ids for subtasks.
+        """
+        task_ids = getattr(template, 'task_ids', None) or getattr(template, 'task_line_ids', None)
+        if not task_ids or not getattr(task_ids, '_model', None) or len(task_ids) == 0:
+            return
+        Task = self.env['project.task']
+        default_stage = self.env['project.task.type'].search([('sequence', '=', 1)], limit=1)
+        stage_id = default_stage.id if default_stage else False
+        task_has_state = 'state' in (Task._fields or {})
+
+        def create_task_from_sub_task(sub_task, parent_task_id=False):
+            user_ids = sub_task.user_ids.ids if getattr(sub_task, 'user_ids', None) else []
+            vals = {
+                'project_id': project.id,
+                'name': sub_task.name,
+                'parent_id': parent_task_id,
+                'description': getattr(sub_task, 'description', False) or False,
+                'user_ids': [(6, 0, user_ids)],
+            }
+            if stage_id:
+                vals['stage_id'] = stage_id
+            if task_has_state and getattr(sub_task, 'state', None):
+                vals['state'] = sub_task.state or '01_in_progress'
+            task = Task.sudo().create(vals)
+            children = getattr(sub_task, 'child_ids', None)
+            if children is None:
+                children = self.env[sub_task._name].browse([])
+            for child in children:
+                create_task_from_sub_task(child, parent_task_id=task.id)
+
+        for item in task_ids:
+            create_task_from_sub_task(item, parent_task_id=False)
+
     def _auto_generate_purchase_orders(self):
         """Automatically generate purchase orders for vendors when tender is won.
         Skips if POs already exist for this tender."""
