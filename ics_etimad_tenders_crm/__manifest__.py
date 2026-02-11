@@ -69,7 +69,7 @@
     },
     "assets": {
         "web.assets_backend": [
-            #"ics_etimad_tenders_crm/static/src/css/etimad_tenders.css",
+            "ics_etimad_tenders_crm/static/src/css/etimad_tenders.css",
         ],
     },
     "installable": True,

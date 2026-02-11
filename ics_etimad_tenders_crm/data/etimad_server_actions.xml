@@ -10,10 +10,7 @@
         <field name="binding_view_types">list,form</field>
         <field name="state">code</field>
         <field name="code">
-if records:
-    action = records[0].fetch_etimad_tenders()
-else:
-    action = model.fetch_etimad_tenders()
+action = model.fetch_etimad_tenders(page_size=50, page_number=1, max_pages=3)
         </field>
     </record>
 

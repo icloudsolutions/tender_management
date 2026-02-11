@@ -366,11 +366,11 @@ class EtimadTender(models.Model):
         return session
 
     @api.model
-    def fetch_etimad_tenders(self, page_size=20, page_number=1, max_pages=None):
+    def fetch_etimad_tenders(self, page_size=50, page_number=1, max_pages=None):
         """Fetch tenders from Etimad platform with retry mechanism and pagination support
         
         Args:
-            page_size: Number of tenders per page (default: 20, max: 50)
+            page_size: Number of tenders per page (default: 50, max: 50)
             page_number: Starting page number (default: 1)
             max_pages: Maximum number of pages to fetch (default: None = single page)
         
@@ -379,9 +379,11 @@ class EtimadTender(models.Model):
         """
         session = self._setup_scraper_session()
         
-        # Get max_retries from settings
+        # Get settings
         params = self.env['ir.config_parameter'].sudo()
         max_retries = int(params.get_param('ics_etimad_tenders_crm.etimad_max_retries', '3') or 3)
+        # PublishDateId filter: 0=All, 1=Today, 2=Yesterday, 3=Last Week, 4=Last Month, 5=Last 3 Months
+        publish_date_id = int(params.get_param('ics_etimad_tenders_crm.etimad_publish_date_filter', '0') or 0)
         
         total_created = 0
         total_updated = 0
@@ -409,11 +411,13 @@ class EtimadTender(models.Model):
                     url = "https://tenders.etimad.sa/Tender/AllSupplierTendersForVisitorAsync"
                     
                     params = {
-                        'PublishDateId': 5,  # Recent tenders
                         'PageSize': min(page_size, 50),  # Cap at 50
                         'PageNumber': current_page,
                         '_': timestamp
                     }
+                    # Only add PublishDateId filter if non-zero (0 = all tenders)
+                    if publish_date_id:
+                        params['PublishDateId'] = publish_date_id
                     
                     response = session.get(url, params=params, timeout=30)
                     
@@ -497,7 +501,7 @@ class EtimadTender(models.Model):
     @api.model
     def action_fetch_batch(self):
         """Fetch multiple pages of tenders (batch operation)"""
-        return self.fetch_etimad_tenders(page_size=50, page_number=1, max_pages=3)
+        return self.fetch_etimad_tenders(page_size=50, page_number=1, max_pages=5)
 
     def _process_tender_data(self, raw_data):
         """Process and create/update tender record with change detection and notifications"""

@@ -19,6 +19,7 @@
                                     <field name="etimad_sync_interval" invisible="not etimad_auto_sync"/>
                                     <field name="etimad_fetch_page_size" invisible="not etimad_auto_sync"/>
                                     <field name="etimad_fetch_pages" invisible="not etimad_auto_sync"/>
+                                    <field name="etimad_publish_date_filter"/>
                                     <field name="etimad_max_retries" invisible="not etimad_auto_sync"/>
                                 </group>
                                 <group string="Manual Actions">

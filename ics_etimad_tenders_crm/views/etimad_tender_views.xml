@@ -13,13 +13,13 @@
                 
                 <header>
                     <button name="%(action_server_fetch_etimad_tenders)d" 
-                            string="Fetch Latest (50)" 
+                            string="Fetch Latest Tenders" 
                             type="action" 
                             class="btn-primary"
                             icon="fa-refresh"
-                            title="Fetch latest 50 tenders from Etimad portal"/>
+                            title="Fetch latest tenders from Etimad portal (up to 150)"/>
                     <button name="%(action_server_fetch_batch_etimad_tenders)d" 
-                            string="Fetch Batch (150)" 
+                            string="Fetch Batch (250)" 
                             type="action" 
                             class="btn-secondary"
                             icon="fa-refresh"

@@ -18,8 +18,17 @@ class EtimadConfigWizard(models.TransientModel):
     etimad_auto_sync = fields.Boolean(string="Enable Auto Sync", default=True)
     etimad_sync_interval = fields.Integer(string="Sync Interval (hours)", default=24)
     etimad_fetch_page_size = fields.Integer(string="Tenders per Page", default=50)
-    etimad_fetch_pages = fields.Integer(string="Pages per Sync", default=1)
+    etimad_fetch_pages = fields.Integer(string="Pages per Sync", default=3)
     etimad_max_retries = fields.Integer(string="Max Retries", default=3)
+    etimad_publish_date_filter = fields.Selection([
+        ('0', 'All Tenders'),
+        ('1', 'Today'),
+        ('2', 'Yesterday'),
+        ('3', 'Last Week'),
+        ('4', 'Last Month'),
+        ('5', 'Last 3 Months'),
+    ], string="Publish Date Filter", default='0',
+       help="Filter tenders by publish date on Etimad portal. 'All Tenders' fetches everything available.")
 
     # ==================== SMART MATCHING ====================
     etimad_enable_matching = fields.Boolean(string="Enable Smart Matching", default=True)
@@ -65,8 +74,9 @@ class EtimadConfigWizard(models.TransientModel):
         'etimad_auto_sync': ('ics_etimad_tenders_crm.etimad_auto_sync', 'bool', True),
         'etimad_sync_interval': ('ics_etimad_tenders_crm.etimad_sync_interval', 'int', 24),
         'etimad_fetch_page_size': ('ics_etimad_tenders_crm.etimad_fetch_page_size', 'int', 50),
-        'etimad_fetch_pages': ('ics_etimad_tenders_crm.etimad_fetch_pages', 'int', 1),
+        'etimad_fetch_pages': ('ics_etimad_tenders_crm.etimad_fetch_pages', 'int', 3),
         'etimad_max_retries': ('ics_etimad_tenders_crm.etimad_max_retries', 'int', 3),
+        'etimad_publish_date_filter': ('ics_etimad_tenders_crm.etimad_publish_date_filter', 'str', '0'),
         'etimad_enable_matching': ('ics_etimad_tenders_crm.etimad_enable_matching', 'bool', True),
         'etimad_preferred_categories': ('ics_etimad_tenders_crm.etimad_preferred_categories', 'str', ''),
         'etimad_preferred_agencies': ('ics_etimad_tenders_crm.etimad_preferred_agencies', 'str', ''),
