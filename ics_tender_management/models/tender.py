@@ -976,7 +976,7 @@ class Tender(models.Model):
         for tender in self:
             tender.boq_count = len(tender.boq_line_ids)
 
-    @api.depends('boq_line_ids.estimated_cost', 'boq_line_ids.selected_vendor_price', 'margin_percentage')
+    @api.depends('boq_line_ids.estimated_cost', 'boq_line_ids.selected_vendor_price', 'boq_line_ids.quantity', 'margin_percentage')
     def _compute_totals(self):
         for tender in self:
             tender.total_estimated_cost = sum(tender.boq_line_ids.mapped('estimated_cost'))
@@ -1164,8 +1164,9 @@ class Tender(models.Model):
         1. Click this button → creates one draft RFQ per potential supplier
         2. Send/print RFQs to suppliers (standard Odoo flow)
         3. Enter supplier prices as they respond
-        4. Click "Sync Supplier Prices" to import prices as vendor offers
-        5. Click "Compare Suppliers" to select the best offers
+        4. Use "Compare Order Lines" (Odoo default view) to choose and compare product offers
+        5. Click "Sync Supplier Prices" to import prices as vendor offers
+        6. Click "Compare Suppliers" to select the best offers
         """
         self.ensure_one()
         if not self.boq_line_ids:
@@ -1302,10 +1303,11 @@ class Tender(models.Model):
         }
 
     def action_compare_rfqs(self):
-        """Open Odoo's native Compare Product Lines page for all tender RFQs.
-        
-        Leverages Purchase Alternatives feature to compare supplier prices
-        side-by-side with green highlighting on best prices.
+        """Open Odoo's default Compare Order Lines view for all tender RFQs.
+
+        Users use this view to choose and compare product offers side-by-side
+        (grouped by product). After comparing, run "Sync Supplier Prices" to
+        import chosen prices into vendor offers, then select best vendor per line.
         """
         self.ensure_one()
         rfqs = self.purchase_order_ids.filtered(
@@ -1323,18 +1325,16 @@ class Tender(models.Model):
                 'Add more potential suppliers and click "Request Supplier Quotations" again.'
             ))
         
-        # Collect all order line IDs from these RFQs
         order_line_ids = rfqs.mapped('order_line').ids
-        
         if not order_line_ids:
             raise UserError(_(
                 'No product lines found in the RFQs.\n\n'
                 'Make sure suppliers have entered their prices.'
             ))
-        
-        # Open Odoo's native Compare Order Lines view
+
+        # Odoo default Compare Order Lines: purchase lines grouped by product
         return {
-            'name': _('Compare Supplier RFQs'),
+            'name': _('Compare Order Lines'),
             'type': 'ir.actions.act_window',
             'res_model': 'purchase.order.line',
             'view_mode': 'list',

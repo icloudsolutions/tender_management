@@ -62,8 +62,9 @@ class VendorComparisonWizard(models.TransientModel):
                     'To compare suppliers, follow these steps:\n'
                     '1. Click "Request Supplier Quotations" to send requests to potential suppliers\n'
                     '2. Enter each supplier\'s quoted prices in their quotation request\n'
-                    '3. Click "Sync Supplier Prices" to import those prices\n'
-                    '4. Then click "Compare Suppliers" to review and select the best offers'
+                    '3. Use "Compare Order Lines" (Odoo default view) to choose and compare product offers\n'
+                    '4. Click "Sync Supplier Prices" to import those prices as vendor offers\n'
+                    '5. Then click "Compare Suppliers" to review and select the best offers'
                 ))
             
             lines = []

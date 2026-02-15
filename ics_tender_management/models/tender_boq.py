@@ -41,7 +41,9 @@ class TenderBoQLine(models.Model):
         domain=[('is_company', '=', True)])
 
     selected_vendor_price = fields.Monetary('Selected Vendor Price',
-        currency_field='currency_id')
+        currency_field='currency_id',
+        compute='_compute_selected_vendor_price', store=True,
+        help='Total from selected vendor offer (unit price × quantity).')
 
     notes = fields.Text('Notes')
 
@@ -54,6 +56,13 @@ class TenderBoQLine(models.Model):
         for line in self:
             line.offer_count = len(line.vendor_offer_ids)
 
+    @api.depends('vendor_offer_ids', 'vendor_offer_ids.total_price', 'selected_vendor_id', 'quantity')
+    def _compute_selected_vendor_price(self):
+        """Total from selected vendor offer (unit price × quantity), so totals stay qty-based."""
+        for line in self:
+            offer = line.vendor_offer_ids.filtered(lambda o: o.vendor_id == line.selected_vendor_id)[:1]
+            line.selected_vendor_price = offer.total_price if offer else 0.0
+
     @api.depends('estimated_cost', 'quantity')
     def _compute_unit_price(self):
         for line in self:
@@ -61,6 +70,27 @@ class TenderBoQLine(models.Model):
                 line.unit_price = line.estimated_cost / line.quantity
             else:
                 line.unit_price = 0.0
+
+    @api.onchange('quantity')
+    def _onchange_quantity_estimated_cost(self):
+        """Keep line total quantity-based: estimated_cost = unit_price * quantity."""
+        if self.quantity and self.unit_price is not None:
+            self.estimated_cost = self.unit_price * self.quantity
+
+    def write(self, vals):
+        """When quantity changes, recompute estimated_cost = unit_price * quantity so totals stay qty-based."""
+        if self.env.context.get('skip_quantity_update'):
+            return super().write(vals)
+        if 'quantity' in vals and 'estimated_cost' not in vals:
+            old_unit_prices = {l.id: l.unit_price for l in self}
+        else:
+            old_unit_prices = {}
+        res = super().write(vals)
+        if old_unit_prices:
+            for line in self:
+                new_total = old_unit_prices[line.id] * line.quantity
+                super(TenderBoQLine, line).with_context(skip_quantity_update=True).write({'estimated_cost': new_total})
+        return res
 
     @api.onchange('product_id')
     def _onchange_product_id(self):
@@ -124,7 +154,4 @@ class TenderVendorOffer(models.Model):
 
     def action_select_vendor(self):
         self.ensure_one()
-        self.boq_line_id.write({
-            'selected_vendor_id': self.vendor_id.id,
-            'selected_vendor_price': self.total_price,
-        })
+        self.boq_line_id.write({'selected_vendor_id': self.vendor_id.id})

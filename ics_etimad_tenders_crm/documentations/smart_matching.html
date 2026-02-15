@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دليل نظام التطابق الذكي - مناقصات اعتماد</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ar-font: 'Noto Sans Arabic', sans-serif;
+            --en-font: 'Inter', sans-serif;
+        }
+        body {
+            font-family: var(--ar-font);
+            background-color: #f8fafc;
+            transition: all 0.3s ease;
+        }
+        .en-mode {
+            font-family: var(--en-font);
+            direction: ltr;
+        }
+        .step-card:hover {
+            transform: translateY(-5px);
+            transition: all 0.3s ease;
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        .badge-blue { background-color: #dbeafe; color: #1e40af; }
+        .badge-green { background-color: #dcfce7; color: #166534; }
+        
+        .tab-btn {
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .tab-btn.active {
+            background-color: white;
+            color: #4338ca;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <!-- Language Switcher -->
+    <div class="fixed top-4 left-4 right-4 z-50 flex justify-center pointer-events-none">
+        <div class="bg-slate-200/80 backdrop-blur p-1 rounded-lg flex gap-1 pointer-events-auto shadow-sm">
+            <button onclick="switchLang('ar')" id="btn-ar" class="tab-btn active">العربية</button>
+            <button onclick="switchLang('en')" id="btn-en" class="tab-btn">English</button>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-indigo-700 text-white py-16 px-6 shadow-lg mb-10">
+        <div class="max-w-5xl mx-auto text-center md:text-right" id="header-content">
+            <h1 class="text-4xl font-bold mb-4" id="main-title">نظام التطابق الذكي Smart Matching</h1>
+            <p class="text-xl opacity-90" id="sub-title">دليل الاستخدام الشامل لتصنيف وتوجيه المناقصات تلقائياً</p>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-6 pb-20">
+        
+        <!-- Section 1: Features -->
+        <section class="mb-12 grid md:grid-cols-3 gap-6" id="features-grid">
+        </section>
+
+        <!-- Section 2: Configuration -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 mb-12" id="config-section">
+        </div>
+
+        <!-- Section 3: Logic Structure -->
+        <h2 class="text-2xl font-bold mb-6 flex items-center gap-2" id="logic-title">
+            <span class="w-2 h-8 bg-amber-500 rounded-full"></span>
+            هيكل القاعدة (المنطق)
+        </h2>
+        
+        <div class="flex flex-col md:flex-row gap-4 mb-12" id="logic-visual">
+        </div>
+
+        <!-- Section 4: Fields & Operators -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden mb-12" id="table-section">
+        </div>
+
+        <!-- Section 5: Practical Examples (Newly Added/Restored) -->
+        <h2 class="text-2xl font-bold mb-6 flex items-center gap-2" id="examples-title">
+            <span class="w-2 h-8 bg-emerald-500 rounded-full"></span>
+            أمثلة عملية (Practical Examples)
+        </h2>
+        <div class="grid md:grid-cols-2 gap-6 mb-12" id="examples-grid">
+        </div>
+
+        <!-- Section 6: Tips -->
+        <div class="bg-indigo-50 p-6 rounded-2xl border border-indigo-100" id="tips-section">
+        </div>
+
+    </main>
+
+    <footer class="text-center py-10 text-slate-400 text-xs border-t" id="footer-text">
+        نظام التطابق الذكي - وحدة مناقصات اعتماد - جميع الحقوق محفوظة
+    </footer>
+
+    <script>
+        const content = {
+            ar: {
+                dir: 'rtl',
+                class: '',
+                title: 'نظام التطابق الذكي Smart Matching',
+                subTitle: 'دليل الاستخدام الشامل لتصنيف وتوجيه المناقصات تلقائياً',
+                logicTitle: 'هيكل القاعدة (المنطق)',
+                examplesTitle: 'أمثلة عملية',
+                features: [
+                    { title: 'توجيه تلقائي', desc: 'تعيين المناقصات للموظفين بناءً على قواعد ذكية دون تدخل بشري.', icon: 'M13 10V3L4 14h7v7l9-11h-7z', bg: 'bg-indigo-100', text: 'text-indigo-600' },
+                    { title: 'قواعد ديناميكية', desc: 'إضافة شروط مخصصة (نصية أو رقمية) لتحديد المناقصات المهمة.', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', bg: 'bg-emerald-100', text: 'text-emerald-600' },
+                    { title: 'تمييز المفضلة', desc: 'تحديد المناقصات ذات الأولوية آلياً ووضعها في قائمة المفضلات.', icon: 'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.921-.755 1.688-1.54 1.118l-3.976-2.888a1 1 0 00-1.175 0l-3.976 2.888c-.784.57-1.838-.197-1.539-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.383-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z', bg: 'bg-amber-100', text: 'text-amber-600' }
+                ],
+                config: {
+                    title: 'إعدادات النظام',
+                    findTitle: 'أين تجد الإعدادات؟',
+                    step1: '<strong>التفعيل:</strong> اذهب إلى مناقصات اعتماد ← الإعدادات ← التطابق الذكي.',
+                    step2: '<strong>إدارة القواعد:</strong> اذهب إلى قائمة "قواعد التطابق الديناميكية".',
+                    whenTitle: 'متى يتم تطبيق القواعد؟',
+                    triggers: ['عند جلب مناقصة جديدة', 'عند حفظ/تعديل البيانات', 'من خلال زر "تطبيق القواعد"'],
+                    triggerBadges: ['آلياً', 'آلياً', 'يدوياً']
+                },
+                logic: {
+                    cond: '1. الشرط (Condition)',
+                    condDesc: '"إذا كانت القيمة التقديرية أكبر من مليون..."',
+                    action: '2. الإجراء (Action)',
+                    actionDesc: '"... فقم بتعيين المناقصة لمدير المبيعات"',
+                    tagsCond: ['الحقل', 'المعامل', 'القيمة'],
+                    tagsAct: ['تعيين مستخدم', 'إضافة ملاحظة']
+                },
+                table: {
+                    title: 'الحقول والمعاملات المتاحة',
+                    head: ['نوع الحقل', 'أمثلة للحقول', 'أهم المعاملات'],
+                    rows: [
+                        ['نصي (Text)', 'اسم المناقصة، الجهة، النشاط', 'يحتوي، يبدأ بـ، في القائمة'],
+                        ['رقمي (Numeric)', 'القيمة التقديرية، الأيام المتبقية', 'أكبر من، أقل من، يساوي']
+                    ]
+                },
+                examples: [
+                    { title: 'توجيه المناقصات الكبرى', cond: 'القيمة التقديرية > 5,000,000', action: 'تعيين إلى "مدير مبيعات أول"' },
+                    { title: 'تمييز الفرص العاجلة', cond: 'الأيام المتبقية ≤ 7', action: 'وضع كمفضلة + إضافة سبب "مناقصة عاجلة"' }
+                ],
+                tipsTitle: 'نصائح هامة للتحكم الكامل',
+                tips: [
+                    'استخدم الترتيب (Sequence) بحكمة؛ القواعد ذات الرقم الأقل تُنفذ أولاً.',
+                    'عند استخدام معامل "في القائمة" (In List)، افصل بين القيم بفاصلة (مثال: برمجيات, صيانة, توريد).',
+                    'إذا تحقق أكثر من شرط لنفس المناقصة، يتم دمج الإجراءات (مثل إضافة ملاحظتين من قاعدتين مختلفتين).',
+                    'تأكد من اختيار "نشط" (Active) في نموذج القاعدة لضمان عملها.'
+                ],
+                footer: 'نظام التطابق الذكي - وحدة مناقصات اعتماد - جميع الحقوق محفوظة'
+            },
+            en: {
+                dir: 'ltr',
+                class: 'en-mode',
+                title: 'Smart Matching System',
+                subTitle: 'Comprehensive guide for automatic tender classification and routing',
+                logicTitle: 'Rule Structure (Logic)',
+                examplesTitle: 'Practical Examples',
+                features: [
+                    { title: 'Auto Routing', desc: 'Assign tenders to staff based on smart rules without human intervention.', icon: 'M13 10V3L4 14h7v7l9-11h-7z', bg: 'bg-indigo-100', text: 'text-indigo-600' },
+                    { title: 'Dynamic Rules', desc: 'Add custom conditions (text or numeric) to define priority tenders.', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', bg: 'bg-emerald-100', text: 'text-emerald-600' },
+                    { title: 'Favorite Tagging', desc: 'Automatically mark priority tenders as favorites for easy tracking.', icon: 'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.921-.755 1.688-1.54 1.118l-3.976-2.888a1 1 0 00-1.175 0l-3.976 2.888c-.784.57-1.838-.197-1.539-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.383-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z', bg: 'bg-amber-100', text: 'text-amber-600' }
+                ],
+                config: {
+                    title: 'System Settings',
+                    findTitle: 'Where to configure?',
+                    step1: '<strong>Enable:</strong> Go to Etimad Tenders → Configuration → Smart Matching.',
+                    step2: '<strong>Manage Rules:</strong> Go to "Dynamic Matching Rules" menu.',
+                    whenTitle: 'When do rules run?',
+                    triggers: ['When fetching new tenders', 'On tender data save/update', 'Via "Apply Rules" button'],
+                    triggerBadges: ['Auto', 'Auto', 'Manual']
+                },
+                logic: {
+                    cond: '1. Condition',
+                    condDesc: '"If estimated amount is greater than 1M..."',
+                    action: '2. Action',
+                    actionDesc: '"...then assign tender to Sales Manager"',
+                    tagsCond: ['Field', 'Operator', 'Value'],
+                    tagsAct: ['Assign User', 'Add Note']
+                },
+                table: {
+                    title: 'Available Fields & Operators',
+                    head: ['Field Type', 'Field Examples', 'Main Operators'],
+                    rows: [
+                        ['Text', 'Tender Name, Agency, Activity', 'Contains, Starts With, In List'],
+                        ['Numeric', 'Estimated Amount, Remaining Days', 'Greater Than, Less Than, Equals']
+                    ]
+                },
+                examples: [
+                    { title: 'Major Tenders Routing', cond: 'Estimated Amount > 5,000,000', action: 'Assign to "Senior Sales Manager"' },
+                    { title: 'Urgent Opportunities', cond: 'Remaining Days ≤ 7', action: 'Mark as Favorite + Add reason "Urgent Tender"' }
+                ],
+                tipsTitle: 'Pro Tips for Full Control',
+                tips: [
+                    'Use Sequence numbers to control priority; lower numbers run first.',
+                    'For "In List" operator, separate values with a comma (e.g., Software, Maintenance, Supply).',
+                    'If multiple rules match, actions are combined (e.g., adding multiple internal notes).',
+                    'Always ensure the "Active" checkbox is checked for the rule to take effect.'
+                ],
+                footer: 'Smart Matching System - Etimad Tenders CRM - All Rights Reserved'
+            }
+        };
+
+        function switchLang(lang) {
+            const data = content[lang];
+            document.documentElement.lang = lang;
+            document.documentElement.dir = data.dir;
+            document.body.className = `text-slate-800 ${data.class}`;
+            
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`btn-${lang}`).classList.add('active');
+
+            document.getElementById('main-title').innerText = data.title;
+            document.getElementById('sub-title').innerText = data.subTitle;
+            document.getElementById('header-content').className = `max-w-5xl mx-auto text-center ${lang === 'ar' ? 'md:text-right' : 'md:text-left'}`;
+
+            const featuresHTML = data.features.map(f => `
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 step-card">
+                    <div class="w-12 h-12 ${f.bg} ${f.text} rounded-lg flex items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${f.icon}" />
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">${f.title}</h3>
+                    <p class="text-sm text-slate-600">${f.desc}</p>
+                </div>
+            `).join('');
+            document.getElementById('features-grid').innerHTML = featuresHTML;
+
+            document.getElementById('config-section').innerHTML = `
+                <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+                    <span class="w-2 h-8 bg-indigo-600 rounded-full"></span>
+                    ${data.config.title}
+                </h2>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="font-semibold text-indigo-700 mb-3">${data.config.findTitle}</h3>
+                        <ul class="space-y-4">
+                            <li class="flex items-start gap-3">
+                                <span class="bg-indigo-50 text-indigo-600 rounded px-2 py-1 text-xs font-bold mt-1">1</span>
+                                <span>${data.config.step1}</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="bg-indigo-50 text-indigo-600 rounded px-2 py-1 text-xs font-bold mt-1">2</span>
+                                <span>${data.config.step2}</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="bg-slate-50 p-6 rounded-xl">
+                        <h3 class="font-semibold mb-3">${data.config.whenTitle}</h3>
+                        <div class="space-y-2">
+                            ${data.config.triggers.map((t, i) => `
+                                <div class="flex justify-between items-center bg-white p-3 rounded-lg border border-slate-200">
+                                    <span>${t}</span>
+                                    <span class="badge ${data.config.triggerBadges[i] === 'Manual' || data.config.triggerBadges[i] === 'يدوياً' ? 'badge-blue' : 'badge-green'}">
+                                        ${data.config.triggerBadges[i]}
+                                    </span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('logic-title').innerHTML = `<span class="w-2 h-8 bg-amber-500 rounded-full"></span>${data.logicTitle}`;
+            document.getElementById('logic-visual').innerHTML = `
+                <div class="flex-1 bg-gradient-to-br from-indigo-50 to-white p-8 rounded-2xl border border-indigo-100 text-center">
+                    <div class="text-indigo-600 font-bold text-xl mb-2">${data.logic.cond}</div>
+                    <p class="text-slate-600 italic">${data.logic.condDesc}</p>
+                    <div class="mt-4 flex flex-wrap justify-center gap-2">
+                        ${data.logic.tagsCond.map(t => `<span class="badge bg-white border border-indigo-200">${t}</span>`).join('')}
+                    </div>
+                </div>
+                <div class="flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-slate-300 transform ${lang === 'ar' ? '' : 'rotate-180'}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                    </svg>
+                </div>
+                <div class="flex-1 bg-gradient-to-br from-emerald-50 to-white p-8 rounded-2xl border border-emerald-100 text-center">
+                    <div class="text-emerald-600 font-bold text-xl mb-2">${data.logic.action}</div>
+                    <p class="text-slate-600 italic">${data.logic.actionDesc}</p>
+                    <div class="mt-4 flex flex-wrap justify-center gap-2">
+                        ${data.logic.tagsAct.map(t => `<span class="badge bg-white border border-emerald-200">${t}</span>`).join('')}
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('table-section').innerHTML = `
+                <div class="bg-slate-800 text-white p-4 font-bold text-center">${data.table.title}</div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-${lang === 'ar' ? 'right' : 'left'} border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b">
+                                ${data.table.head.map(h => `<th class="p-4">${h}</th>`).join('')}
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y">
+                            ${data.table.rows.map(row => `
+                                <tr>
+                                    ${row.map(cell => `<td class="p-4 text-sm">${cell}</td>`).join('')}
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            // Update Examples (Restored)
+            document.getElementById('examples-title').innerHTML = `<span class="w-2 h-8 bg-emerald-500 rounded-full"></span>${data.examplesTitle}`;
+            document.getElementById('examples-grid').innerHTML = data.examples.map(ex => `
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                    <h4 class="font-bold text-indigo-700 mb-3 border-b pb-2">${ex.title}</h4>
+                    <div class="space-y-2 text-sm">
+                        <p><strong>${lang === 'ar' ? 'الشرط:' : 'Condition:'}</strong> <span class="text-amber-600 font-mono">${ex.cond}</span></p>
+                        <p><strong>${lang === 'ar' ? 'الإجراء:' : 'Action:'}</strong> <span class="text-emerald-600 font-semibold">${ex.action}</span></p>
+                    </div>
+                </div>
+            `).join('');
+
+            // Update Tips (Extended)
+            document.getElementById('tips-section').innerHTML = `
+                <h3 class="font-bold mb-3 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                    </svg>
+                    ${data.tipsTitle}
+                </h3>
+                <ul class="text-sm text-slate-700 space-y-2 list-disc ${lang === 'ar' ? 'pr-5' : 'pl-5'}">
+                    ${data.tips.map(tip => `<li>${tip}</li>`).join('')}
+                </ul>
+            `;
+
+            document.getElementById('footer-text').innerText = data.footer;
+        }
+
+        window.onload = () => switchLang('ar');
+    </script>
+</body>
+</html>

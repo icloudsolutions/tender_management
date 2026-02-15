@@ -39,40 +39,48 @@ class GenerateQuotationWizard(models.TransientModel):
 
     currency_id = fields.Many2one('res.currency', related='tender_id.currency_id')
 
-    @api.depends('tender_id.boq_line_ids', 'margin_percentage', 'use_vendor_costs')
+    @api.depends(
+        'tender_id.boq_line_ids',
+        'tender_id.boq_line_ids.quantity',
+        'tender_id.boq_line_ids.estimated_cost',
+        'tender_id.boq_line_ids.selected_vendor_price',
+        'tender_id.boq_line_ids.selected_vendor_id',
+        'margin_percentage',
+        'use_vendor_costs',
+    )
     def _compute_preview_lines(self):
+        """Build preview from BoQ: cost per line = (unit cost × qty), margin on line total, total = cost + margin."""
         for wizard in self:
-            # Use command syntax for computed One2many fields
             lines = []
             for boq_line in wizard.tender_id.boq_line_ids:
-                # Use vendor cost if selected and vendor is chosen
-                # Check for selected_vendor_id instead of price to handle $0.00 offers
+                # Line cost = total for line (already unit × qty from BoQ)
                 if wizard.use_vendor_costs and boq_line.selected_vendor_id:
                     cost = boq_line.selected_vendor_price or 0.0
                 else:
                     cost = boq_line.estimated_cost or 0.0
 
-                # Calculate margin and totals
+                # Margin and line total (all quantity-based)
                 margin = cost * (wizard.margin_percentage / 100)
                 total = cost + margin
-                
-                # Calculate unit price safely
-                if boq_line.quantity and boq_line.quantity > 0:
-                    unit_price = total / boq_line.quantity
+
+                # Sale unit price = line total / qty so that qty × unit_price = total
+                qty = boq_line.quantity or 0.0
+                if qty > 0:
+                    unit_price = total / qty
                 else:
-                    unit_price = total  # If no quantity, unit price = total
+                    unit_price = total
 
                 lines.append((0, 0, {
                     'product_id': boq_line.product_id.id,
-                    'name': boq_line.name or boq_line.product_id.name or 'Product',
-                    'quantity': boq_line.quantity,
+                    'name': boq_line.name or (boq_line.product_id.name if boq_line.product_id else 'Product'),
+                    'quantity': qty,
                     'uom_id': boq_line.uom_id.id,
                     'cost': cost,
                     'margin': margin,
                     'unit_price': unit_price,
                     'total': total,
                 }))
-            
+
             wizard.line_preview_ids = lines
 
     @api.depends('line_preview_ids.cost', 'line_preview_ids.margin', 'line_preview_ids.total')
