@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_smb_credit_reject_reason_list" model="ir.ui.view">
+            <field name="name">smb.credit.reject.reason.list</field>
+            <field name="model">smb.credit.reject.reason</field>
+            <field name="arch" type="xml">
+                <list string="Reject Reasons" create="1" delete="1" edit="1">
+                    <field name="sequence" widget="handle"/>
+                    <field name="name"/>
+                    <field name="active"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_smb_credit_reject_reason_form" model="ir.ui.view">
+            <field name="name">smb.credit.reject.reason.form</field>
+            <field name="model">smb.credit.reject.reason</field>
+            <field name="arch" type="xml">
+                <form string="Reject Reason">
+                    <sheet>
+                        <group>
+                            <field name="name" placeholder="e.g. Overdue payments – please clear outstanding balance"/>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_smb_credit_reject_reason" model="ir.actions.act_window">
+            <field name="name">Reject Reasons</field>
+            <field name="res_model">smb.credit.reject.reason</field>
+            <field name="view_mode">list,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No reject reasons defined.
+                </p>
+                <p>
+                    Add predefined reasons shown when Credit Control rejects a quotation.
+                    Users can still add additional notes in the Reject Credit wizard.
+                </p>
+            </field>
+        </record>
+    </data>
+</odoo>

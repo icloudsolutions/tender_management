@@ -8,7 +8,8 @@
                 <form string="Reject Credit">
                     <group>
                         <field name="order_id" readonly="1"/>
-                        <field name="reason" placeholder="e.g. Overdue payments; credit limit exceeded. Request payment clearance or credit limit increase."/>
+                        <field name="reason_id" options="{'no_create': False}" placeholder="Select a reason or add notes below"/>
+                        <field name="reason_notes" placeholder="Optional: add details or type a custom reason"/>
                     </group>
                     <footer>
                         <button name="action_reject" string="Reject" type="object" class="btn-danger"/>

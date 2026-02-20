@@ -73,6 +73,12 @@
             parent="menu_smb_config"
             action="action_smb_project_task_template"
             sequence="10"/>
+        <menuitem id="menu_smb_credit_reject_reasons"
+            name="Reject Reasons"
+            parent="menu_smb_config"
+            action="action_smb_credit_reject_reason"
+            sequence="20"
+            groups="ics_smb_management.group_smb_credit_control"/>
 
         <!-- SMB Credit State filters: added via action context (search_default_*). 
              To add filters to Sale Order search view, inherit sale.view_order_search 

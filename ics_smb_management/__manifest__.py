@@ -38,12 +38,14 @@ Features:
         'views/res_config_settings_views.xml',
         'views/sale_order_views.xml',
         'views/smb_project_task_template_views.xml',
+        'views/smb_credit_reject_reason_views.xml',
         'views/smb_menus.xml',
         'views/crm_lead_views.xml',
         'views/project_project_views.xml',
         'wizard/smb_credit_reject_wizard_views.xml',
         'wizard/smb_create_project_wizard_views.xml',
         'data/smb_project_task_template_data.xml',
+        'data/smb_credit_reject_reason_data.xml',
     ],
     'assets': {
         'web.assets_backend': [

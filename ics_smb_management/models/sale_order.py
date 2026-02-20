@@ -45,6 +45,70 @@ class SaleOrder(models.Model):
         default=False,
         help='If set, sales coordinates with logistics for timely delivery.',
     )
+    warranty_years = fields.Selection(
+        selection=[
+            (1, '1 Year'),
+            (2, '2 Years'),
+            (3, '3 Years'),
+        ],
+        string='Warranty (Years)',
+        copy=True,
+        help='Warranty period in years. This is added explicitly to Terms and Conditions.',
+    )
+
+    def _smb_warranty_sentence(self, years):
+        """Return the explicit warranty clause for terms and conditions."""
+        if not years:
+            return ''
+        year_label = _('%s year', 'Warranty years') % years if years == 1 else _('%s years', 'Warranty years') % years
+        return _('Warranty: %s from the date of delivery.', 'Terms and conditions clause') % year_label
+
+    def _smb_note_apply_warranty(self, note, warranty_years):
+        """Ensure note contains exactly one warranty sentence; remove old, append new if years set."""
+        if not note:
+            note = ''
+        prefix = 'Warranty:'
+        lines = []
+        for line in note.splitlines():
+            stripped = line.strip()
+            if stripped.startswith(prefix):
+                continue
+            lines.append(line)
+        base = '\n'.join(lines).rstrip()
+        sentence = self._smb_warranty_sentence(warranty_years) if warranty_years else ''
+        if not sentence:
+            return base
+        return base + ('\n\n' if base else '') + sentence
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if 'warranty_years' in vals:
+                vals['note'] = self._smb_note_apply_warranty(
+                    vals.get('note') or '', vals.get('warranty_years')
+                )
+        return super().create(vals_list)
+
+    def write(self, vals):
+        if 'warranty_years' in vals and 'note' not in vals:
+            warranty_years = vals['warranty_years']
+            for order in self:
+                new_note = order._smb_note_apply_warranty(order.note or '', warranty_years)
+                super(SaleOrder, order).write(dict(vals, note=new_note))
+            return True
+        if 'warranty_years' in vals and 'note' in vals:
+            if len(self) == 1:
+                vals['note'] = self._smb_note_apply_warranty(
+                    vals['note'] or '', vals['warranty_years']
+                )
+            else:
+                for order in self:
+                    super(SaleOrder, order).write(dict(
+                        vals,
+                        note=order._smb_note_apply_warranty(order.note or '', vals['warranty_years']),
+                    ))
+                return True
+        return super().write(vals)
 
     def action_smb_send_to_credit(self):
         """Sales: send quotation to Credit Control for approval (SMB-SOP-1)."""

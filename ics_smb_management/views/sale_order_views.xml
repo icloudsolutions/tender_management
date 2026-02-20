@@ -57,6 +57,7 @@
                         decoration-danger="smb_credit_state == 'credit_rejected'"
                         invisible="smb_credit_state == 'draft'"/>
                     <field name="smb_critical_order" invisible="state not in ('draft', 'sent')"/>
+                    <field name="warranty_years" placeholder="1, 2 or 3 years"/>
                 </xpath>
                 <xpath expr="//sheet" position="inside">
                     <group string="SMB Credit Control" name="smb_credit_control"
