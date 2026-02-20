@@ -74,22 +74,9 @@
             action="action_smb_project_task_template"
             sequence="10"/>
 
-        <!-- Search view: SMB Credit State filters -->
-        <record id="view_order_search_inherit_smb" model="ir.ui.view">
-            <field name="name">sale.order.search.inherit.smb</field>
-            <field name="model">sale.order</field>
-            <field name="inherit_id" ref="sale.view_order_search"/>
-            <field name="arch" type="xml">
-                <xpath expr="//search" position="inside">
-                    <filter string="Sent to Credit" name="sent_to_credit"
-                        domain="[('smb_credit_state', '=', 'sent_to_credit')]"/>
-                    <filter string="Credit Approved" name="credit_approved"
-                        domain="[('smb_credit_state', '=', 'credit_approved')]"/>
-                    <filter string="Credit Rejected" name="credit_rejected"
-                        domain="[('smb_credit_state', '=', 'credit_rejected')]"/>
-                </xpath>
-            </field>
-        </record>
+        <!-- SMB Credit State filters: added via action context (search_default_*). 
+             To add filters to Sale Order search view, inherit sale.view_order_search 
+             or sale_management.view_order_search (id varies by Odoo/Enterprise). -->
 
     </data>
 </odoo>
