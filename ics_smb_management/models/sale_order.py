@@ -64,8 +64,13 @@ class SaleOrder(models.Model):
             n = int(years)
         except (TypeError, ValueError):
             return ''
-        year_label = _('%s year', 'Warranty years') % n if n == 1 else _('%s years', 'Warranty years') % n
-        return _('Warranty: %s from the date of delivery.', 'Terms and conditions clause') % year_label
+        if n == 1:
+            year_label = _('1 year')
+        elif n == 2:
+            year_label = _('2 years')
+        else:
+            year_label = _('3 years')
+        return _('Warranty: %s from the date of delivery.') % year_label
 
     def _smb_note_apply_warranty(self, note, warranty_years):
         """Ensure note contains exactly one warranty sentence; remove old, append new if years set."""
