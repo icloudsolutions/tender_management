@@ -47,9 +47,9 @@ class SaleOrder(models.Model):
     )
     warranty_years = fields.Selection(
         selection=[
-            (1, '1 Year'),
-            (2, '2 Years'),
-            (3, '3 Years'),
+            ('1', '1 Year'),
+            ('2', '2 Years'),
+            ('3', '3 Years'),
         ],
         string='Warranty (Years)',
         copy=True,
@@ -60,7 +60,11 @@ class SaleOrder(models.Model):
         """Return the explicit warranty clause for terms and conditions."""
         if not years:
             return ''
-        year_label = _('%s year', 'Warranty years') % years if years == 1 else _('%s years', 'Warranty years') % years
+        try:
+            n = int(years)
+        except (TypeError, ValueError):
+            return ''
+        year_label = _('%s year', 'Warranty years') % n if n == 1 else _('%s years', 'Warranty years') % n
         return _('Warranty: %s from the date of delivery.', 'Terms and conditions clause') % year_label
 
     def _smb_note_apply_warranty(self, note, warranty_years):
