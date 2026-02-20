@@ -81,15 +81,21 @@ class SmbCreateProjectWizard(models.TransientModel):
         project_start = self.date_start or fields.Date.context_today(self)
         Task = self.env['project.task']
         has_planned_hours = 'planned_hours' in Task._fields
+        priority_field = Task._fields.get('priority')
+        if priority_field and hasattr(priority_field, 'selection') and not callable(priority_field.selection):
+            allowed_priorities = set(v for v, _ in (priority_field.selection or []))
+        else:
+            allowed_priorities = set()
         for line in self.task_template_id.task_line_ids:
             task_vals = {
                 'name': line.name,
                 'project_id': project.id,
                 'partner_id': self.partner_id.id,
                 'description': line.description,
-                'priority': line.priority,
                 'tag_ids': [(6, 0, line.tag_ids.ids)] if line.tag_ids else False,
             }
+            if allowed_priorities and line.priority in allowed_priorities:
+                task_vals['priority'] = line.priority
             if has_planned_hours:
                 task_vals['planned_hours'] = line.planned_hours
             if line.delay_days > 0:
