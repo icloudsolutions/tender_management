@@ -2,6 +2,7 @@
 <odoo>
     <data noupdate="1">
         <!-- Monthly: remind to send Statement of Account to credit customers (SMB-SOP-1 Collection) -->
+        <!-- Odoo 18: numbercall and doall removed from ir.cron -->
         <record id="ir_cron_smb_monthly_soa_reminder" model="ir.cron">
             <field name="name">SMB: Monthly SoA reminder</field>
             <field name="model_id" ref="sale.model_sale_order"/>
@@ -9,9 +10,7 @@
             <field name="code">model._cron_smb_monthly_soa_reminder()</field>
             <field name="interval_number">1</field>
             <field name="interval_type">months</field>
-            <field name="numbercall">-1</field>
             <field name="active" eval="True"/>
-            <field name="doall" eval="False"/>
         </record>
         <!-- Daily: escalate overdue invoices to Sales (SMB-SOP-1 Collection) -->
         <record id="ir_cron_smb_escalate_overdue_to_sales" model="ir.cron">
@@ -21,9 +20,7 @@
             <field name="code">model._cron_smb_escalate_overdue_to_sales()</field>
             <field name="interval_number">1</field>
             <field name="interval_type">days</field>
-            <field name="numbercall">-1</field>
             <field name="active" eval="True"/>
-            <field name="doall" eval="False"/>
         </record>
     </data>
 </odoo>
