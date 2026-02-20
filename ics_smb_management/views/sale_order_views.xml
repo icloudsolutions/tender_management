@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Sale Order form: SMB Credit Control workflow -->
+        <record id="view_order_form_inherit_smb" model="ir.ui.view">
+            <field name="name">sale.order.form.inherit.smb</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button name="action_smb_create_project" type="object"
+                        class="oe_stat_button" icon="fa-tasks"
+                        invisible="state not in ('sale', 'done')"
+                        groups="ics_smb_management.group_smb_user">
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_text">Create Project</span>
+                        </div>
+                    </button>
+                    <button name="action_smb_send_to_credit" type="object"
+                        class="oe_stat_button" icon="fa-credit-card"
+                        invisible="state not in ('draft', 'sent') or smb_credit_state not in ('draft', 'credit_rejected')"
+                        groups="ics_smb_management.group_smb_user">
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_text">Send to Credit</span>
+                        </div>
+                    </button>
+                    <button name="action_smb_credit_approve" type="object"
+                        class="oe_stat_button" icon="fa-check-circle"
+                        invisible="smb_credit_state != 'sent_to_credit'"
+                        groups="ics_smb_management.group_smb_credit_control">
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_text">Approve Credit</span>
+                        </div>
+                    </button>
+                    <button name="action_smb_open_reject_wizard" type="object"
+                        class="oe_stat_button" icon="fa-times-circle"
+                        invisible="smb_credit_state != 'sent_to_credit'"
+                        groups="ics_smb_management.group_smb_credit_control">
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_text">Reject Credit</span>
+                        </div>
+                    </button>
+                    <button name="action_smb_reset_credit" type="object"
+                        class="oe_stat_button" icon="fa-undo"
+                        invisible="smb_credit_state != 'credit_rejected' or state not in ('draft', 'sent')"
+                        groups="ics_smb_management.group_smb_user">
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_text">Reset Credit</span>
+                        </div>
+                    </button>
+                </xpath>
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="smb_credit_state" widget="badge"
+                        decoration-success="smb_credit_state == 'credit_approved'"
+                        decoration-warning="smb_credit_state == 'sent_to_credit'"
+                        decoration-danger="smb_credit_state == 'credit_rejected'"
+                        invisible="smb_credit_state == 'draft'"/>
+                    <field name="smb_critical_order" invisible="state not in ('draft', 'sent')"/>
+                </xpath>
+                <xpath expr="//sheet" position="inside">
+                    <group string="SMB Credit Control" name="smb_credit_control"
+                        invisible="smb_credit_state == 'draft' and not smb_credit_reject_reason">
+                        <group>
+                            <field name="smb_credit_approved_by" readonly="1"/>
+                            <field name="smb_credit_approved_date" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="smb_credit_reject_reason" readonly="1" nolabel="1"
+                                placeholder="Reason for rejection (e.g. overdue payments, credit limit exceeded)..."/>
+                        </group>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>

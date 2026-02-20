@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_smb_project_task_template_list" model="ir.ui.view">
+            <field name="name">smb.project.task.template.list</field>
+            <field name="model">smb.project.task.template</field>
+            <field name="arch" type="xml">
+                <list string="Project Task Templates" create="1" delete="1" edit="1">
+                    <field name="sequence" widget="handle"/>
+                    <field name="name"/>
+                    <field name="project_type"/>
+                    <field name="task_count"/>
+                    <field name="active" invisible="1"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_smb_project_task_template_form" model="ir.ui.view">
+            <field name="name">smb.project.task.template.form</field>
+            <field name="model">smb.project.task.template</field>
+            <field name="arch" type="xml">
+                <form string="SMB Project Task Template">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="project_type"/>
+                                <field name="sequence"/>
+                                <field name="active"/>
+                            </group>
+                            <group>
+                                <field name="task_count"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Tasks" name="tasks">
+                                <field name="task_line_ids">
+                                    <list editable="bottom" create="1" delete="1">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="name"/>
+                                        <field name="planned_hours"/>
+                                        <field name="priority"/>
+                                        <field name="delay_days"/>
+                                        <field name="user_id"/>
+                                        <field name="stage_id"/>
+                                    </list>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_smb_project_task_template" model="ir.actions.act_window">
+            <field name="name">Project Task Templates</field>
+            <field name="res_model">smb.project.task.template</field>
+            <field name="view_mode">list,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">Create your first SMB project task template</p>
+                <p>Define reusable task lists for delivery or support projects. Use them when creating a project from a Sale Order (Create Project button). Set a default in Settings → Sales → SMB Credit Control.</p>
+            </field>
+        </record>
+    </data>
+</odoo>

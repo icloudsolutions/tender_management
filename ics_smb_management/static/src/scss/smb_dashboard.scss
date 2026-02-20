@@ -1,0 +1,94 @@
+.ics_smb_dashboard {
+    padding: 20px;
+    background-color: #f8f9fc;
+    min-height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    .dashboard-header h2 {
+        color: #5a5c69;
+        font-weight: 700;
+        font-size: 1.75rem;
+    }
+
+    .card {
+        border-radius: 0.35rem;
+        border: none;
+
+        &.border-left-primary {
+            border-left: 0.25rem solid #4e73df !important;
+        }
+        &.border-left-success {
+            border-left: 0.25rem solid #1cc88a !important;
+        }
+        &.border-left-info {
+            border-left: 0.25rem solid #36b9cc !important;
+        }
+        &.border-left-warning {
+            border-left: 0.25rem solid #f6c23e !important;
+        }
+        &.border-left-danger {
+            border-left: 0.25rem solid #e74a3b !important;
+        }
+
+        .card-header {
+            background-color: #f8f9fc;
+            border-bottom: 1px solid #e3e6f0;
+            padding: 0.75rem 1.25rem;
+        }
+        .card-body {
+            padding: 1.25rem;
+        }
+    }
+
+    .cursor-pointer {
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+        &:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        }
+    }
+
+    .chart-container {
+        position: relative;
+        height: 250px;
+        canvas {
+            max-height: 100%;
+            max-width: 100%;
+        }
+    }
+
+    .text-gray-800 {
+        color: #5a5c69 !important;
+    }
+    .text-gray-300 {
+        color: #dddfeb !important;
+    }
+    .text-xs {
+        font-size: 0.7rem;
+    }
+    .font-weight-bold {
+        font-weight: 700;
+    }
+    .text-uppercase {
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    .shadow {
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15) !important;
+    }
+    .h5 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 0;
+    }
+    .no-gutters > .col,
+    .no-gutters > [class*="col-"] {
+        padding-right: 0;
+        padding-left: 0;
+    }
+    .text-muted {
+        color: #858796 !important;
+    }
+}

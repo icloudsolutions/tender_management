@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- SMB root menu (under Sales) -->
+        <menuitem id="menu_smb_root"
+            name="SMB"
+            parent="sale.sale_menu_root"
+            sequence="50"/>
+
+        <!-- Dashboard (first) -->
+        <menuitem id="menu_smb_dashboard"
+            name="Dashboard"
+            parent="menu_smb_root"
+            action="action_smb_dashboard"
+            sequence="0"/>
+
+        <record id="action_smb_dashboard" model="ir.actions.client">
+            <field name="name">SMB Dashboard</field>
+            <field name="tag">ics_smb_management.smb_dashboard</field>
+        </record>
+
+        <!-- Credit Approval queue: quotations sent to Credit Control -->
+        <menuitem id="menu_smb_credit_approval"
+            name="Credit Approval"
+            parent="menu_smb_root"
+            action="action_smb_credit_approval_orders"
+            sequence="10"
+            groups="ics_smb_management.group_smb_credit_control"/>
+
+        <!-- Collection: overdue invoices (escalate to Sales per SMB-SOP-1) -->
+        <menuitem id="menu_smb_collection_overdue"
+            name="Overdue Invoices"
+            parent="menu_smb_root"
+            action="action_smb_overdue_invoices"
+            sequence="20"/>
+
+        <!-- Action: Overdue customer invoices (Collection follow-up) -->
+        <record id="action_smb_overdue_invoices" model="ir.actions.act_window">
+            <field name="name">Overdue Invoices (SMB Collection)</field>
+            <field name="res_model">account.move</field>
+            <field name="view_mode">list,form</field>
+            <field name="domain">[('move_type', '=', 'out_invoice'), ('state', '=', 'posted'), ('payment_state', 'in', ['not_paid', 'partial'])]</field>
+            <field name="context">{'default_move_type': 'out_invoice'}</field>
+        </record>
+
+        <!-- Action: Quotations pending credit approval -->
+        <record id="action_smb_credit_approval_orders" model="ir.actions.act_window">
+            <field name="name">Credit Approval Queue</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_mode">list,form</field>
+            <field name="context">{
+                'search_default_sent_to_credit': 1,
+                'search_default_draft': 1,
+            }</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No quotations pending credit approval.
+                </p>
+                <p>
+                    Quotations sent to Credit Control by Sales appear here.
+                    Use <strong>Approve Credit</strong> or <strong>Reject Credit</strong> on the order form.
+                </p>
+            </field>
+        </record>
+
+        <!-- Configuration: Project Task Templates (like ics_tender_management) -->
+        <menuitem id="menu_smb_config"
+            name="Configuration"
+            parent="menu_smb_root"
+            sequence="90"/>
+        <menuitem id="menu_smb_project_task_templates"
+            name="Project Task Templates"
+            parent="menu_smb_config"
+            action="action_smb_project_task_template"
+            sequence="10"/>
+
+        <!-- Search view: SMB Credit State filters -->
+        <record id="view_order_search_inherit_smb" model="ir.ui.view">
+            <field name="name">sale.order.search.inherit.smb</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_search"/>
+            <field name="arch" type="xml">
+                <xpath expr="//search" position="inside">
+                    <filter string="Sent to Credit" name="sent_to_credit"
+                        domain="[('smb_credit_state', '=', 'sent_to_credit')]"/>
+                    <filter string="Credit Approved" name="credit_approved"
+                        domain="[('smb_credit_state', '=', 'credit_approved')]"/>
+                    <filter string="Credit Rejected" name="credit_rejected"
+                        domain="[('smb_credit_state', '=', 'credit_rejected')]"/>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>
