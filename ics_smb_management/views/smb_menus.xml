@@ -8,34 +8,12 @@
             parent="sale.sale_menu_root"
             sequence="50"/>
 
-        <!-- Dashboard (first) -->
-        <menuitem id="menu_smb_dashboard"
-            name="Dashboard"
-            parent="menu_smb_root"
-            action="action_smb_dashboard"
-            sequence="0"/>
-
+        <!-- Define all actions before menuitems that reference them -->
         <record id="action_smb_dashboard" model="ir.actions.client">
             <field name="name">SMB Dashboard</field>
             <field name="tag">ics_smb_management.smb_dashboard</field>
         </record>
 
-        <!-- Credit Approval queue: quotations sent to Credit Control -->
-        <menuitem id="menu_smb_credit_approval"
-            name="Credit Approval"
-            parent="menu_smb_root"
-            action="action_smb_credit_approval_orders"
-            sequence="10"
-            groups="ics_smb_management.group_smb_credit_control"/>
-
-        <!-- Collection: overdue invoices (escalate to Sales per SMB-SOP-1) -->
-        <menuitem id="menu_smb_collection_overdue"
-            name="Overdue Invoices"
-            parent="menu_smb_root"
-            action="action_smb_overdue_invoices"
-            sequence="20"/>
-
-        <!-- Action: Overdue customer invoices (Collection follow-up) -->
         <record id="action_smb_overdue_invoices" model="ir.actions.act_window">
             <field name="name">Overdue Invoices (SMB Collection)</field>
             <field name="res_model">account.move</field>
@@ -44,7 +22,6 @@
             <field name="context">{'default_move_type': 'out_invoice'}</field>
         </record>
 
-        <!-- Action: Quotations pending credit approval -->
         <record id="action_smb_credit_approval_orders" model="ir.actions.act_window">
             <field name="name">Credit Approval Queue</field>
             <field name="res_model">sale.order</field>
@@ -63,6 +40,28 @@
                 </p>
             </field>
         </record>
+
+        <!-- Dashboard -->
+        <menuitem id="menu_smb_dashboard"
+            name="Dashboard"
+            parent="menu_smb_root"
+            action="action_smb_dashboard"
+            sequence="0"/>
+
+        <!-- Credit Approval queue: quotations sent to Credit Control -->
+        <menuitem id="menu_smb_credit_approval"
+            name="Credit Approval"
+            parent="menu_smb_root"
+            action="action_smb_credit_approval_orders"
+            sequence="10"
+            groups="ics_smb_management.group_smb_credit_control"/>
+
+        <!-- Collection: overdue invoices (escalate to Sales per SMB-SOP-1) -->
+        <menuitem id="menu_smb_collection_overdue"
+            name="Overdue Invoices"
+            parent="menu_smb_root"
+            action="action_smb_overdue_invoices"
+            sequence="20"/>
 
         <!-- Configuration: Project Task Templates (like ics_tender_management) -->
         <menuitem id="menu_smb_config"
