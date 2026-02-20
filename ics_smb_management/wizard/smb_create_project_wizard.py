@@ -79,6 +79,8 @@ class SmbCreateProjectWizard(models.TransientModel):
         if not self.task_template_id or not self.task_template_id.task_line_ids:
             return
         project_start = self.date_start or fields.Date.context_today(self)
+        Task = self.env['project.task']
+        has_planned_hours = 'planned_hours' in Task._fields
         for line in self.task_template_id.task_line_ids:
             task_vals = {
                 'name': line.name,
@@ -87,8 +89,9 @@ class SmbCreateProjectWizard(models.TransientModel):
                 'description': line.description,
                 'priority': line.priority,
                 'tag_ids': [(6, 0, line.tag_ids.ids)] if line.tag_ids else False,
-                'planned_hours': line.planned_hours,
             }
+            if has_planned_hours:
+                task_vals['planned_hours'] = line.planned_hours
             if line.delay_days > 0:
                 task_vals['date_deadline'] = project_start + timedelta(days=line.delay_days)
             if line.user_id:
@@ -97,4 +100,4 @@ class SmbCreateProjectWizard(models.TransientModel):
                 task_vals['user_ids'] = [(6, 0, [self.user_id.id])]
             if line.stage_id:
                 task_vals['stage_id'] = line.stage_id.id
-            self.env['project.task'].create(task_vals)
+            Task.create(task_vals)
