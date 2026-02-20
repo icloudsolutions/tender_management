@@ -1,9 +1,13 @@
+/* Ensure SMB dashboard is scrollable inside Odoo action manager */
 .ics_smb_dashboard {
     padding: 20px;
     background-color: #f8f9fc;
-    min-height: 100vh;
+    max-height: 100vh;
+    min-height: 0;
     overflow-y: auto;
     overflow-x: hidden;
+    box-sizing: border-box;
+    -webkit-overflow-scrolling: touch;
 
     .dashboard-header h2 {
         color: #5a5c69;
