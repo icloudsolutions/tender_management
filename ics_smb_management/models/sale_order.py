@@ -174,18 +174,25 @@ class SaleOrder(models.Model):
         return True
 
     def action_confirm(self):
-        """Enforce: only allow confirm when credit is approved (if company requires it and SMB workflow was used)."""
+        """Enforce: when company requires it, only allow confirm when credit is approved (SMB workflow)."""
         for order in self:
-            if not order.company_id.smb_require_credit_approval:
+            company = order.company_id or self.env.company
+            if not getattr(company, 'smb_require_credit_approval', False):
                 continue
-            if order.smb_credit_state == 'sent_to_credit':
+            # Require credit_approved: block draft (never sent), sent_to_credit (pending), credit_rejected
+            if order.smb_credit_state != 'credit_approved':
+                if order.smb_credit_state == 'sent_to_credit':
+                    raise UserError(
+                        _('This order is pending Credit Control approval. It cannot be confirmed yet.')
+                    )
+                if order.smb_credit_state == 'credit_rejected':
+                    raise UserError(
+                        _('This order was rejected by Credit Control. '
+                          'Reset credit state after payment clearance, then resend to Credit Control.')
+                    )
+                # draft or any other: must go through credit first
                 raise UserError(
-                    _('This order is pending Credit Control approval. It cannot be confirmed yet.')
-                )
-            if order.smb_credit_state == 'credit_rejected':
-                raise UserError(
-                    _('This order was rejected by Credit Control. '
-                      'Reset credit state after payment clearance, then resend to Credit Control.')
+                    _('Credit approval is required before confirming. Send this quotation to Credit Control first (Send to Credit), then confirm after approval.')
                 )
         return super().action_confirm()
 

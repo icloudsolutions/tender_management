@@ -1,18 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <record id="view_crm_lead_form_inherit_smb" model="ir.ui.view">
-            <field name="name">crm.lead.form.inherit.smb</field>
-            <field name="model">crm.lead</field>
-            <field name="inherit_id" ref="crm.crm_lead_view_form"/>
-            <field name="arch" type="xml">
-                <xpath expr="//header" position="inside">
-                    <button name="action_create_smb_quotation" string="Create SMB Quotation"
-                        type="object" class="btn-secondary"
-                        groups="ics_smb_management.group_smb_user"
-                        invisible="type == 'lead' or not partner_id"/>
-                </xpath>
-            </field>
-        </record>
+        <!-- Create SMB Quotation removed: use standard Odoo "New Quotation" on opportunity (same result). -->
     </data>
 </odoo>
