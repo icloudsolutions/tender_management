@@ -39,7 +39,7 @@ jobs:
       - name: Deploy addons (rsync)
         run: |
           RSYNC_RSH="ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new -p ${{ secrets.DEPLOY_SSH_PORT || 22 }}"
-          for MODULE in ics_etimad_tenders_crm ics_tender_management project_tasks_from_templates; do
+          for MODULE in ics_etimad_tenders_crm ics_tender_management project_tasks_from_templates ics_smb_management; do
             rsync -avz --delete -e "$RSYNC_RSH" \
               ${MODULE}/ \
               ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ env.DEPLOY_PATH }}/${{ env.ADDONS_DIR }}/${MODULE}/
