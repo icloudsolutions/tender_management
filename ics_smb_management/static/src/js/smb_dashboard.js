@@ -144,6 +144,32 @@ export class SmbDashboard extends Component {
         });
     }
 
+    openCreditApproved() {
+        this.action.doAction({
+            name: "Credit Approved",
+            type: "ir.actions.act_window",
+            res_model: "sale.order",
+            views: [
+                [false, "list"],
+                [false, "form"],
+            ],
+            domain: [["smb_credit_state", "=", "credit_approved"]],
+        });
+    }
+
+    openCreditRejected() {
+        this.action.doAction({
+            name: "Credit Rejected",
+            type: "ir.actions.act_window",
+            res_model: "sale.order",
+            views: [
+                [false, "list"],
+                [false, "form"],
+            ],
+            domain: [["smb_credit_state", "=", "credit_rejected"]],
+        });
+    }
+
     openOverdueInvoices() {
         this.action.doAction({
             name: "Overdue Invoices",
