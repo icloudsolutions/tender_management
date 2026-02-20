@@ -12,13 +12,14 @@ on:
       - 'ics_tender_management/**'
       - 'ics_etimad_tenders_crm/**'
       - 'project_tasks_from_templates/**'
+      - 'ics_smb_management/**'
       - '.github/workflows/deploy.yml'
   workflow_dispatch:
 
 env:
   DEPLOY_PATH: /root/libya/dev-18
   ADDONS_DIR: addons
-  MODULES: ics_etimad_tenders_crm,ics_tender_management,project_tasks_from_templates
+  MODULES: ics_etimad_tenders_crm,ics_tender_management,ics_smb_management,project_tasks_from_templates
 
 jobs:
   deploy:
