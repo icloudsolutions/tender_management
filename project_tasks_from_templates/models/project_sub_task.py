@@ -45,7 +45,7 @@ class ProjectSubTask(models.Model):
     user_ids = fields.Many2many(
         'res.users', relation='project_task_custom_user_rel',
         column1='task_id', column2='user_id', string='Assignees',
-        tracking=True, help='Select the users who are assigned to this task.')
+        help='Select the users who are assigned to this task.')
     parent_id = fields.Many2one(
         'project.sub.task', string='Parent Task', index=True,
         help='Select the parent task, if any.')
