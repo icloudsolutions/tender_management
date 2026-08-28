@@ -167,8 +167,13 @@ class Tender(models.Model):
     # Dates
     etimad_published_at = fields.Datetime('Published At', 
         help='Publication date from Etimad portal', tracking=True)
-    
-    
+
+    # Fees from Etimad portal
+    etimad_financial_fees = fields.Float('Financial Fees',
+        help='Financial/document fees from the Etimad portal')
+    etimad_total_fees = fields.Float('Total Fees',
+        help='Total fees from the Etimad portal')
+
     # External Source
     external_source = fields.Char('External Source', default='Etimad Portal', readonly=True,
         help='Source of the tender (e.g., Etimad Portal, Manual Entry)')
