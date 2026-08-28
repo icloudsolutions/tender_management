@@ -24,10 +24,10 @@
                            string="Linked Tender"
                            options="{'no_create': True}"
                            readonly="1"/>
-                    <div invisible="not tender_id_ics" class="alert alert-success mt-2">
+                    <div invisible="not tender_id_ics" class="alert alert-success mt-2" role="status">
                         <i class="fa fa-check-circle"/> This tender is linked to Tender Management
                     </div>
-                    <div invisible="tender_id_ics" class="alert alert-info mt-2">
+                    <div invisible="tender_id_ics" class="alert alert-info mt-2" role="status">
                         <i class="fa fa-lightbulb-o"/> Click "Create Tender" to start managing this tender
                     </div>
                 </group>

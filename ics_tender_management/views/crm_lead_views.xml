@@ -16,7 +16,7 @@
                 <xpath expr="//sheet" position="before">
                     <div class="alert alert-warning" role="alert" invisible="not active_tender_id">
                         <div class="d-flex align-items-center">
-                            <i class="fa fa-lock fa-2x me-3"/>
+                            <i class="fa fa-lock fa-2x me-3" title="Locked"/>
                             <div class="flex-grow-1">
                                 <strong><i class="fa fa-briefcase"/> This opportunity is controlled by Tender Management</strong>
                                 <p class="mb-0">
