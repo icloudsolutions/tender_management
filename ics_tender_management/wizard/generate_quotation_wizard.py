@@ -25,8 +25,8 @@ class GenerateQuotationWizard(models.TransientModel):
 
     notes = fields.Html('Terms and Conditions')
 
-    line_preview_ids = fields.One2many('ics.tender.quotation.line.preview', 'wizard_id',
-        string='Preview Lines', compute='_compute_preview_lines', store=False, readonly=True)
+    line_preview_ids = fields.One2many(
+        'ics.tender.quotation.line.preview', 'wizard_id', string='Preview Lines')
 
     total_cost = fields.Monetary('Total Cost', compute='_compute_totals',
         currency_field='currency_id')
@@ -86,9 +86,17 @@ class GenerateQuotationWizard(models.TransientModel):
     @api.depends('line_preview_ids.cost', 'line_preview_ids.margin', 'line_preview_ids.total')
     def _compute_totals(self):
         for wizard in self:
-            wizard.total_cost = sum(wizard.line_preview_ids.mapped('cost'))
-            wizard.total_margin = sum(wizard.line_preview_ids.mapped('margin'))
-            wizard.total_amount = sum(wizard.line_preview_ids.mapped('total'))
+            if not wizard.tender_id:
+                wizard.total_cost = wizard.total_margin = wizard.total_amount = 0.0
+                continue
+            totals = wizard._get_preview_totals(
+                wizard.tender_id, wizard.margin_percentage, wizard.use_vendor_costs)
+            wizard.total_cost, wizard.total_margin, wizard.total_amount = totals
+
+    def _refresh_preview_lines(self):
+        self.ensure_one()
+        self.line_preview_ids = [(5, 0, 0)] + self._prepare_preview_commands(
+            self.tender_id, self.margin_percentage, self.use_vendor_costs)
 
     def action_generate_quotation(self):
         self.ensure_one()
@@ -98,7 +106,7 @@ class GenerateQuotationWizard(models.TransientModel):
 
         if not self.partner_id:
             raise UserError(_('Please set a customer on the tender before generating quotation.'))
-        
+
         if self.margin_percentage < 0:
             raise UserError(_('Margin percentage cannot be negative.'))
 
@@ -114,12 +122,11 @@ class GenerateQuotationWizard(models.TransientModel):
         # Build quotation vals with only available fields
         so_model = self.env['sale.order']
         so_fields = so_model._fields.keys()
-        
+
         quotation_vals = {
             'partner_id': self.partner_id.id,
         }
-        
-        # Add optional fields if they exist
+
         if 'tender_id' in so_fields:
             quotation_vals['tender_id'] = self.tender_id.id
         if 'validity_date' in so_fields:
@@ -210,7 +217,7 @@ class GenerateQuotationWizard(models.TransientModel):
                 sol_vals['product_uom'] = preview_line.uom_id.id
             if 'price_unit' in sol_fields:
                 sol_vals['price_unit'] = preview_line.unit_price
-                
+
             sol_model.create(sol_vals)
 
 
