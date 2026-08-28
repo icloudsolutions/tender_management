@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
-
         <record id="view_tender_list" model="ir.ui.view">
             <field name="name">ics.tender.list</field>
             <field name="model">ics.tender</field>
@@ -589,6 +587,4 @@
                 </search>
             </field>
         </record>
-
-    </data>
 </odoo>
