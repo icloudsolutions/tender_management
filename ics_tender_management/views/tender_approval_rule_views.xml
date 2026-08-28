@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+        
         <record id="view_tender_approval_rule_tree" model="ir.ui.view">
             <field name="name">ics.tender.approval.rule.tree</field>
             <field name="model">ics.tender.approval.rule</field>
@@ -109,4 +110,5 @@
                 </p>
             </field>
         </record>
+        
 </odoo>

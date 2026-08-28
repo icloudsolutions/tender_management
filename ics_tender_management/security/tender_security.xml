@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo noupdate="0">
+
         <record id="module_category_tender_management" model="ir.module.category">
             <field name="name">Tender Management</field>
             <field name="description">Manage tender processes and workflows</field>
@@ -44,4 +45,5 @@
             <field name="perm_create" eval="True"/>
             <field name="perm_unlink" eval="True"/>
         </record>
+
 </odoo>

@@ -13,41 +13,50 @@
                 
                 <header>
                     <button name="%(action_server_fetch_etimad_tenders)d" 
-                            string="🔄 Fetch Latest (50)" 
+                            string="Fetch Latest Tenders" 
                             type="action" 
                             class="btn-primary"
-                            title="Fetch latest 50 tenders from Etimad portal"/>
+                            icon="fa-refresh"
+                            title="Fetch latest tenders from Etimad portal (up to 150)"/>
                     <button name="%(action_server_fetch_batch_etimad_tenders)d" 
-                            string="🔄 Fetch Batch (150)" 
+                            string="Fetch Batch (250)" 
                             type="action" 
                             class="btn-secondary"
+                            icon="fa-refresh"
                             title="Fetch 150 tenders (3 pages) from Etimad portal"/>
+                    <button name="action_apply_matching_rules"
+                            string="Apply Matching Rules"
+                            type="object"
+                            class="btn-secondary"
+                            icon="fa-magic"
+                            title="Re-run dynamic matching rules on selected tenders"/>
                 </header>
                 
                 <field name="is_favorite" widget="boolean_favorite" nolabel="1"/>
-                <field name="reference_number" string="المرجع | Reference"/>
-                <field name="name" string="اسم المنافسة | Tender Name"/>
-                <field name="agency_name" string="الجهة | Agency"/>
-                <field name="tender_type" string="النوع | Type"/>
-                <field name="activity_name" string="النشاط | Activity" optional="hide"/>
-                <field name="estimated_amount" widget="monetary" options="{'currency_field': 'currency_id'}" optional="show" string="القيمة التقديرية | Est. Value"/>
+                <field name="reference_number" string="Reference"/>
+                <field name="name" string="Tender Name"/>
+                <field name="agency_name" string="Agency"/>
+                <field name="etimad_tender_type" string="Type"/>
+                <field name="activity_name" string="Activity" optional="hide"/>
+                <field name="estimated_amount" widget="monetary" options="{'currency_field': 'currency_id'}" optional="show" string="Est. Value"/>
                 <field name="estimated_value_category" widget="badge" optional="show" string="Value Category"
                        decoration-info="estimated_value_category == 'small'"
                        decoration-primary="estimated_value_category == 'medium'"
                        decoration-success="estimated_value_category == 'large'"
                        decoration-danger="estimated_value_category == 'mega'"/>
                 <field name="matching_score" widget="progressbar" optional="show" string="Match %" />
-                <field name="offers_deadline" string="آخر موعد للتقديم | Deadline"/>
+                <field name="offers_deadline" string="Deadline"/>
                 <field name="remaining_days" 
-                       string="الوقت المتبقي | Days Left"
+                       string="Days Left"
                        decoration-danger="is_urgent" 
                        decoration-warning="remaining_days &lt; 7 and remaining_days &gt; 3"/>
-                <field name="total_fees" widget="monetary" options="{'currency_field': 'currency_id'}" optional="hide" string="Total Fees"/>
+                <field name="document_cost_amount" widget="monetary" options="{'currency_field': 'currency_id'}" optional="hide" string="Document Cost"/>
                 <field name="tender_status_text" optional="show" string="Etimad Status" widget="badge"/>
-                <field name="is_participating" widget="boolean" optional="show" string="👥 Participating"/>
-                <field name="award_announced" widget="boolean" optional="hide" string="🏆 Awarded"/>
+                <field name="is_participating" widget="boolean" optional="show" string="Participating"/>
+                <field name="award_announced" widget="boolean" optional="hide" string="Awarded"/>
                 <field name="opportunity_id" optional="show" string="Opportunity"/>
-                <field name="deadline_extended" widget="boolean" optional="show" string="🔄 Extended"/>
+                <field name="assigned_user_id" optional="show" string="Assigned To"/>
+                <field name="deadline_extended" widget="boolean" optional="show" string="Extended"/>
                 <field name="scraping_status" widget="badge" optional="hide" string="Data Status"
                        decoration-success="scraping_status == 'success'"
                        decoration-danger="scraping_status == 'failed'"
@@ -89,15 +98,17 @@
             <form string="Etimad Tender" class="o_etimad_tender_form">
                 <header>
                     <button name="action_toggle_participating" 
-                            string="✅ Mark as Participating" 
+                            string="Mark as Participating" 
                             type="object" 
                             class="btn-success"
+                            icon="fa-check"
                             invisible="is_participating"
                             help="Mark that your company is preparing a quotation for this tender"/>
                     <button name="action_toggle_participating" 
-                            string="⬜ Unmark Participating" 
+                            string="Unmark Participating" 
                             type="object" 
                             class="btn-secondary"
+                            icon="fa-times"
                             invisible="not is_participating"
                             help="Remove participation flag"/>
                 </header>
@@ -182,12 +193,12 @@
                     
                     <!-- Status Ribbons -->
                     <widget name="web_ribbon" 
-                            title="⭐ Favorite" 
+                            title="Favorite" 
                             bg_color="bg-warning" 
                             invisible="not is_favorite"/>
                     
                     <widget name="web_ribbon" 
-                            title="⚠ Urgent" 
+                            title="Urgent" 
                             bg_color="bg-danger" 
                             invisible="remaining_days &gt; 3 or remaining_days &lt;= 0"/>
                     
@@ -212,13 +223,13 @@
                     
                     <!-- Main Information Groups -->
                     <group>
-                        <group string="📋 Tender Information" name="tender_info">
+                        <group string="Tender Information" name="tender_info">
                             <field name="tender_number" 
                                    string="Tender Number"
                                    placeholder="Auto-filled from Etimad"/>
-                            <field name="tender_type" 
-                                   string="Type"
-                                   placeholder="Tender type"/>
+                            <field name="etimad_tender_type" 
+                                   string="Etimad Type"
+                                   placeholder="Tender type from Etimad"/>
                             <field name="activity_name" 
                                    string="Activity"
                                    placeholder="Tender activity"/>
@@ -233,7 +244,7 @@
                                    readonly="1"/>
                         </group>
                         
-                        <group string="📅 Important Dates" name="dates_info">
+                        <group string="Important Dates" name="dates_info">
                             <field name="created_on" 
                                    string="Created" 
                                    readonly="1"
@@ -262,44 +273,43 @@
                     
                     <!-- Financial and CRM Information -->
                     <group>
-                        <group string="💰 Financial Information" name="financial_info">
+                        <group string="Financial Information" name="financial_info">
                             <field name="currency_id" invisible="1"/>
-                            <field name="invitation_cost" 
-                                   string="Invitation Cost"
+                            <field name="document_cost_amount" 
+                                   string="Document Cost"
+                                   help="قيمة وثائق المنافسة"
                                    widget="monetary" 
                                    options="{'currency_field': 'currency_id'}"/>
-                            <field name="financial_fees" 
-                                   string="Financial Fees"
-                                   widget="monetary" 
+                            <field name="estimated_amount"
+                                   string="Estimated Value"
+                                   help="القيمة التقديرية - Not always published"
+                                   widget="monetary"
                                    options="{'currency_field': 'currency_id'}"/>
-                            <label for="total_fees" string="Total Fees" class="fw-bold"/>
-                            <field name="total_fees" 
-                                   widget="monetary" 
-                                   options="{'currency_field': 'currency_id'}" 
-                                   class="oe_subtotal_footer_separator fw-bold"/>
                         </group>
                         
-                        <group string="🤝 CRM Integration" name="crm_info">
+                        <group string="CRM Integration" name="crm_info">
                             <field name="opportunity_id" 
                                    string="Linked Opportunity"
                                    options="{'no_create': True}"/>
-                            <div invisible="not opportunity_id" class="alert alert-info mt-2">
-                                <i class="fa fa-info-circle"/> This tender is linked to a CRM opportunity
+                            <field name="assigned_user_id" string="Assigned To"/>
+                            <field name="dynamic_match_reasons" invisible="not dynamic_match_reasons" placeholder="Set by matching rules"/>
+                            <div invisible="not opportunity_id" class="alert alert-info mt-2" role="status">
+                                <i class="fa fa-info-circle" title="Information"/> This tender is linked to a CRM opportunity
                             </div>
-                            <div invisible="opportunity_id" class="alert alert-warning mt-2">
-                                <i class="fa fa-exclamation-triangle"/> No opportunity created yet
+                            <div invisible="opportunity_id" class="alert alert-warning mt-2" role="status">
+                                <i class="fa fa-exclamation-triangle" title="Warning"/> No opportunity created yet
                             </div>
                         </group>
                         
-                        <group string="🔄 Etimad Updates" name="etimad_updates" invisible="not has_etimad_updates">
+                        <group string="Etimad Updates" name="etimad_updates" invisible="not has_etimad_updates">
                             <field name="has_etimad_updates" invisible="1"/>
                             <field name="deadline_extended" readonly="1" widget="boolean"/>
                             <field name="deadline_extensions_count" readonly="1" string="Times Extended" invisible="deadline_extensions_count == 0"/>
                             <field name="last_deadline_extension_date" readonly="1" widget="datetime" invisible="not last_deadline_extension_date"/>
                             <field name="previous_offers_deadline" readonly="1" widget="datetime" string="Previous Deadline" invisible="not previous_offers_deadline"/>
                             <field name="last_significant_change" readonly="1" widget="text" string="Last Change" invisible="not last_significant_change"/>
-                            <div invisible="not deadline_extended" class="alert alert-success mt-2">
-                                <i class="fa fa-check-circle"/> <strong>Deadline Extended!</strong> This tender's deadline has been extended by Etimad. Check activities for details.
+                            <div invisible="not deadline_extended" class="alert alert-success mt-2" role="status">
+                                <i class="fa fa-check-circle" title="Success"/> <strong>Deadline Extended!</strong> This tender's deadline has been extended by Etimad. Check activities for details.
                             </div>
                         </group>
                     </group>
@@ -308,79 +318,50 @@
                     <group invisible="not tender_url">
                         <div class="d-flex gap-2 mt-3">
                             <button name="action_open_url" 
-                                    string="🔗 Open on Etimad Portal" 
+                                    string="Open on Etimad Portal" 
                                     type="object" 
                                     class="btn btn-primary flex-grow-1" 
                                     icon="fa-external-link"
                                     title="Visit this tender on the Etimad website"/>
                             <button name="action_open_details_page" 
-                                    string="📋 View Details Page" 
+                                    string="View Details Page" 
                                     type="object" 
                                     class="btn btn-primary flex-grow-1" 
                                     icon="fa-file-text-o"
                                     invisible="not tender_id_string"
                                     title="Open detailed tender information page"/>
                             <button name="action_open_detailed_report" 
-                                    string="📊 View Report" 
+                                    string="View Report" 
                                     type="object" 
                                     class="btn btn-secondary flex-grow-1" 
                                     icon="fa-bar-chart"
                                     invisible="not tender_id_string"
                                     title="Open detailed tender report"/>
                             <button name="action_fetch_detailed_info" 
-                                    string="🔄 Fetch Details" 
+                                    string="Fetch Details" 
                                     type="object" 
                                     class="btn btn-warning flex-grow-1" 
                                     icon="fa-download"
                                     invisible="not tender_id_string"
                                     title="Fetch detailed information from Etimad API"/>
                             <button name="action_create_opportunity" 
-                                    string="➕ Create Opportunity" 
+                                    string="Create Opportunity" 
                                     type="object" 
                                     class="btn btn-success flex-grow-1" 
                                     icon="fa-plus-circle"
                                     invisible="opportunity_id"
                                     title="Create a CRM opportunity from this tender"/>
+                            <button name="action_apply_matching_rules"
+                                    string="Apply Matching Rules"
+                                    type="object"
+                                    class="btn btn-secondary flex-grow-1"
+                                    icon="fa-magic"
+                                    title="Re-run dynamic matching rules on this tender"/>
                         </div>
                     </group>
                     
                     <!-- Detailed Information in Notebook -->
                     <notebook>
-                        <page string="📝 Description" name="description">
-                            <field name="description" 
-                                   placeholder="Enter detailed tender description, requirements, and specifications..."
-                                   widget="text"
-                                   nolabel="1"/>
-                        </page>
-                        
-                        <page string="📓 Internal Notes" name="notes">
-                            <field name="notes" 
-                                   placeholder="Add internal notes, team comments, or action items here..."
-                                   widget="text"
-                                   nolabel="1"/>
-                        </page>
-                        
-                        <page string="📊 Technical Details" name="technical">
-                            <group>
-                                <group string="System Information">
-                                    <field name="tender_id" readonly="1"/>
-                                    <field name="tender_id_string" readonly="1"/>
-                                    <field name="activity_id" readonly="1"/>
-                                    <field name="tender_status_id" readonly="1"/>
-                                    <field name="tender_type_id" readonly="1"/>
-                                    <field name="agency_code" readonly="1"/>
-                                    <field name="tender_url" readonly="1" widget="url"/>
-                                </group>
-                                <group string="Status Information">
-                                    <field name="tender_status_text"/>
-                                    <field name="tender_status_approved" readonly="1"/>
-                                    <field name="is_participating" readonly="1"/>
-                                    <field name="is_favorite" readonly="1"/>
-                                    <field name="remaining_days" readonly="1"/>
-                                </group>
-                            </group>
-                        </page>
-                        
                         <!-- Tab 1: Basic Information (المعلومات الأساسية) -->
                         <page string="1. Basic Information" name="enhanced_basic_info">
                             <group>
@@ -395,21 +376,20 @@
                                 </group>
                             </group>
                             <group>
-                                <group string="Document Cost">
-                                    <field name="document_cost_type"/>
-                                    <field name="document_cost_amount" invisible="document_cost_type != 'paid'" widget="monetary"/>
-                                </group>
                                 <group string="Submission Method">
                                     <field name="submission_method"/>
                                 </group>
                             </group>
                             <group>
-                                <group string="Insurance &amp; Guarantees (الضمانات)">
+                                <group string="Insurance &amp; Guarantees">
                                     <field name="insurance_required"/>
                                     <field name="initial_guarantee_required" string="Initial Guarantee"/>
                                     <field name="initial_guarantee_type" 
                                            invisible="not initial_guarantee_required"
                                            string="Type"/>
+                                    <field name="initial_guarantee_address"
+                                           invisible="not initial_guarantee_required"
+                                           string="Address"/>
                                     <field name="final_guarantee_required" 
                                            readonly="1"
                                            string="Final Guarantee"/>
@@ -418,8 +398,8 @@
                                            invisible="not final_guarantee_required"
                                            string="Final %"/>
                                     
-                                    <div invisible="not final_guarantee_required" class="alert alert-info mt-2">
-                                        <i class="fa fa-bank"/> <strong>Final Guarantee (حسن الأداء):</strong><br/>
+                                    <div invisible="not final_guarantee_required" class="alert alert-info mt-2" role="status">
+                                        <i class="fa fa-bank" title="Bank guarantee"/> <strong>Final Guarantee (حسن الأداء):</strong><br/>
                                         Bank guarantee of <field name="final_guarantee_percentage" nolabel="1" readonly="1" widget="percentage"/> required after winning
                                     </div>
                                 </group>
@@ -460,14 +440,9 @@
                                     <field name="execution_regions" widget="text" placeholder="مناطق التنفيذ (Regions)"/>
                                     <field name="execution_cities" widget="text" placeholder="مدن التنفيذ (Cities)"/>
                                 </group>
-                                <group string="Classification">
+                                <group string="Contractor Classification">
                                     <field name="classification_field"/>
                                     <field name="classification_required"/>
-                                </group>
-                            </group>
-                            <group>
-                                <group string="Activity Details">
-                                    <field name="activity_details" widget="text" nolabel="1" placeholder="نشاط المنافسة (Tender Activity Details)"/>
                                 </group>
                             </group>
                         </page>
@@ -475,15 +450,19 @@
                         <!-- Tab 4: Work Types (أنواع الأعمال) -->
                         <page string="4. Work Types" name="enhanced_work_types">
                             <group>
+                                <group string="Tender Activity">
+                                    <field name="activity_details" widget="text" nolabel="1" 
+                                           placeholder="نشاط المنافسة (Tender Activity Details)"/>
+                                </group>
                                 <group string="Supply Items">
                                     <field name="includes_supply_items"/>
                                 </group>
+                            </group>
+                            <group>
                                 <group string="Construction Works">
                                     <field name="construction_works" widget="text" nolabel="1" 
                                            placeholder="أعمال الإنشاء (Construction Works)"/>
                                 </group>
-                            </group>
-                            <group>
                                 <group string="Maintenance &amp; Operation">
                                     <field name="maintenance_works" widget="text" nolabel="1" 
                                            placeholder="أعمال الصيانة والتشغيل (Maintenance &amp; Operation Works)"/>
@@ -498,11 +477,11 @@
                                     <field name="award_announced"/>
                                 </group>
                             </group>
-                            <div invisible="not award_announced" class="alert alert-success">
-                                <i class="fa fa-check-circle"/> Award results have been announced
+                            <div invisible="not award_announced" class="alert alert-success" role="status">
+                                <i class="fa fa-check-circle" title="Award announced"/> Award results have been announced
                             </div>
-                            <div invisible="award_announced" class="alert alert-info text-center">
-                                <i class="fa fa-info-circle" style="font-size:3rem"/> 
+                            <div invisible="award_announced" class="alert alert-info text-center" role="status">
+                                <i class="fa fa-info-circle" style="font-size:3rem" title="Award not yet announced"/> 
                                 <br/>لم يتم اعلان نتائج الترسية بعد
                                 <br/><small>Award results have not been announced yet</small>
                             </div>
@@ -518,13 +497,13 @@
                         <!-- Tab 6: Local Content & SME (المحتوى المحلي والمنشآت الصغيرة) -->
                         <page string="6. Local Content &amp; SME" name="local_content">
                             <group>
-                                <group string="Local Content Requirements (متطلبات المحتوى المحلي)">
+                                <group string="Local Content Requirements">
                                     <field name="local_content_required"/>
                                 </group>
                             </group>
                             
-                            <div invisible="local_content_required" class="alert alert-info text-center">
-                                <i class="fa fa-info-circle" style="font-size:3rem"/> 
+                            <div invisible="local_content_required" class="alert alert-info text-center" role="status">
+                                <i class="fa fa-info-circle" style="font-size:3rem" title="No local content requirements"/> 
                                 <br/>لا توجد متطلبات محتوى محلي
                                 <br/><small>No local content requirements for this tender</small>
                             </div>
@@ -544,7 +523,7 @@
                                            string="Calculation Mechanism"/>
                                 </group>
                                 
-                                <group string="SME Benefits (المنشآت الصغيرة والمتوسطة)">
+                                <group string="SME Benefits">
                                     <field name="sme_participation_allowed"/>
                                     <field name="sme_price_preference" 
                                            widget="percentage"
@@ -554,8 +533,8 @@
                                            invisible="not sme_participation_allowed"
                                            string="SME Certificate Mandatory"/>
                                     
-                                    <div invisible="not sme_participation_allowed" class="alert alert-success mt-2">
-                                        <i class="fa fa-check-circle"/> <strong>SME Participation Allowed</strong><br/>
+                                    <div invisible="not sme_participation_allowed" class="alert alert-success mt-2" role="status">
+                                        <i class="fa fa-check-circle" title="SME participation allowed"/> <strong>SME Participation Allowed</strong><br/>
                                         Small &amp; Medium Enterprises can participate in this tender with special benefits.
                                     </div>
                                 </group>
@@ -583,25 +562,27 @@
         <field name="name">etimad.tender.kanban</field>
         <field name="model">ics.etimad.tender</field>
         <field name="arch" type="xml">
-            <kanban class="o_kanban_mobile o_etimad_kanban" default_group_by="tender_type">
+            <kanban class="o_kanban_mobile o_etimad_kanban" default_group_by="etimad_tender_type">
                 <header>
                     <button name="%(action_server_fetch_etimad_tenders)d" 
-                            string="🔄 Fetch Latest" 
+                            string="Fetch Latest" 
                             type="action" 
-                            class="btn-primary"/>
+                            class="btn-primary"
+                            icon="fa-refresh"/>
                     <button name="%(action_server_fetch_batch_etimad_tenders)d" 
-                            string="🔄 Fetch Batch" 
+                            string="Fetch Batch" 
                             type="action" 
-                            class="btn-secondary"/>
+                            class="btn-secondary"
+                            icon="fa-refresh"/>
                 </header>
                 <field name="name"/>
                 <field name="reference_number"/>
                 <field name="agency_name"/>
-                <field name="tender_type"/>
+                <field name="etimad_tender_type"/>
                 <field name="activity_name"/>
                 <field name="estimated_amount"/>
                 <field name="estimated_value_category"/>
-                <field name="total_fees"/>
+                <field name="document_cost_amount"/>
                 <field name="remaining_days"/>
                 <field name="offers_deadline"/>
                 <field name="tender_status_text"/>
@@ -611,17 +592,18 @@
                 <field name="is_hot_tender"/>
                 <field name="matching_score"/>
                 <field name="opportunity_id"/>
+                <field name="assigned_user_id"/>
                 <field name="currency_id"/>
                 
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div class="oe_kanban_global_click" t-attf-class="{{record.is_hot_tender.raw_value ? 'border-info' : ''}} {{record.is_urgent.raw_value ? 'border-danger' : ''}}">
                             <!-- Header -->
                             <div class="o_kanban_record_top">
                                 <div class="o_kanban_record_headings">
                                     <strong class="o_kanban_record_title">
-                                        <t t-if="record.is_hot_tender.raw_value">🔥 </t>
-                                        <t t-if="record.is_urgent.raw_value">⚠️ </t>
+                                        <t t-if="record.is_hot_tender.raw_value"><i class="fa fa-fire text-info" title="Hot tender"/> </t>
+                                        <t t-if="record.is_urgent.raw_value"><i class="fa fa-exclamation-triangle text-danger" title="Urgent"/> </t>
                                         <field name="name"/>
                                     </strong>
                                     <div class="o_kanban_record_subtitle text-muted">
@@ -637,13 +619,13 @@
                             <div class="o_kanban_record_body">
                                 <div class="row">
                                     <div class="col-12">
-                                        <i class="fa fa-building-o text-muted"/> <field name="agency_name"/>
+                                        <i class="fa fa-building-o text-muted" title="Agency"/> <field name="agency_name"/>
                                     </div>
-                                    <div class="col-12 mt-1" t-if="record.tender_type.raw_value">
-                                        <i class="fa fa-tag text-muted"/> <field name="tender_type"/>
+                                    <div class="col-12 mt-1" t-if="record.etimad_tender_type.raw_value">
+                                        <i class="fa fa-tag text-muted" title="Type"/> <field name="etimad_tender_type"/>
                                     </div>
                                     <div class="col-12 mt-1" t-if="record.activity_name.raw_value">
-                                        <i class="fa fa-briefcase text-muted"/> <field name="activity_name"/>
+                                        <i class="fa fa-briefcase text-muted" title="Activity"/> <field name="activity_name"/>
                                     </div>
                                 </div>
                                 
@@ -671,7 +653,7 @@
                                 <div class="row mt-2">
                                     <div class="col-12">
                                         <t t-if="record.opportunity_id.raw_value">
-                                            <span class="badge badge-info"><i class="fa fa-rocket"/> Opportunity</span>
+                                            <span class="badge badge-info"><i class="fa fa-rocket" title="Opportunity"/> Opportunity</span>
                                         </t>
                                     </div>
                                 </div>
@@ -681,7 +663,7 @@
                             <div class="o_kanban_record_bottom mt-2">
                                 <div class="oe_kanban_bottom_left">
                                     <span class="text-muted">
-                                        <i class="fa fa-calendar-o"/> 
+                                        <i class="fa fa-calendar-o" title="Deadline"/> 
                                         <field name="offers_deadline" widget="date"/>
                                     </span>
                                 </div>
@@ -689,10 +671,10 @@
                                     <span t-if="record.remaining_days.raw_value &gt; 0" 
                                           class="badge badge-pill" 
                                           t-attf-class="badge-{{record.is_urgent.raw_value ? 'danger' : (record.remaining_days.raw_value &lt; 7 ? 'warning' : 'info')}}">
-                                        <i class="fa fa-clock-o"/> <field name="remaining_days"/> days
+                                        <i class="fa fa-clock-o" title="Days left"/> <field name="remaining_days"/> days
                                     </span>
                                     <span t-if="record.remaining_days.raw_value == 0" class="badge badge-pill badge-dark">
-                                        <i class="fa fa-clock-o"/> Due Today
+                                        <i class="fa fa-clock-o" title="Due today"/> Due Today
                                     </span>
                                 </div>
                             </div>
@@ -708,7 +690,7 @@
                                 <button name="action_open_url" 
                                         type="object" 
                                         class="btn btn-sm btn-secondary ml-1">
-                                    <i class="fa fa-external-link"/> Visit
+                                    <i class="fa fa-external-link" title="Visit Etimad"/> Visit
                                 </button>
                             </div>
                         </div>
@@ -727,14 +709,14 @@
                 <field name="name" string="Tender Name"/>
                 <field name="reference_number"/>
                 <field name="agency_name"/>
-                <field name="tender_type"/>
+                <field name="etimad_tender_type"/>
                 <field name="activity_name"/>
                 <field name="tender_number"/>
                 
                 <!-- Quick Filters -->
-                <filter string="⭐ Favorites" name="favorites" domain="[('is_favorite', '=', True)]"/>
-                <filter string="🔥 Hot Tenders" name="hot_tenders" domain="[('is_hot_tender', '=', True)]"/>
-                <filter string="⚠️ Urgent" name="urgent" domain="[('is_urgent', '=', True)]"/>
+                <filter string="Favorites" name="favorites" domain="[('is_favorite', '=', True)]"/>
+                <filter string="Hot Tenders" name="hot_tenders" domain="[('is_hot_tender', '=', True)]"/>
+                <filter string="Urgent" name="urgent" domain="[('is_urgent', '=', True)]"/>
                 
                 <separator/>
                 <filter string="With Opportunity" name="with_opportunity" domain="[('opportunity_id', '!=', False)]"/>
@@ -742,11 +724,11 @@
                 
                 <separator/>
                 <!-- Status Filters -->
-                <filter string="👥 Participating" name="filter_participating" domain="[('is_participating','=',True)]"/>
-                <filter string="✅ Approved (Etimad)" name="filter_approved" domain="[('tender_status_approved','=',True)]"/>
-                <filter string="🏆 With Award Results" name="filter_awarded" domain="[('award_announced','=',True)]"/>
-                <filter string="🇸🇦 Local Content Required" name="filter_local_content" domain="[('local_content_required','=',True)]"/>
-                <filter string="🏢 SME Allowed" name="filter_sme" domain="[('sme_participation_allowed','=',True)]"/>
+                <filter string="Participating" name="filter_participating" domain="[('is_participating','=',True)]"/>
+                <filter string="Approved" name="filter_approved" domain="[('tender_status_approved','=',True)]"/>
+                <filter string="With Award Results" name="filter_awarded" domain="[('award_announced','=',True)]"/>
+                <filter string="Local Content Required" name="filter_local_content" domain="[('local_content_required','=',True)]"/>
+                <filter string="SME Allowed" name="filter_sme" domain="[('sme_participation_allowed','=',True)]"/>
                 
                 <separator/>
                 <!-- Deadline Filters -->
@@ -791,7 +773,7 @@
                 
                 <group expand="0" string="Group By">
                     <filter string="Agency" name="group_agency" context="{'group_by': 'agency_name'}"/>
-                    <filter string="Tender Type" name="group_type" context="{'group_by': 'tender_type'}"/>
+                    <filter string="Etimad Type" name="group_type" context="{'group_by': 'etimad_tender_type'}"/>
                     <filter string="Activity" name="group_activity" context="{'group_by': 'activity_name'}"/>
                     <filter string="Participating" name="group_participating" context="{'group_by': 'is_participating'}"/>
                     <filter string="Value Category" name="group_value" context="{'group_by': 'estimated_value_category'}"/>

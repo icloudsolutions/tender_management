@@ -12,30 +12,30 @@
 
 ## Field Mapping Validation Results
 
-### ✅ All Basic Fields Captured (20/20)
+### [OK] All Basic Fields Captured (20/20)
 
 | Etimad Field | Model Field | Example Value | Status |
 |-------------|-------------|---------------|---------|
-| اسم المنافسة | `name` | "صيانة معدات و سيارات..." | ✅ |
-| رقم المنافسة | `tender_number` | "2026/20" | ✅ |
-| الرقم المرجعي | `reference_number` | "260239001155" | ✅ |
-| الغرض من المنافسة | `tender_purpose` | "صيانة معدات و سيارات..." | ✅ |
-| قيمة وثائق المنافسة | `document_cost_amount` | 2500.00 SAR | ✅ |
-| حالة المنافسة | `tender_status_text` | "معتمدة" | ✅ |
-| | `tender_status_approved` | True (computed) | ✅ |
-| مدة العقد | `contract_duration` | "90 يوم" | ✅ |
-| | `contract_duration_days` | 90 (computed) | ✅ |
-| هل التأمين من متطلبات المنافسة | `insurance_required` | False | ✅ |
-| نوع المنافسة | `tender_type` | "منافسة عامة" | ✅ |
-| الجهة الحكوميه | `agency_name` | "أمانة منطقة الرياض" | ✅ |
-| الوقت المتبقى | `remaining_days` | 16 (computed) | ✅ |
-| طريقة تقديم العروض | `submission_method` | "single_file" | ✅ |
-| مطلوب ضمان الإبتدائي | `initial_guarantee_required` | False | ✅ |
-| | `initial_guarantee_type` | "لا يوجد ضمان" | ✅ |
-| **الضمان النهائي** | `final_guarantee_percentage` | **5.00** | ✅ **ADDED** |
-| | `final_guarantee_required` | True (computed) | ✅ **ADDED** |
-| آخر موعد للتقديم | `offers_deadline` | (datetime) | ✅ |
-| تاريخ النشر | `published_at` | (datetime) | ✅ |
+| اسم المنافسة | `name` | "صيانة معدات و سيارات..." | [OK] |
+| رقم المنافسة | `tender_number` | "2026/20" | [OK] |
+| الرقم المرجعي | `reference_number` | "260239001155" | [OK] |
+| الغرض من المنافسة | `tender_purpose` | "صيانة معدات و سيارات..." | [OK] |
+| قيمة وثائق المنافسة | `document_cost_amount` | 2500.00 SAR | [OK] |
+| حالة المنافسة | `tender_status_text` | "معتمدة" | [OK] |
+| | `tender_status_approved` | True (computed) | [OK] |
+| مدة العقد | `contract_duration` | "90 يوم" | [OK] |
+| | `contract_duration_days` | 90 (computed) | [OK] |
+| هل التأمين من متطلبات المنافسة | `insurance_required` | False | [OK] |
+| نوع المنافسة | `tender_type` | "منافسة عامة" | [OK] |
+| الجهة الحكوميه | `agency_name` | "أمانة منطقة الرياض" | [OK] |
+| الوقت المتبقى | `remaining_days` | 16 (computed) | [OK] |
+| طريقة تقديم العروض | `submission_method` | "single_file" | [OK] |
+| مطلوب ضمان الإبتدائي | `initial_guarantee_required` | False | [OK] |
+| | `initial_guarantee_type` | "لا يوجد ضمان" | [OK] |
+| **الضمان النهائي** | `final_guarantee_percentage` | **5.00** | [OK] **ADDED** |
+| | `final_guarantee_required` | True (computed) | [OK] **ADDED** |
+| آخر موعد للتقديم | `offers_deadline` | (datetime) | [OK] |
+| تاريخ النشر | `published_at` | (datetime) | [OK] |
 
 ---
 
@@ -91,11 +91,11 @@ GET https://tenders.etimad.sa/Tender/GetTendersByAgencyID
 ```
 
 Captures:
-- ✅ Tender name, number, reference
-- ✅ Agency, branch
-- ✅ Type, activity
-- ✅ Deadlines
-- ✅ Status
+- [OK] Tender name, number, reference
+- [OK] Agency, branch
+- [OK] Type, activity
+- [OK] Deadlines
+- [OK] Status
 
 ### 2. Relations Details API
 ```
@@ -104,11 +104,11 @@ GET https://tenders.etimad.sa/Tender/GetRelationsDetailsViewComponenet
 ```
 
 Captures:
-- ✅ Classification
-- ✅ Execution locations
-- ✅ Activity details
-- ✅ Supply/construction/maintenance flags
-- ✅ **Final guarantee %** ⬅️ NEW
+- [OK] Classification
+- [OK] Execution locations
+- [OK] Activity details
+- [OK] Supply/construction/maintenance flags
+- [OK] **Final guarantee %**  NEW
 
 ### 3. Dates API
 ```
@@ -117,9 +117,9 @@ GET https://tenders.etimad.sa/Tender/GetTenderDatesViewComponenet
 ```
 
 Captures:
-- ✅ All dates with times
-- ✅ Inquiry periods
-- ✅ Opening location
+- [OK] All dates with times
+- [OK] Inquiry periods
+- [OK] Opening location
 
 ### 4. Award Results API
 ```
@@ -128,8 +128,8 @@ GET https://tenders.etimad.sa/Tender/GetAwardingResultsForVisitorViewComponenet
 ```
 
 Captures:
-- ✅ Award announced flag
-- ✅ Award date, company, amount
+- [OK] Award announced flag
+- [OK] Award date, company, amount
 
 ### 5. Local Content API
 ```
@@ -138,21 +138,21 @@ GET https://tenders.etimad.sa/Tender/GetLocalContentDetailsViewComponenet
 ```
 
 Captures:
-- ✅ Local content %
-- ✅ SME benefits
+- [OK] Local content %
+- [OK] SME benefits
 
 ---
 
 ## Validation Summary
 
 ### Before This Update
-- **19 out of 20 basic fields** captured ✅
-- **1 critical field missing:** Final Guarantee % ⚠️
+- **19 out of 20 basic fields** captured [OK]
+- **1 critical field missing:** Final Guarantee % [!]
 
 ### After This Update
-- **20 out of 20 basic fields** captured ✅
-- **100% coverage** of basic tender information ✅
-- **5 API endpoints** fully implemented ✅
+- **20 out of 20 basic fields** captured [OK]
+- **100% coverage** of basic tender information [OK]
+- **5 API endpoints** fully implemented [OK]
 
 ---
 
@@ -161,7 +161,7 @@ Captures:
 ### For Bidders
 **Now can see upfront:**
 - Initial guarantee requirements (before bidding)
-- **Final guarantee requirements (after winning)** ⬅️ NEW
+- **Final guarantee requirements (after winning)**  NEW
 - Total capital requirements for participation
 - Bank guarantee costs
 
@@ -182,9 +182,9 @@ Captures:
 - Final guarantee: 5% = **50,000 SAR**
 
 **Decision:**
-- ✅ Can bid (no initial guarantee needed)
-- ✅ Can fulfill if win (50K final guarantee < 100K credit limit)
-- ⚠️ Will tie up 50% of credit line
+- [OK] Can bid (no initial guarantee needed)
+- [OK] Can fulfill if win (50K final guarantee < 100K credit limit)
+- [!] Will tie up 50% of credit line
 
 ---
 
@@ -199,12 +199,12 @@ After deploying to test server:
 - [ ] Verify shows:
   - Initial Guarantee Required: ❌ No
   - Initial Guarantee Type: "لا يوجد ضمان"
-  - **Final Guarantee Required: ✅ Yes**
+  - **Final Guarantee Required: [OK] Yes**
   - **Final Guarantee %: 5.00%**
 - [ ] Verify info alert appears explaining final guarantee
 
 ### Test 2: Data Fetching
-- [ ] Click "🔄 Fetch Details" button
+- [ ] Click "Fetch Details" button
 - [ ] Wait for notification
 - [ ] Check that `final_guarantee_percentage = 5.0`
 - [ ] Check that `final_guarantee_required = True`
@@ -248,7 +248,7 @@ docker compose exec -T odoo18 odoo -u ics_etimad_tenders_crm -d <database> --sto
 
 ## Conclusion
 
-✅ **100% Field Coverage Achieved**
+[OK] **100% Field Coverage Achieved**
 
 The `ics_etimad_tenders_crm` module now captures **ALL** basic tender information from the Etimad portal, including the critical **Final Guarantee percentage** that was previously missing.
 
@@ -258,5 +258,5 @@ This completes the basic information capture and provides bidders with complete 
 
 **Validated:** 2026-02-03  
 **Tender Sample:** 2026/20 (Riyadh Municipality)  
-**Result:** ✅ All fields mapped and validated  
+**Result:** [OK] All fields mapped and validated  
 **Commit:** `58dd83a` - "Add final guarantee percentage field"

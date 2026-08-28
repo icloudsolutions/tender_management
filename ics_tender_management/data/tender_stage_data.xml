@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo noupdate="1">
+
         <record id="stage_draft" model="ics.tender.stage">
             <field name="name">Draft</field>
             <field name="sequence">1</field>
@@ -64,4 +65,5 @@
             <field name="fold" eval="True"/>
             <field name="requirements">&lt;p&gt;Tender has been cancelled&lt;/p&gt;</field>
         </record>
+
 </odoo>

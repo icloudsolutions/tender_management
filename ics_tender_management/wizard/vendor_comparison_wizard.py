@@ -58,8 +58,13 @@ class VendorComparisonWizard(models.TransientModel):
             
             if total_offers == 0:
                 raise UserError(_(
-                    'No vendor offers found!\n\n'
-                    'Please ensure vendors have submitted their offers before comparing.'
+                    'No supplier offers found!\n\n'
+                    'To compare suppliers, follow these steps:\n'
+                    '1. Click "Request Supplier Quotations" to send requests to potential suppliers\n'
+                    '2. Enter each supplier\'s quoted prices in their quotation request\n'
+                    '3. Use "Compare Order Lines" (Odoo default view) to choose and compare product offers\n'
+                    '4. Click "Sync Supplier Prices" to import those prices as vendor offers\n'
+                    '5. Then click "Compare Suppliers" to review and select the best offers'
                 ))
             
             lines = []

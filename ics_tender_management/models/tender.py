@@ -1,3 +1,4 @@
+from markupsafe import Markup
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError, ValidationError
 from datetime import datetime, timedelta
@@ -38,7 +39,7 @@ class Tender(models.Model):
     tender_type = fields.Selection([
         ('single_vendor', 'Single Vendor for All Products'),
         ('product_wise', 'Product-wise Vendor Selection'),
-    ], string='Tender Type', default='single_vendor', required=True, tracking=True,
+    ], string='Tender Type', default='product_wise', required=True, tracking=True,
         help='Single Vendor: Select one vendor for all products (all prices mandatory). '
              'Product-wise: Select different vendors per product (prices optional, multiple POs).')
 
@@ -84,8 +85,14 @@ class Tender(models.Model):
         compute='_compute_totals', store=True, currency_field='currency_id')
 
     requisition_ids = fields.One2many('purchase.requisition', 'tender_id',
-        string='Purchase Agreements (RFQs)')
+        string='Purchase Agreements (Legacy)')
     requisition_count = fields.Integer('Purchase Agreements', compute='_compute_requisition_count')
+
+    purchase_order_ids = fields.One2many('purchase.order', 'tender_id',
+        string='Purchase Orders')
+    purchase_order_count = fields.Integer('Purchase Orders', compute='_compute_purchase_order_count')
+    rfq_count = fields.Integer('RFQs', compute='_compute_rfq_count',
+        help='Number of pre-win Requests for Quotation sent to suppliers')
 
     quotation_ids = fields.One2many('sale.order', 'tender_id', string='Quotations')
     quotation_count = fields.Integer('Quotations', compute='_compute_quotation_count')
@@ -138,36 +145,29 @@ class Tender(models.Model):
     
     # ========== ETIMAD-SPECIFIC FIELDS ==========
     # Etimad Identifiers
-    etimad_tender_id_integer = fields.Integer('Etimad Tender ID (Integer)', 
+    etimad_tender_id_integer = fields.Integer('Etimad Tender ID', 
         help='Internal Etimad tender ID', tracking=True)
-    etimad_tender_id_string = fields.Char('Etimad Tender ID (String)', 
+    etimad_tender_id_string = fields.Char('Etimad Tender ID String', 
         help='Etimad tender ID string used in URLs', tracking=True)
     etimad_reference_number = fields.Char('Etimad Reference Number', 
         help='Official reference number from Etimad portal', tracking=True, index=True)
     
-    # Agency Information (from Etimad)
-    etimad_agency_name = fields.Char('Agency Name (from Etimad)', 
+    # Agency Information
+    etimad_agency_name = fields.Char('Agency Name', 
         help='Original agency name as scraped from Etimad', tracking=True)
-    etimad_branch_name = fields.Char('Branch Name (from Etimad)', 
+    etimad_branch_name = fields.Char('Branch Name', 
         help='Branch name from Etimad portal')
     
-    # Tender Activity (from Etimad)
-    etimad_activity_name = fields.Char('Tender Activity (from Etimad)', 
+    # Tender Activity
+    etimad_activity_name = fields.Char('Tender Activity', 
         help='Activity name from Etimad portal', tracking=True)
     etimad_activity_id = fields.Integer('Etimad Activity ID', 
         help='Activity ID from Etimad portal')
     
-    # Dates (from Etimad)
-    etimad_published_at = fields.Datetime('Published At (Etimad)', 
+    # Dates
+    etimad_published_at = fields.Datetime('Published At', 
         help='Publication date from Etimad portal', tracking=True)
     
-    # Financial (from Etimad)
-    etimad_financial_fees = fields.Monetary('Financial Fees (from Etimad)', 
-        currency_field='currency_id', 
-        help='Financial fees separate from invitation cost')
-    etimad_total_fees = fields.Monetary('Total Fees (from Etimad)', 
-        compute='_compute_etimad_total_fees', store=True, currency_field='currency_id',
-        help='Total fees: invitation cost + financial fees')
     
     # External Source
     external_source = fields.Char('External Source', default='Etimad Portal', readonly=True,
@@ -266,11 +266,6 @@ class Tender(models.Model):
                 tender.require_financial_manager = False
                 tender.require_ceo = False
     
-    @api.depends('tender_booklet_price', 'etimad_financial_fees')
-    def _compute_etimad_total_fees(self):
-        """Calculate total Etimad fees (invitation cost + financial fees)"""
-        for tender in self:
-            tender.etimad_total_fees = (tender.tender_booklet_price or 0.0) + (tender.etimad_financial_fees or 0.0)
     
     # Qualification Phase
     presales_employee = fields.Many2one('res.users', string='Presales Employee')
@@ -282,6 +277,29 @@ class Tender(models.Model):
     estimated_project_value = fields.Monetary('Estimated Project Value', currency_field='currency_id')
     required_inquiries = fields.Text('Required Inquiries/Questions')
     
+    # Under Evaluation Tracking
+    evaluation_start_date = fields.Date('Evaluation Start Date',
+        help='Date when customer started evaluating the tender', tracking=True)
+    expected_result_date = fields.Date('Expected Result Date',
+        help='Expected date for the customer to announce the result', tracking=True)
+    evaluation_days = fields.Integer('Days in Evaluation',
+        compute='_compute_evaluation_days',
+        help='Number of days the tender has been under evaluation')
+    evaluation_notes = fields.Text('Evaluation Notes',
+        help='Track clarification requests, negotiations, and evaluation updates')
+    clarification_requested = fields.Boolean('Clarification Requested', default=False,
+        help='Customer has requested clarification on the offer')
+    clarification_response_date = fields.Date('Clarification Response Deadline')
+    clarification_submitted = fields.Boolean('Clarification Submitted', default=False)
+    
+    @api.depends('evaluation_start_date')
+    def _compute_evaluation_days(self):
+        for tender in self:
+            if tender.evaluation_start_date and tender.state == 'evaluation':
+                tender.evaluation_days = (fields.Date.today() - tender.evaluation_start_date).days
+            else:
+                tender.evaluation_days = 0
+    
     # Evaluation Phase
     challenges = fields.Text('Challenges')
     winning_probability = fields.Float('Winning Probability', help='Probability percentage (0-100)')
@@ -291,7 +309,10 @@ class Tender(models.Model):
         ('strategic', 'Strategic Partner')
     ], string='Client Relationship')
     participation_decision = fields.Boolean('Participating in Tender', default=True)
-    non_participation_reason = fields.Text('Reasons for Non-Participation')
+    decline_reason_id = fields.Many2one('ics.tender.decline.reason', string='Decline Reason',
+        help='Predefined reason for not participating in this tender')
+    non_participation_reason = fields.Text('Decline Notes',
+        help='Additional details about the decline decision')
     
     # Document Management
     tender_documents_uploaded = fields.Boolean('Update Tender Documents', default=False)
@@ -410,10 +431,11 @@ class Tender(models.Model):
             
             # Log the sync in CRM
             self.lead_id.message_post(
-                body=_('Stage synchronized from Tender: <a href="/web#id=%s&model=ics.tender">%s</a><br/>Tender State: %s') % (
+                body=Markup(_('Stage synchronized from Tender: <a href="/web#id=%s&model=ics.tender">%s</a><br/>Tender State: %s')) % (
                     self.id, self.name, dict(self._fields['state'].selection).get(self.state)
                 ),
-                subject=_('Tender Stage Update')
+                subject=_('Tender Stage Update'),
+                body_is_html=True,
             )
     
     def _get_crm_stage_mapping(self):
@@ -446,36 +468,47 @@ class Tender(models.Model):
         return probability_mapping.get(self.state, 20)
     
     def _auto_create_project(self):
-        """Automatically create project from won tender with task template
+        """Automatically create project from won tender with task template.
         
         Template selection priority:
-        1. Exact category match (supply/maintenance/etc.)
-        2. General template (no category)
-        3. Use project_tasks_from_templates module if available
+        1. Category mapping (Configuration → Category Template Mapping): external or ICS
+        2. ICS template by exact category match
+        3. ICS general template (no category)
+        4. project_tasks_from_templates by name search (fallback)
         """
         self.ensure_one()
         
-        # Priority 1: Find exact category match
-        template = self.env['ics.project.task.template'].search([
-            ('tender_category', '=', self.tender_category),
-            ('active', '=', True)
+        # Priority 1: Settings mapping (Tender Category → Template)
+        template = self.env['ics.project.task.template'].browse()
+        mapping = self.env['ics.tender.category.template.mapping'].search([
+            ('tender_category', '=', self.tender_category)
         ], limit=1)
-        
-        # Priority 2: If no category-specific template, get general template
+        if mapping:
+            if mapping.use_external_template and mapping.external_template_id and 'project.task.template' in self.env:
+                external = self.env['project.task.template'].browse(mapping.external_template_id)
+                if external.exists():
+                    return self._create_project_with_template_module(external)
+            if mapping.ics_template_id and mapping.ics_template_id.active:
+                template = mapping.ics_template_id
+        if not template:
+            # Priority 2: ICS template by exact category match
+            template = self.env['ics.project.task.template'].search([
+                ('tender_category', '=', self.tender_category),
+                ('active', '=', True)
+            ], limit=1)
+        # Priority 3: ICS general template (no category)
         if not template:
             template = self.env['ics.project.task.template'].search([
                 ('tender_category', '=', False),
                 ('active', '=', True)
             ], limit=1)
         
-        # Priority 3: Try project_tasks_from_templates module if available
+        # Priority 4: project_tasks_from_templates by name search
         if not template and 'project.task.template' in self.env:
-            # Check if project_tasks_from_templates module is installed
             project_template = self.env['project.task.template'].search([
                 ('name', 'ilike', self.tender_category)
             ], limit=1)
             if project_template:
-                # Use project_tasks_from_templates module
                 return self._create_project_with_template_module(project_template)
         
         # Create project
@@ -594,26 +627,81 @@ class Tender(models.Model):
         
         project = self.env['project.project'].create(project_vals)
         
-        # Use project_tasks_from_templates module to create tasks
-        if 'project.task.template' in self.env and template:
-            # Create tasks from template using the module's method
-            template.with_context(default_project_id=project.id).create_tasks()
+        # Create tasks and subtasks from external template via project_tasks_from_templates API
+        if template:
+            try:
+                if hasattr(project, 'project_template_id'):
+                    project.sudo().write({'project_template_id': template.id})
+                    if hasattr(project, 'action_create_project_from_template'):
+                        project.sudo().action_create_project_from_template()
+                else:
+                    # Fallback: copy template.task_ids (and child_ids) to project.task manually
+                    self._copy_external_template_tasks_to_project(template, project)
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).warning(
+                    'Could not create tasks from external template %s: %s', template, e
+                )
         
         return project
     
+    def _copy_external_template_tasks_to_project(self, template, project):
+        """Copy tasks and subtasks from external project.task.template to project.
+        Used when project_tasks_from_templates does not expose project_template_id on project.
+        Expects template to have task_ids (project.sub.task) with child_ids for subtasks.
+        """
+        task_ids = getattr(template, 'task_ids', None) or getattr(template, 'task_line_ids', None)
+        if not task_ids or not getattr(task_ids, '_model', None) or len(task_ids) == 0:
+            return
+        Task = self.env['project.task']
+        default_stage = self.env['project.task.type'].search([('sequence', '=', 1)], limit=1)
+        stage_id = default_stage.id if default_stage else False
+        task_has_state = 'state' in (Task._fields or {})
+
+        def create_task_from_sub_task(sub_task, parent_task_id=False):
+            user_ids = sub_task.user_ids.ids if getattr(sub_task, 'user_ids', None) else []
+            vals = {
+                'project_id': project.id,
+                'name': sub_task.name,
+                'parent_id': parent_task_id,
+                'description': getattr(sub_task, 'description', False) or False,
+                'user_ids': [(6, 0, user_ids)],
+            }
+            if stage_id:
+                vals['stage_id'] = stage_id
+            if task_has_state and getattr(sub_task, 'state', None):
+                vals['state'] = sub_task.state or '01_in_progress'
+            task = Task.sudo().create(vals)
+            children = getattr(sub_task, 'child_ids', None)
+            if children is None:
+                children = self.env[sub_task._name].browse([])
+            for child in children:
+                create_task_from_sub_task(child, parent_task_id=task.id)
+
+        for item in task_ids:
+            create_task_from_sub_task(item, parent_task_id=False)
+
     def _auto_generate_purchase_orders(self):
-        """Automatically generate purchase orders for vendors when tender is won"""
+        """Automatically generate purchase orders for vendors when tender is won.
+        Skips if POs already exist for this tender."""
         self.ensure_one()
         
         if not self.boq_line_ids:
             return  # No BoQ lines, nothing to purchase
         
+        # Guard: don't create POs if they already exist
+        if self.purchase_order_count > 0:
+            return
+        
+        # Only auto-create if vendors are selected on BoQ lines
+        lines_with_vendor = self.boq_line_ids.filtered(lambda l: l.selected_vendor_id)
+        if not lines_with_vendor:
+            return  # No vendors selected, skip auto-creation
+        
         # Check tender type
         if self.tender_type == 'single_vendor':
-            # Single vendor for all products
             self._create_single_purchase_order()
         elif self.tender_type == 'product_wise':
-            # Multiple vendors (one per product)
             self._create_multiple_purchase_orders()
     
     def _trigger_state_activities(self, old_state, new_state):
@@ -641,7 +729,7 @@ class Tender(models.Model):
         if self.etimad_tender_id or self.etimad_link:
             self.activity_schedule(
                 'mail.mail_activity_data_todo',
-                summary=_('📥 Download Tender Documents from Etimad'),
+                summary=_('Download Tender Documents from Etimad'),
                 note=_(
                     '<strong>Action Required:</strong><br/>'
                     '<ul>'
@@ -666,7 +754,7 @@ class Tender(models.Model):
         
         self.activity_schedule(
             'mail.mail_activity_data_meeting',
-            summary=_('📍 Schedule Site Visit (الزيارة الميدانية)'),
+            summary=_('Schedule Site Visit'),
             note=_(
                 '<strong>Site Visit Required</strong><br/>'
                 '<ul>'
@@ -686,7 +774,7 @@ class Tender(models.Model):
         
         self.activity_schedule(
             'mail.mail_activity_data_todo',
-            summary=_('📋 Complete Technical Study & BoQ'),
+            summary=_('Complete Technical Study & BoQ'),
             note=_(
                 '<strong>Technical Phase Tasks:</strong><br/>'
                 '<ul>'
@@ -708,7 +796,7 @@ class Tender(models.Model):
         # Activity: Request vendor quotes
         self.activity_schedule(
             'mail.mail_activity_data_todo',
-            summary=_('💰 Request Vendor Quotations'),
+            summary=_('Request Vendor Quotations'),
             note=_(
                 '<strong>Financial Phase Tasks:</strong><br/>'
                 '<ul>'
@@ -729,7 +817,7 @@ class Tender(models.Model):
         
         self.activity_schedule(
             'mail.mail_activity_data_todo',
-            summary=_('📄 Review & Approve Quotation'),
+            summary=_('Review & Approve Quotation'),
             note=_(
                 '<strong>Quotation Review:</strong><br/>'
                 '<ul>'
@@ -750,7 +838,7 @@ class Tender(models.Model):
         
         self.activity_schedule(
             'mail.mail_activity_data_todo',
-            summary=_('✅ Confirm Submission & Track'),
+            summary=_('Confirm Submission & Track'),
             note=_(
                 '<strong>Post-Submission:</strong><br/>'
                 '<ul>'
@@ -768,21 +856,39 @@ class Tender(models.Model):
         """Activities during evaluation phase"""
         self.ensure_one()
         
+        # Use expected result date as deadline, or 14 days from now
+        deadline = self.expected_result_date or (
+            fields.Date.today() + timedelta(days=14)
+        )
+        
         self.activity_schedule(
             'mail.mail_activity_data_todo',
-            summary=_('🔍 Monitor Evaluation & Prepare Response'),
+            summary=_('Monitor Evaluation & Follow Up'),
             note=_(
-                '<strong>Evaluation Phase:</strong><br/>'
+                '<strong>Under Evaluation - Action Items:</strong><br/>'
                 '<ul>'
-                '<li>Monitor customer evaluation progress</li>'
-                '<li>Respond to clarification requests</li>'
-                '<li>Prepare for negotiations if needed</li>'
-                '<li>Track competitor information</li>'
-                '<li>Stay ready for final presentations</li>'
+                '<li>Contact customer to confirm evaluation timeline</li>'
+                '<li>Respond promptly to any clarification requests</li>'
+                '<li>Prepare for negotiations or presentations if needed</li>'
+                '<li>Track competitor information and market feedback</li>'
+                '<li>Follow up with customer if no response by expected date</li>'
                 '</ul>'
             ),
             user_id=self.user_id.id,
-            date_deadline=fields.Date.today()
+            date_deadline=deadline,
+        )
+        
+        # Schedule a follow-up reminder 7 days from now
+        self.activity_schedule(
+            'mail.mail_activity_data_todo',
+            summary=_('Follow Up: Check Evaluation Status'),
+            note=_(
+                '<strong>Follow-Up Reminder:</strong><br/>'
+                'Contact the customer to check the evaluation status and '
+                'ask if they need any additional information or clarification.'
+            ),
+            user_id=self.user_id.id,
+            date_deadline=fields.Date.today() + timedelta(days=7),
         )
     
     def _trigger_appeal_option(self):
@@ -791,7 +897,7 @@ class Tender(models.Model):
         
         self.activity_schedule(
             'mail.mail_activity_data_todo',
-            summary=_('⚖️ Consider Appeal (إعتراض) - You Have the Right!'),
+            summary=_('Consider Appeal - You Have the Right!'),
             note=_(
                 '<strong style="color: #d9534f;">Tender Lost - Appeal Option Available</strong><br/><br/>'
                 
@@ -816,11 +922,39 @@ class Tender(models.Model):
                 '<li>Track response status</li>'
                 '</ul><br/>'
                 
-                '<strong>⏰ Act quickly - appeals are usually time-sensitive!</strong>'
+                '<strong><i class="fa fa-clock-o"/> Act quickly - appeals are usually time-sensitive!</strong>'
             ),
             user_id=self.user_id.id,
             date_deadline=fields.Date.today()
         )
+
+    def action_reopen_after_appeal_accepted(self):
+        """Re-open tender for re-evaluation when appeal has been accepted.
+        
+        Moves state from 'lost' back to 'evaluation' so the customer can
+        re-evaluate and you can later mark as Won or Lost again.
+        """
+        self.ensure_one()
+        if self.state != 'lost':
+            raise UserError(_('Only lost tenders can be re-opened after appeal.'))
+        if self.appeal_status != 'accepted':
+            raise UserError(_(
+                'Only tenders with "Appeal Accepted" can be re-opened.\n\n'
+                'Set Appeal Status to "Appeal Accepted" first.'
+            ))
+        self.write({'state': 'evaluation'})
+        self.message_post(
+            body=Markup(_(
+                '<strong><i class="fa fa-refresh"/> Tender re-opened after appeal accepted</strong><br/><br/>'
+                'The tender is back under evaluation. You can track the new outcome and '
+                'use <strong>Mark as Won</strong> or <strong>Mark as Lost</strong> when the result is known.'
+            )),
+            subject=_('Tender re-opened (appeal accepted)'),
+            message_type='notification',
+            subtype_xmlid='mail.mt_note',
+            body_is_html=True,
+        )
+        return True
 
     @api.depends('submission_deadline')
     def _compute_days_to_deadline(self):
@@ -842,7 +976,7 @@ class Tender(models.Model):
         for tender in self:
             tender.boq_count = len(tender.boq_line_ids)
 
-    @api.depends('boq_line_ids.estimated_cost', 'boq_line_ids.selected_vendor_price', 'margin_percentage')
+    @api.depends('boq_line_ids.estimated_cost', 'boq_line_ids.selected_vendor_price', 'boq_line_ids.quantity', 'margin_percentage')
     def _compute_totals(self):
         for tender in self:
             tender.total_estimated_cost = sum(tender.boq_line_ids.mapped('estimated_cost'))
@@ -859,6 +993,22 @@ class Tender(models.Model):
     def _compute_requisition_count(self):
         for tender in self:
             tender.requisition_count = len(tender.requisition_ids)
+
+    @api.depends('purchase_order_ids', 'purchase_order_ids.is_tender_rfq')
+    def _compute_purchase_order_count(self):
+        for tender in self:
+            # Count only post-win Purchase Orders (not pre-win RFQs)
+            tender.purchase_order_count = len(
+                tender.purchase_order_ids.filtered(lambda po: not po.is_tender_rfq)
+            )
+
+    @api.depends('purchase_order_ids', 'purchase_order_ids.is_tender_rfq')
+    def _compute_rfq_count(self):
+        for tender in self:
+            # Count only pre-win RFQs sent to suppliers
+            tender.rfq_count = len(
+                tender.purchase_order_ids.filtered(lambda po: po.is_tender_rfq)
+            )
 
     @api.depends('quotation_ids')
     def _compute_quotation_count(self):
@@ -897,6 +1047,7 @@ class Tender(models.Model):
         self.ensure_one()
         if not self.boq_line_ids:
             raise UserError(_('Please add BoQ lines before preparing quotation.'))
+        self._validate_required_approvals()
         self.write({'state': 'quotation'})
 
     def action_submit_tender(self):
@@ -905,10 +1056,51 @@ class Tender(models.Model):
             raise UserError(_('Please set a Customer before submitting the tender.'))
         if not self.quotation_ids:
             raise UserError(_('Please generate a quotation before submitting the tender.'))
+        self._validate_required_approvals()
         self.write({'state': 'submitted'})
+
+    def action_start_evaluation(self):
+        """Move tender to Under Evaluation stage.
+        
+        This represents the customer starting their evaluation.
+        Records the evaluation start date and schedules follow-up activities.
+        """
+        self.ensure_one()
+        if self.state != 'submitted':
+            raise UserError(_('Only submitted tenders can be moved to evaluation.'))
+        
+        vals = {
+            'state': 'evaluation',
+            'evaluation_start_date': fields.Date.today(),
+        }
+        
+        # Set offer opening date if not already set
+        if not self.offer_opening_date:
+            vals['offer_opening_date'] = fields.Datetime.now()
+        
+        self.write(vals)
+
+    def _validate_required_approvals(self):
+        """Ensure all required approvals are completed before proceeding."""
+        missing = []
+        if self.require_direct_manager and not self.approval_direct_manager:
+            missing.append(_('Direct Manager Approval'))
+        if self.require_department_manager and not self.approval_department_manager:
+            missing.append(_('Department Manager Approval'))
+        if self.require_financial_manager and not self.approval_financial_manager:
+            missing.append(_('Financial Manager Approval'))
+        if self.require_ceo and not self.approval_ceo:
+            missing.append(_('CEO Approval'))
+
+        if missing:
+            raise UserError(
+                _('Cannot proceed without required approvals: %s') % ', '.join(missing)
+            )
 
     def action_mark_won(self):
         self.ensure_one()
+        if self.state != 'evaluation':
+            raise UserError(_('Only tenders under evaluation can be marked as won.'))
         self.write({'state': 'won'})
         if self.lead_id:
             # Mark CRM opportunity as won with context to bypass lock
@@ -922,16 +1114,28 @@ class Tender(models.Model):
     def action_mark_lost(self):
         """Open wizard to mark tender as lost with reason"""
         self.ensure_one()
-        
-        # Create wizard
-        wizard = self.env['ics.tender.mark.lost.wizard'].create({
-            'tender_id': self.id,
-        })
-        
         return {
             'name': _('Mark Tender as Lost'),
             'type': 'ir.actions.act_window',
             'res_model': 'ics.tender.mark.lost.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {'default_tender_id': self.id},
+        }
+
+    def action_decline_tender(self):
+        """Open wizard to decline participation (not participating) with reason.
+        Available in draft, technical study, and financial study states."""
+        self.ensure_one()
+        
+        wizard = self.env['ics.tender.decline.wizard'].create({
+            'tender_id': self.id,
+        })
+        
+        return {
+            'name': _('Decline Tender - Not Participating'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'ics.tender.decline.wizard',
             'view_mode': 'form',
             'res_id': wizard.id,
             'target': 'new',
@@ -949,80 +1153,199 @@ class Tender(models.Model):
             'context': {'default_tender_id': self.id},
         }
 
-    def action_create_purchase_agreement(self):
+    def action_request_supplier_quotations(self):
+        """Create direct RFQs for potential suppliers to collect their prices.
+        
+        Creates one draft Request for Quotation (purchase.order) per potential
+        supplier, each containing all BoQ products. This is a pre-win activity
+        to gather supplier prices before preparing the tender quotation.
+        
+        Workflow:
+        1. Click this button → creates one draft RFQ per potential supplier
+        2. Send/print RFQs to suppliers (standard Odoo flow)
+        3. Enter supplier prices as they respond
+        4. Use "Compare Order Lines" (Odoo default view) to choose and compare product offers
+        5. Click "Sync Supplier Prices" to import prices as vendor offers
+        6. Click "Compare Suppliers" to select the best offers
+        """
         self.ensure_one()
         if not self.boq_line_ids:
-            raise UserError(_('Please add BoQ lines before creating a purchase agreement.'))
-
-        # Try to get the purchase requisition type, fallback gracefully if not found
-        type_id = False
-        try:
-            type_id = self.env.ref('purchase_requisition.type_multi').id
-        except (ValueError, KeyError):
-            # Odoo 18: type_multi might not exist, try to get any blanket order type
-            # Check if the model exists first
-            if 'purchase.requisition.type' in self.env:
-                type_obj = self.env['purchase.requisition.type'].search([('name', 'ilike', 'blanket')], limit=1)
-                type_id = type_obj.id if type_obj else False
-
-        # Build vals dict with only fields that exist in the model
-        requisition_model = self.env['purchase.requisition']
-        available_fields = requisition_model._fields.keys()
+            raise UserError(_('Please add BoQ lines before requesting supplier quotations.'))
         
-        vals = {}
+        # Get potential suppliers
+        potential_suppliers = self.potential_suppliers_ids.filtered(
+            lambda s: s.status in ('potential', 'invited') and s.partner_id
+        )
+        if not potential_suppliers:
+            raise UserError(_(
+                'No potential suppliers found!\n\n'
+                'Please add potential suppliers in the "Team & Suppliers" tab first.'
+            ))
         
-        # Add tender_id if field exists
-        if 'tender_id' in available_fields:
-            vals['tender_id'] = self.id
-            
-        # Add user_id if field exists
-        if 'user_id' in available_fields:
-            vals['user_id'] = self.user_id.id
-            
-        # Add ordering_date if field exists (might not exist in some versions)
-        if 'ordering_date' in available_fields:
-            vals['ordering_date'] = fields.Date.today()
-            
-        # Add schedule_date if field exists
-        if 'schedule_date' in available_fields and self.submission_deadline:
-            vals['schedule_date'] = self.submission_deadline.date()
+        # Check for existing RFQs to avoid duplicates
+        existing_rfqs = self.purchase_order_ids.filtered(
+            lambda po: po.is_tender_rfq and po.state != 'cancel'
+        )
+        existing_supplier_ids = existing_rfqs.mapped('partner_id').ids
         
-        # Add type_id if we found one
-        if type_id and 'type_id' in available_fields:
-            vals['type_id'] = type_id
-
-        requisition = requisition_model.create(vals)
-
-        # Create requisition lines from BoQ
-        line_model = self.env['purchase.requisition.line']
-        line_fields = line_model._fields.keys()
-
-        for boq_line in self.boq_line_ids:
-            line_vals = {
-                'requisition_id': requisition.id,
-                'product_id': boq_line.product_id.id,
+        # Filter out suppliers that already have an RFQ
+        new_suppliers = potential_suppliers.filtered(
+            lambda s: s.partner_id.id not in existing_supplier_ids
+        )
+        if not new_suppliers:
+            raise UserError(_(
+                'RFQs already exist for all potential suppliers.\n\n'
+                'You can view them using the "RFQs" stat button above.'
+            ))
+        
+        po_model = self.env['purchase.order']
+        po_fields = po_model._fields.keys()
+        pol_model = self.env['purchase.order.line']
+        pol_fields = pol_model._fields.keys()
+        
+        created_rfqs = self.env['purchase.order']
+        
+        for supplier in new_suppliers:
+            # Build RFQ header
+            po_vals = {
+                'partner_id': supplier.partner_id.id,
+                'is_tender_rfq': True,
             }
+            if 'tender_id' in po_fields:
+                po_vals['tender_id'] = self.id
+            if 'origin' in po_fields:
+                po_vals['origin'] = self.name
+            if 'date_order' in po_fields:
+                po_vals['date_order'] = fields.Datetime.now()
+            if 'notes' in po_fields:
+                po_vals['notes'] = _('RFQ for tender: %s') % self.tender_title
             
-            # Add optional fields if they exist
-            if 'product_qty' in line_fields:
-                line_vals['product_qty'] = boq_line.quantity
-            if 'product_uom_id' in line_fields:
-                line_vals['product_uom_id'] = boq_line.uom_id.id
-            if 'price_unit' in line_fields:
-                line_vals['price_unit'] = boq_line.estimated_cost / boq_line.quantity if boq_line.quantity else 0
+            try:
+                rfq = po_model.create(po_vals)
                 
-            line_model.create(line_vals)
-
+                # Add BoQ products as order lines
+                for boq_line in self.boq_line_ids:
+                    line_vals = {
+                        'order_id': rfq.id,
+                        'product_id': boq_line.product_id.id,
+                    }
+                    if 'name' in pol_fields:
+                        line_vals['name'] = boq_line.name
+                    if 'product_qty' in pol_fields:
+                        line_vals['product_qty'] = boq_line.quantity
+                    if 'product_uom' in pol_fields:
+                        line_vals['product_uom'] = boq_line.uom_id.id
+                    if 'price_unit' in pol_fields:
+                        line_vals['price_unit'] = 0  # Supplier will fill in their price
+                    if 'date_planned' in pol_fields:
+                        line_vals['date_planned'] = self.submission_deadline or fields.Datetime.now()
+                    
+                    pol_model.create(line_vals)
+                
+                created_rfqs |= rfq
+                # Mark supplier as invited
+                supplier.write({'status': 'invited'})
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).warning(
+                    'Failed to create RFQ for supplier %s: %s', supplier.partner_id.name, e
+                )
+                continue
+        
+        if not created_rfqs:
+            raise UserError(_('Failed to create any RFQs. Please check the potential suppliers.'))
+        
+        # Link RFQs as Purchase Alternatives (Odoo native feature)
+        # This enables "Compare Product Lines" from any RFQ's Alternatives tab
+        all_rfqs = existing_rfqs | created_rfqs
+        if len(all_rfqs) > 1 and 'alternative_po_ids' in po_fields:
+            for rfq in all_rfqs:
+                # Link each RFQ to all others as alternatives
+                other_rfqs = all_rfqs - rfq
+                rfq.write({
+                    'alternative_po_ids': [(4, other.id) for other in other_rfqs]
+                })
+        
+        # Show the created RFQs
+        if len(created_rfqs) == 1:
+            return {
+                'name': _('Request for Quotation'),
+                'type': 'ir.actions.act_window',
+                'res_model': 'purchase.order',
+                'view_mode': 'form',
+                'res_id': created_rfqs.id,
+                'target': 'current',
+            }
         return {
-            'name': _('Purchase Agreement'),
+            'name': _('Requests for Quotation'),
             'type': 'ir.actions.act_window',
-            'res_model': 'purchase.requisition',
-            'view_mode': 'form',
-            'res_id': requisition.id,
+            'res_model': 'purchase.order',
+            'view_mode': 'list,form',
+            'domain': [('id', 'in', created_rfqs.ids)],
             'target': 'current',
         }
 
+    def action_create_purchase_agreement(self):
+        """Backward compatibility alias."""
+        return self.action_request_supplier_quotations()
+
+    def action_view_rfqs(self):
+        """View pre-win RFQs sent to suppliers for price collection."""
+        self.ensure_one()
+        rfqs = self.purchase_order_ids.filtered(lambda po: po.is_tender_rfq)
+        return {
+            'name': _('Requests for Quotation'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'purchase.order',
+            'view_mode': 'list,form',
+            'domain': [('id', 'in', rfqs.ids)],
+            'context': {'default_tender_id': self.id, 'default_is_tender_rfq': True},
+        }
+
+    def action_compare_rfqs(self):
+        """Open Odoo's default Compare Order Lines view for all tender RFQs.
+
+        Users use this view to choose and compare product offers side-by-side
+        (grouped by product). After comparing, run "Sync Supplier Prices" to
+        import chosen prices into vendor offers, then select best vendor per line.
+        """
+        self.ensure_one()
+        rfqs = self.purchase_order_ids.filtered(
+            lambda po: po.is_tender_rfq and po.state != 'cancel'
+        )
+        if not rfqs:
+            raise UserError(_(
+                'No RFQs found!\n\n'
+                'Please first click "Request Supplier Quotations" to create RFQs for suppliers.'
+            ))
+        
+        if len(rfqs) < 2:
+            raise UserError(_(
+                'At least 2 RFQs are needed to compare.\n\n'
+                'Add more potential suppliers and click "Request Supplier Quotations" again.'
+            ))
+        
+        order_line_ids = rfqs.mapped('order_line').ids
+        if not order_line_ids:
+            raise UserError(_(
+                'No product lines found in the RFQs.\n\n'
+                'Make sure suppliers have entered their prices.'
+            ))
+
+        # Odoo default Compare Order Lines: purchase lines grouped by product
+        return {
+            'name': _('Compare Order Lines'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'purchase.order.line',
+            'view_mode': 'list',
+            'domain': [('id', 'in', order_line_ids)],
+            'context': {
+                'search_default_groupby_product': True,
+            },
+        }
+
     def action_view_purchase_agreements(self):
+        """Legacy: View purchase agreements (kept for backward compatibility)."""
         self.ensure_one()
         return {
             'name': _('Purchase Agreements'),
@@ -1035,6 +1358,13 @@ class Tender(models.Model):
 
     def action_generate_quotation(self):
         self.ensure_one()
+        # Guard: don't create duplicate quotations
+        existing = self.quotation_ids.filtered(lambda q: q.state != 'cancel')
+        if existing:
+            raise UserError(_(
+                'A Sales Quotation already exists for this tender (%s).\n\n'
+                'Use "Update Sales Quotation" to refresh it with current data.'
+            ) % existing[0].name)
         return {
             'name': _('Generate Quotation'),
             'type': 'ir.actions.act_window',
@@ -1042,6 +1372,40 @@ class Tender(models.Model):
             'view_mode': 'form',
             'target': 'new',
             'context': {'default_tender_id': self.id},
+        }
+
+    def action_regenerate_quotation(self):
+        """Update the existing sales quotation with current BoQ data and margins.
+        
+        Instead of creating a new quotation, this updates the existing one
+        by removing old lines and recreating them from current BoQ.
+        """
+        self.ensure_one()
+        existing = self.quotation_ids.filtered(lambda q: q.state != 'cancel')
+        if not existing:
+            # No existing quotation — fall through to generate
+            return self.action_generate_quotation()
+        
+        quotation = existing[0]
+        
+        # Only allow update on draft/sent quotations
+        if quotation.state not in ('draft', 'sent'):
+            raise UserError(_(
+                'Cannot update quotation "%s" because it is in "%s" state.\n\n'
+                'Only draft or sent quotations can be updated.'
+            ) % (quotation.name, quotation.state))
+        
+        # Open wizard with regenerate context
+        return {
+            'name': _('Update Sales Quotation'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'ics.tender.quotation.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_tender_id': self.id,
+                'regenerate_quotation_id': quotation.id,
+            },
         }
 
     def action_view_quotations(self):
@@ -1054,6 +1418,121 @@ class Tender(models.Model):
             'domain': [('tender_id', '=', self.id)],
             'context': {'default_tender_id': self.id, 'default_partner_id': self.partner_id.id},
         }
+
+    def action_sync_supplier_prices(self):
+        """Import supplier prices from RFQs into vendor offers for comparison.
+        
+        Reads prices from the direct RFQs (purchase.order with is_tender_rfq=True)
+        created by "Request Supplier Quotations" and imports them as vendor offers
+        on BoQ lines for supplier comparison.
+        """
+        self.ensure_one()
+        
+        if not self.boq_line_ids:
+            raise UserError(_('No BoQ lines found in this tender.'))
+        
+        # Get pre-win RFQs (direct RFQs to suppliers)
+        supplier_rfqs = self.purchase_order_ids.filtered(
+            lambda po: po.is_tender_rfq and po.state != 'cancel'
+        )
+        
+        # Fallback: also check legacy Purchase Agreement-linked POs
+        if not supplier_rfqs and self.requisition_ids:
+            supplier_rfqs = self.env['purchase.order'].search([
+                ('requisition_id', 'in', self.requisition_ids.ids),
+                ('state', '!=', 'cancel'),
+            ])
+        
+        if not supplier_rfqs:
+            raise UserError(_(
+                'No RFQs found!\n\n'
+                'Please first click "Request Supplier Quotations" to create RFQs '
+                'for your potential suppliers, then enter their prices.'
+            ))
+        
+        VendorOffer = self.env['ics.tender.vendor.offer']
+        created_count = 0
+        updated_count = 0
+        skipped_count = 0
+        
+        for rfq in supplier_rfqs:
+            supplier = rfq.partner_id
+            if not supplier:
+                continue
+                
+            for rfq_line in rfq.order_line:
+                product = rfq_line.product_id
+                if not product:
+                    continue
+                
+                # Find matching BoQ line by product
+                boq_line = self.boq_line_ids.filtered(
+                    lambda l: l.product_id.id == product.id
+                )
+                if not boq_line:
+                    skipped_count += 1
+                    continue
+                boq_line = boq_line[0]
+                
+                # Check if offer already exists for this supplier + BoQ line
+                existing_offer = VendorOffer.search([
+                    ('boq_line_id', '=', boq_line.id),
+                    ('vendor_id', '=', supplier.id),
+                ], limit=1)
+                
+                unit_price = rfq_line.price_unit
+                if unit_price <= 0:
+                    skipped_count += 1
+                    continue
+                
+                if existing_offer:
+                    if existing_offer.unit_price != unit_price:
+                        existing_offer.write({
+                            'unit_price': unit_price,
+                            'purchase_order_id': rfq.id,
+                        })
+                        updated_count += 1
+                else:
+                    VendorOffer.create({
+                        'boq_line_id': boq_line.id,
+                        'vendor_id': supplier.id,
+                        'unit_price': unit_price,
+                        'purchase_order_id': rfq.id,
+                    })
+                    created_count += 1
+        
+        # Update potential supplier statuses
+        for rfq in supplier_rfqs:
+            supplier_rec = self.potential_suppliers_ids.filtered(
+                lambda s: s.partner_id.id == rfq.partner_id.id
+            )
+            if supplier_rec and supplier_rec.status == 'invited':
+                supplier_rec.write({'status': 'responded'})
+        
+        if created_count == 0 and updated_count == 0:
+            raise UserError(_(
+                'No supplier prices to sync!\n\n'
+                'Make sure:\n'
+                '• RFQs have been created for suppliers\n'
+                '• Supplier prices have been entered in the RFQ lines\n'
+                '• RFQ products match the BoQ products'
+            ))
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Supplier Prices Synced'),
+                'message': _('%d created, %d updated') % (created_count, updated_count),
+                'type': 'success',
+                'sticky': False,
+                'next': {'type': 'ir.actions.act_window_close'},
+            }
+        }
+
+    def action_sync_vendor_offers(self):
+        """Backward compatibility alias."""
+        return self.action_sync_supplier_prices()
 
     def action_compare_vendors(self):
         self.ensure_one()
@@ -1090,6 +1569,17 @@ class Tender(models.Model):
             'domain': [('tender_id', '=', self.id)],
         }
 
+    def action_view_purchase_orders(self):
+        self.ensure_one()
+        return {
+            'name': _('Purchase Orders'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'purchase.order',
+            'view_mode': 'list,form',
+            'domain': [('tender_id', '=', self.id)],
+            'context': {'default_tender_id': self.id},
+        }
+
     def action_view_attachments(self):
         self.ensure_one()
         return {
@@ -1106,6 +1596,17 @@ class Tender(models.Model):
 
     def action_create_purchase_orders(self):
         self.ensure_one()
+        
+        # Check if POs already exist for this tender
+        existing_pos = self.env['purchase.order'].search_count([
+            ('tender_id', '=', self.id),
+            ('state', '!=', 'cancel'),
+        ])
+        if existing_pos:
+            raise UserError(_(
+                'Purchase Orders already exist for this tender (%d active PO(s)).\n\n'
+                'To create new ones, first cancel the existing Purchase Orders.'
+            ) % existing_pos)
 
         if self.tender_type == 'single_vendor':
             return self._create_single_purchase_order()

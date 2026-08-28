@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
         <record id="view_tender_boq_line_tree" model="ir.ui.view">
             <field name="name">ics.tender.boq.line.list</field>
             <field name="model">ics.tender.boq.line</field>
@@ -81,4 +82,5 @@
                 </form>
             </field>
         </record>
+
 </odoo>

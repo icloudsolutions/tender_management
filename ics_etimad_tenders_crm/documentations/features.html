@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مميزات وحدة مناقصات اعتماد - ICS Etimad Tenders CRM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ar-font: 'Noto Sans Arabic', sans-serif;
+            --en-font: 'Inter', sans-serif;
+        }
+        body {
+            font-family: var(--ar-font);
+            background-color: #f8fafc;
+            transition: all 0.3s ease;
+        }
+        .en-mode {
+            font-family: var(--en-font);
+            direction: ltr;
+        }
+        .feature-card:hover {
+            transform: translateY(-4px);
+            transition: all 0.3s ease;
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        .badge-indigo { background-color: #e0e7ff; color: #4338ca; }
+        .badge-emerald { background-color: #d1fae5; color: #047857; }
+        .badge-amber { background-color: #fef3c7; color: #b45309; }
+        .tab-btn {
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .tab-btn.active {
+            background-color: white;
+            color: #4338ca;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .workflow-step {
+            position: relative;
+        }
+        .workflow-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            bottom: -1.5rem;
+            left: 50%;
+            width: 2px;
+            height: 1.5rem;
+            background: linear-gradient(to bottom, #c7d2fe, transparent);
+            transform: translateX(-50%);
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <!-- Language Switcher -->
+    <div class="fixed top-4 left-4 right-4 z-50 flex justify-center pointer-events-none">
+        <div class="bg-slate-200/80 backdrop-blur p-1 rounded-lg flex gap-1 pointer-events-auto shadow-sm">
+            <button onclick="switchLang('ar')" id="btn-ar" class="tab-btn active">العربية</button>
+            <button onclick="switchLang('en')" id="btn-en" class="tab-btn">English</button>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-indigo-700 text-white py-16 px-6 shadow-lg mb-10">
+        <div class="max-w-5xl mx-auto text-center md:text-right" id="header-content">
+            <h1 class="text-4xl font-bold mb-4" id="main-title">مميزات وحدة مناقصات اعتماد</h1>
+            <p class="text-xl opacity-90" id="sub-title">التكامل الشامل مع منصة اعتماد الحكومية وربطها بـ CRM</p>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-6 pb-20">
+
+        <!-- Section 1: Overview -->
+        <section class="mb-12">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+                <h2 class="text-2xl font-bold mb-4 flex items-center gap-2" id="overview-title">
+                    <span class="w-2 h-8 bg-indigo-600 rounded-full"></span>
+                    <span id="overview-title-text">نظرة عامة</span>
+                </h2>
+                <p class="text-slate-600 leading-relaxed" id="overview-desc"></p>
+            </div>
+        </section>
+
+        <!-- Section 2: Key Features Grid -->
+        <h2 class="text-2xl font-bold mb-6 flex items-center gap-2" id="features-title">
+            <span class="w-2 h-8 bg-emerald-500 rounded-full"></span>
+            <span id="features-title-text">المميزات الرئيسية</span>
+        </h2>
+        <section class="mb-12 grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="features-grid">
+        </section>
+
+        <!-- Section 3: Workflow -->
+        <h2 class="text-2xl font-bold mb-6 flex items-center gap-2" id="workflow-title">
+            <span class="w-2 h-8 bg-amber-500 rounded-full"></span>
+            <span id="workflow-title-text">سير العمل</span>
+        </h2>
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 mb-12" id="workflow-section">
+        </div>
+
+        <!-- Section 4: ICS Tender Management Integration -->
+        <h2 class="text-2xl font-bold mb-6 flex items-center gap-2" id="integration-title">
+            <span class="w-2 h-8 bg-violet-500 rounded-full"></span>
+            <span id="integration-title-text">التكامل مع إدارة المناقصات ICS</span>
+        </h2>
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 mb-12" id="integration-section">
+        </div>
+
+        <!-- Section 5: Configuration & Documentation -->
+        <h2 class="text-2xl font-bold mb-6 flex items-center gap-2" id="config-docs-title">
+            <span class="w-2 h-8 bg-slate-600 rounded-full"></span>
+            <span id="config-docs-title-text">الإعدادات والتوثيق</span>
+        </h2>
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden mb-12" id="config-docs-section">
+        </div>
+
+        <!-- Section 6: Tips -->
+        <div class="bg-indigo-50 p-6 rounded-2xl border border-indigo-100" id="tips-section">
+        </div>
+
+    </main>
+
+    <footer class="text-center py-10 text-slate-400 text-xs border-t" id="footer-text">
+        مناقصات اعتماد - iCloud Solutions - جميع الحقوق محفوظة
+    </footer>
+
+    <script>
+        const content = {
+            ar: {
+                dir: 'rtl',
+                class: '',
+                mainTitle: 'مميزات وحدة مناقصات اعتماد',
+                subTitle: 'التكامل الشامل مع منصة اعتماد الحكومية وربطها بـ CRM',
+                overviewTitle: 'نظرة عامة',
+                overviewDesc: 'توفر وحدة مناقصات اعتماد (ICS Etimad Tenders CRM) تكاملاً كاملاً مع منصة اعتماد الحكومية السعودية. يتم جلب المناقصات تلقائياً أو يدوياً، مع إمكانية تصنيفها وتوجيهها عبر نظام التطابق الذكي، وربطها بفرص المبيعات في Odoo لمتابعة كاملة حتى الفوز أو الخسارة.',
+                featuresTitle: 'المميزات الرئيسية',
+                features: [
+                    { title: 'جلب المناقصات', desc: 'مزامنة تلقائية أو يدوية مع بوابة اعتماد (tenders.etimad.sa) مع دعم إعادة المحاولة وحماية مضادة للبوت.', icon: 'M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12', bg: 'bg-indigo-100', text: 'text-indigo-600' },
+                    { title: 'التطابق الذكي', desc: 'قواعد ديناميكية لتعيين المناقصات للموظفين، وضع المفضلة، وإضافة ملاحظات تلقائياً حسب الشروط التي تحددها.', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', bg: 'bg-emerald-100', text: 'text-emerald-600' },
+                    { title: 'ربط CRM', desc: 'إنشاء فرصة مبيعات من المناقصة بنقرة واحدة وربطها للمتابعة حتى الفوز أو الخسارة.', icon: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6-6', bg: 'bg-amber-100', text: 'text-amber-600' },
+                    { title: 'المفضلة والعاجلة', desc: 'وضع مناقصات مهمة في المفضلة، مع تمييز بصري للمناقصات العاجلة (موعد قريب) والعالية القيمة.', icon: 'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.921-.755 1.688-1.54 1.118l-3.976-2.888a1 1 0 00-1.175 0l-3.976 2.888c-.784.57-1.838-.197-1.539-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.383-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z', bg: 'bg-rose-100', text: 'text-rose-600' },
+                    { title: 'نسبة التطابق', desc: 'حساب تلقائي لنسبة تطابق المناقصة مع الأنشطة والجهات والفئات المفضلة في الإعدادات.', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z', bg: 'bg-violet-100', text: 'text-violet-600' },
+                    { title: 'الإشعارات', desc: 'إشعارات عند مناقصات جديدة، مناقصات ذات تطابق عالٍ، مواعيد عاجلة، وتغييرات على المناقصات.', icon: 'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9', bg: 'bg-sky-100', text: 'text-sky-600' }
+                ],
+                workflowTitle: 'سير العمل',
+                workflowSteps: [
+                    'جدولة أو تشغيل جلب المناقصات من اعتماد',
+                    'مراجعة المناقصات في القائمة أو كانبان مع ألوان الأولوية',
+                    'التطابق الذكي يطبق القواعد (تعيين، مفضلة، ملاحظات)',
+                    'إنشاء فرصة مبيعات من المناقصة عند الحاجة',
+                    'متابعة الحالة حتى الفوز أو الخسارة'
+                ],
+                integrationTitle: 'التكامل مع إدارة المناقصات ICS',
+                integrationIntro: 'عند تثبيت وحدة إدارة المناقصات (ICS Tender Management) إلى جانب مناقصات اعتماد، تصبح المناقصات المجلوبة من اعتماد نقطة انطلاق لدورة حياة مناقصة كاملة: من الفرصة إلى المناقصة الداخلية ثم العرض والترسية والمشروع.',
+                integrationPoints: [
+                    { title: 'إنشاء مناقصة من اعتماد', desc: 'من نموذج مناقصة اعتماد (ics.etimad.tender) يظهر زر "إنشاء مناقصة" لإنشاء سجل مناقصة داخلية (ics.tender) مع نسخ العنوان، الجهة، المواعيد، القيمة التقديرية، وربط ثنائي الاتجاه.' },
+                    { title: 'ربط الفرص بمناقصات اعتماد', desc: 'الفرص (crm.lead) يمكن ربطها بمناقصة اعتماد. عند تحويل الفرصة إلى مناقصة، تُنسخ بيانات اعتماد تلقائياً إلى المناقصة الداخلية.' },
+                    { title: 'حقل الربط والمرجع', desc: 'المناقصة الداخلية تحتوي على حقل "مناقصة اعتماد" (etimad_tender_id) ورابط البوابة، رقم المرجع، وبيانات الجهة والنشاط من اعتماد للاستعلام والتتبع.' },
+                    { title: 'لوحة التحكم', desc: 'لوحة إدارة المناقصات تعرض إحصائيات مناقصات اعتماد (الإجمالي، الجديدة) عند تفعيل الوحدتين معاً.' }
+                ],
+                configDocsTitle: 'الإعدادات والتوثيق',
+                configDocs: [
+                    { label: 'الإعدادات العامة', path: 'مناقصات اعتماد ← الإعدادات', desc: 'تفعيل المزامنة، التطابق الذكي، الإشعارات، الأرشفة.' },
+                    { label: 'قواعد التطابق الديناميكية', path: 'الإعدادات ← قواعد التطابق الديناميكية', desc: 'إنشاء قواعد الشرط والإجراء (تعيين، مفضلة، ملاحظات).' },
+                    { label: 'دليل التطابق الذكي', path: 'smart_matching.html', desc: 'شرح مفصل لشروط القواعد والمعاملات والإجراءات.', link: 'smart_matching.html' }
+                ],
+                tipsTitle: 'نصائح سريعة',
+                tips: [
+                    'فعّل "التطابق الذكي" في الإعدادات لتفعيل القواعد الديناميكية تلقائياً.',
+                    'استخدم "جلب أحدث المناقصات" أو "جلب دفعة" من قائمة المناقصات لتحديث البيانات.',
+                    'المناقصات العاجلة (أقل من 7 أيام) والعالية القيمة تظهر بتمييز لوني في القائمة والكانبان.',
+                    'يمكنك إعادة تطبيق قواعد التطابق يدوياً من زر "تطبيق قواعد التطابق" على المناقصات المحددة.'
+                ],
+                footer: 'مناقصات اعتماد - iCloud Solutions - جميع الحقوق محفوظة'
+            },
+            en: {
+                dir: 'ltr',
+                class: 'en-mode',
+                mainTitle: 'Etimad Tenders CRM — Features',
+                subTitle: 'Full integration with Saudi Etimad government tenders platform and Odoo CRM',
+                overviewTitle: 'Overview',
+                overviewDesc: 'The ICS Etimad Tenders CRM module provides full integration with Saudi Arabia\'s Etimad government tenders platform. Tenders are fetched automatically or manually, with smart matching to classify and route them, and one-click linking to CRM opportunities for complete tracking until won or lost.',
+                featuresTitle: 'Key Features',
+                features: [
+                    { title: 'Tender Fetching', desc: 'Automatic or manual sync with Etimad portal (tenders.etimad.sa) with retry and anti-bot handling.', icon: 'M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12', bg: 'bg-indigo-100', text: 'text-indigo-600' },
+                    { title: 'Smart Matching', desc: 'Dynamic rules to assign tenders to users, mark favorites, and add notes automatically based on your conditions.', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', bg: 'bg-emerald-100', text: 'text-emerald-600' },
+                    { title: 'CRM Integration', desc: 'Create a sales opportunity from a tender in one click and link it for full follow-up to won or lost.', icon: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6-6', bg: 'bg-amber-100', text: 'text-amber-600' },
+                    { title: 'Favorites & Urgent', desc: 'Mark important tenders as favorites; visual cues for urgent deadlines and high-value tenders.', icon: 'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.921-.755 1.688-1.54 1.118l-3.976-2.888a1 1 0 00-1.175 0l-3.976 2.888c-.784.57-1.838-.197-1.539-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.383-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z', bg: 'bg-rose-100', text: 'text-rose-600' },
+                    { title: 'Match Score', desc: 'Automatic score showing how well a tender matches your preferred activities, agencies, and categories.', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z', bg: 'bg-violet-100', text: 'text-violet-600' },
+                    { title: 'Notifications', desc: 'Alerts for new tenders, high match score, urgent deadlines, and tender updates.', icon: 'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9', bg: 'bg-sky-100', text: 'text-sky-600' }
+                ],
+                workflowTitle: 'Workflow',
+                workflowSteps: [
+                    'Schedule or run tender fetch from Etimad',
+                    'Review tenders in list or kanban with priority colors',
+                    'Smart matching applies rules (assign, favorite, notes)',
+                    'Create sales opportunity from tender when relevant',
+                    'Track status through to won or lost'
+                ],
+                integrationTitle: 'Integration with ICS Tender Management',
+                integrationIntro: 'When the ICS Tender Management module is installed alongside Etimad Tenders CRM, Etimad-fetched tenders become the starting point for a full tender lifecycle: from opportunity to internal tender, then quotation, award, and project.',
+                integrationPoints: [
+                    { title: 'Create Tender from Etimad', desc: 'From an Etimad tender form (ics.etimad.tender), a "Create Tender" button creates an internal tender (ics.tender) with title, agency, dates, estimated value copied, and a two-way link between the records.' },
+                    { title: 'Link Opportunities to Etimad', desc: 'CRM leads (crm.lead) can be linked to an Etimad tender. When converting the lead to a tender, Etimad data is copied automatically into the internal tender.' },
+                    { title: 'Link Field & Reference', desc: 'The internal tender stores "Etimad Tender" (etimad_tender_id), portal link, reference number, and agency/activity data from Etimad for reporting and traceability.' },
+                    { title: 'Dashboard', desc: 'The Tender Management dashboard shows Etimad tender statistics (total, new) when both modules are installed.' }
+                ],
+                configDocsTitle: 'Configuration & Documentation',
+                configDocs: [
+                    { label: 'General Settings', path: 'Etimad Tenders → Configuration → Settings', desc: 'Enable sync, smart matching, notifications, archive.' },
+                    { label: 'Dynamic Matching Rules', path: 'Configuration → Dynamic Matching Rules', desc: 'Create condition/action rules (assign, favorite, notes).' },
+                    { label: 'Smart Matching Guide', path: 'smart_matching.html', desc: 'Detailed guide to rule conditions, operators, and actions.', link: 'smart_matching.html' }
+                ],
+                tipsTitle: 'Quick Tips',
+                tips: [
+                    'Enable "Smart Matching" in Settings to run dynamic rules automatically.',
+                    'Use "Fetch Latest Tenders" or "Fetch Batch" from the tenders list to refresh data.',
+                    'Urgent (under 7 days) and high-value tenders are highlighted in list and kanban.',
+                    'You can re-apply matching rules manually via "Apply Matching Rules" on selected tenders.'
+                ],
+                footer: 'Etimad Tenders CRM - iCloud Solutions - All Rights Reserved'
+            }
+        };
+
+        function switchLang(lang) {
+            const data = content[lang];
+            document.documentElement.lang = lang === 'ar' ? 'ar' : 'en';
+            document.documentElement.dir = data.dir;
+            document.body.className = `text-slate-800 ${data.class}`;
+
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`btn-${lang}`).classList.add('active');
+
+            document.getElementById('main-title').innerText = data.mainTitle;
+            document.getElementById('sub-title').innerText = data.subTitle;
+            document.getElementById('header-content').className = `max-w-5xl mx-auto text-center ${lang === 'ar' ? 'md:text-right' : 'md:text-left'}`;
+
+            document.getElementById('overview-title-text').innerText = data.overviewTitle;
+            document.getElementById('overview-desc').innerText = data.overviewDesc;
+
+            document.getElementById('features-title-text').innerText = data.featuresTitle;
+            document.getElementById('features-grid').innerHTML = data.features.map(f => `
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 feature-card">
+                    <div class="w-12 h-12 ${f.bg} ${f.text} rounded-lg flex items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${f.icon}" />
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">${f.title}</h3>
+                    <p class="text-sm text-slate-600">${f.desc}</p>
+                </div>
+            `).join('');
+
+            document.getElementById('workflow-title-text').innerText = data.workflowTitle;
+            document.getElementById('workflow-section').innerHTML = `
+                <div class="grid md:grid-cols-5 gap-6 text-center">
+                    ${data.workflowSteps.map((step, i) => `
+                        <div class="workflow-step">
+                            <div class="bg-indigo-50 text-indigo-700 w-10 h-10 rounded-full flex items-center justify-center font-bold mx-auto mb-3">${i + 1}</div>
+                            <p class="text-sm font-medium text-slate-700">${step}</p>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            document.getElementById('integration-title-text').innerText = data.integrationTitle;
+            document.getElementById('integration-section').innerHTML = `
+                <p class="text-slate-600 mb-6 leading-relaxed">${data.integrationIntro}</p>
+                <div class="grid md:grid-cols-2 gap-4">
+                    ${data.integrationPoints.map((p, i) => `
+                        <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50">
+                            <h4 class="font-semibold text-violet-700 mb-2">${p.title}</h4>
+                            <p class="text-sm text-slate-600">${p.desc}</p>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            document.getElementById('config-docs-title-text').innerText = data.configDocsTitle;
+            document.getElementById('config-docs-section').innerHTML = `
+                <div class="divide-y divide-slate-100">
+                    ${data.configDocs.map((row, i) => `
+                        <div class="p-6 flex flex-col md:flex-row md:items-center gap-4 ${i % 2 === 1 ? 'bg-slate-50/50' : ''} ${row.link ? 'hover:bg-indigo-50/30' : ''}">
+                            <div class="md:w-1/3">
+                                ${row.link
+                                    ? `<a href="${row.link}" target="_blank" class="font-semibold text-indigo-600 hover:underline">${row.label} ↗</a>`
+                                    : `<span class="font-semibold text-indigo-700">${row.label}</span>`}
+                                <p class="text-xs text-slate-500 mt-1 font-mono">${row.path}</p>
+                            </div>
+                            <div class="md:flex-1 text-sm text-slate-600">${row.desc}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            document.getElementById('tips-section').innerHTML = `
+                <h3 class="font-bold mb-3 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                    </svg>
+                    ${data.tipsTitle}
+                </h3>
+                <ul class="text-sm text-slate-700 space-y-2 list-disc ${lang === 'ar' ? 'pr-5' : 'pl-5'}">
+                    ${data.tips.map(tip => `<li>${tip}</li>`).join('')}
+                </ul>
+            `;
+
+            document.getElementById('footer-text').innerText = data.footer;
+        }
+
+        window.onload = () => switchLang('ar');
+    </script>
+</body>
+</html>

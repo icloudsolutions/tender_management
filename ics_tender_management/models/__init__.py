@@ -1,4 +1,5 @@
 from . import tender_stage
+from . import tender_decline_reason
 from . import tender
 from . import etimad_tender
 from . import tender_boq
@@ -6,8 +7,10 @@ from . import tender_dashboard
 from . import tender_team
 from . import tender_supplier
 from . import project_task_template
+from . import tender_category_template
 from . import tender_approval_rule
 from . import crm_lead
 from . import purchase_requisition
+from . import purchase_order
 from . import sale_order
 from . import project_project

@@ -1,3 +1,4 @@
+from markupsafe import Markup
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
@@ -91,8 +92,9 @@ class CrmLead(models.Model):
         
         # Log in CRM
         self.message_post(
-            body=_('Tender created: <a href="/web#id=%s&model=ics.tender">%s</a>') % (tender.id, tender.name),
-            subject=_('Tender Created')
+            body=Markup(_('Tender created: <a href="/web#id=%s&model=ics.tender">%s</a>')) % (tender.id, tender.name),
+            subject=_('Tender Created'),
+            body_is_html=True,
         )
         
         return {
@@ -141,11 +143,11 @@ class CrmLead(models.Model):
                 'etimad_tender_id_string': etimad.tender_id_string,
                 'etimad_reference_number': etimad.reference_number,
                 
-                # Agency Information (from Etimad)
+                # Agency Information
                 'etimad_agency_name': etimad.agency_name,
                 'etimad_branch_name': etimad.branch_name,
                 
-                # Tender Activity (from Etimad)
+                # Tender Activity
                 'etimad_activity_name': etimad.activity_name,
                 'etimad_activity_id': etimad.activity_id,
                 
@@ -157,9 +159,8 @@ class CrmLead(models.Model):
                 'last_inquiry_date': etimad.last_enquiry_date.date() if etimad.last_enquiry_date else False,
                 
                 # Financial from Etimad
-                'tender_booklet_price': etimad.invitation_cost or 0.0,
-                'etimad_financial_fees': etimad.financial_fees or 0.0,
-                'estimated_project_value': etimad.total_fees or 0.0,
+                'tender_booklet_price': etimad.document_cost_amount or 0.0,
+                'estimated_project_value': etimad.estimated_amount or 0.0,
                 
                 # External Source
                 'external_source': etimad.external_source or 'Etimad Portal',
@@ -189,7 +190,7 @@ class CrmLead(models.Model):
     
     def _map_tender_category_from_etimad(self, etimad):
         """Map Etimad activity to tender category"""
-        activity_text = etimad.activity_name or etimad.tender_type or ''
+        activity_text = etimad.activity_name or etimad.etimad_tender_type or ''
         activity_lower = activity_text.lower()
         
         if any(word in activity_lower for word in ['توريد', 'supply', 'توريدات', 'شراء']):

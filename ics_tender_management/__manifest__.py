@@ -1,6 +1,6 @@
 {
     'name': 'ICS Tender Management',
-    'version': '18.0.2.5.1',
+    'version': '18.0.2.6.0',
     'category': 'Sales/CRM',
     'summary': 'Complete Tender Management System for Saudi Etimad Portal Integration',
     'description': """
@@ -160,7 +160,11 @@
         'data/tender_stage_data.xml',
         'data/mail_template_data.xml',
         'data/project_task_templates.xml',
+        'data/tender_category_template_mapping_data.xml',
+        'data/tender_decline_reason_data.xml',
+        'views/tender_decline_reason_views.xml',
         'views/tender_approval_rule_views.xml',
+        'views/tender_category_template_views.xml',
         'views/tender_menus.xml',
         'views/tender_dashboard_views.xml',
         'views/tender_views.xml',
@@ -174,6 +178,7 @@
         'wizard/create_project_wizard_views.xml',
         'wizard/import_boq_wizard_views.xml',
         'wizard/mark_lost_wizard_views.xml',
+        'wizard/decline_tender_wizard_views.xml',
         'report/tender_report.xml',
         'report/tender_templates.xml',
     ],

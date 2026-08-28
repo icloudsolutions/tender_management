@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Create SMB Quotation removed: use standard Odoo "New Quotation" on opportunity (same result). -->
+    </data>
+</odoo>

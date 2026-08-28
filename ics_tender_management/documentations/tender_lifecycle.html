@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دورة حياة المناقصة - ICS Tender Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --ar-font: 'Noto Sans Arabic', sans-serif; --en-font: 'Inter', sans-serif; }
+        body { font-family: var(--ar-font); background-color: #f8fafc; transition: all 0.3s ease; }
+        .en-mode { font-family: var(--en-font); direction: ltr; }
+        .tab-btn { padding: 0.5rem 1.5rem; border-radius: 0.5rem; font-weight: 600; transition: all 0.2s; }
+        .tab-btn.active { background-color: white; color: #4338ca; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .phase-card { transition: all 0.2s; }
+        .phase-card:hover { transform: translateY(-2px); }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <div class="fixed top-4 left-4 right-4 z-50 flex justify-center pointer-events-none">
+        <div class="bg-slate-200/80 backdrop-blur p-1 rounded-lg flex gap-1 pointer-events-auto shadow-sm">
+            <button onclick="switchLang('ar')" id="btn-ar" class="tab-btn active">العربية</button>
+            <button onclick="switchLang('en')" id="btn-en" class="tab-btn">English</button>
+        </div>
+    </div>
+
+    <header class="bg-indigo-700 text-white py-16 px-6 shadow-lg mb-10">
+        <div class="max-w-5xl mx-auto text-center md:text-right" id="header-content">
+            <h1 class="text-4xl font-bold mb-4" id="main-title">دورة حياة المناقصة</h1>
+            <p class="text-xl opacity-90" id="sub-title">من المسودة حتى الفوز وإنشاء المشروع</p>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-6 pb-20">
+
+        <section class="mb-12 grid md:grid-cols-3 gap-6" id="features-grid"></section>
+
+        <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+            <span class="w-2 h-8 bg-amber-500 rounded-full"></span>
+            <span id="phases-title-text">المراحل الست</span>
+        </h2>
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 mb-12" id="phases-section"></div>
+
+        <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+            <span class="w-2 h-8 bg-emerald-500 rounded-full"></span>
+            <span id="wontoproject-title-text">من الفوز إلى المشروع</span>
+        </h2>
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 mb-12" id="wontoproject-section"></div>
+
+        <div class="bg-indigo-50 p-6 rounded-2xl border border-indigo-100" id="tips-section"></div>
+
+    </main>
+
+    <footer class="text-center py-10 text-slate-400 text-xs border-t" id="footer-text"></footer>
+
+    <script>
+        const content = {
+            ar: {
+                dir: 'rtl',
+                class: '',
+                title: 'دورة حياة المناقصة',
+                subTitle: 'من المسودة حتى الفوز وإنشاء المشروع',
+                features: [
+                    { title: 'مراحل كانبان', desc: 'ست مراحل من المسودة إلى الفوز/الخسارة مع انتقال واضح بين المراحل.', icon: 'M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 01-2 2H9a2 2 0 01-2-2z', bg: 'bg-indigo-100', text: 'text-indigo-600' },
+                    { title: 'إنشاء المشروع عند الفوز', desc: 'عند "تم كمناقصة فائزة" يُنشأ مشروع مرتبط ومهام من القالب حسب الفئة.', icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10', bg: 'bg-emerald-100', text: 'text-emerald-600' },
+                    { title: 'فئة → قالب المشروع', desc: 'ربط فئة المناقصة (توريد، خدمات، صيانة...) بقالب مهام لإنشاء المهام تلقائياً.', icon: 'M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6z', bg: 'bg-amber-100', text: 'text-amber-600' }
+                ],
+                phasesTitle: 'المراحل الست',
+                phases: [
+                    { name: 'مسودة', desc: 'إنشاء المناقصة أو ربطها بفرصة/مناقصة اعتماد. تعيين الفريق والفئة.' },
+                    { name: 'دراسة فنية', desc: 'قائمة الكميات (BoQ)، استيراد من Excel، المواصفات الفنية.' },
+                    { name: 'دراسة مالية', desc: 'طلبات عروض (RFQ)، مقارنة الموردين، اختيار أفضل عرض.' },
+                    { name: 'عرض جاهز', desc: 'حساب الهوامش، إنشاء عرض السعر، الموافقات الداخلية.' },
+                    { name: 'مقدّم / قيد التقييم', desc: 'تتبع التقديم والاستيضاحات ونتيجة التقييم.' },
+                    { name: 'فوز / خسارة / إلغاء', desc: 'الترسية وإنشاء المشروع، أو توثيق سبب الخسارة/الاعتذار.' }
+                ],
+                wontoprojectTitle: 'من الفوز إلى المشروع',
+                wontoprojectSteps: [
+                    'الضغط على "تم كمناقصة فائزة" في المناقصة.',
+                    'النظام يبحث عن ربط "فئة المناقصة → قالب المشروع" في الإعدادات.',
+                    'إنشاء مشروع جديد مرتبط بالمناقصة وأمر البيع (إن وُجد).',
+                    'إنشاء المهام من القالب: إما قالب ICS (توريد/صيانة/عام) أو قالب خارجي (project_tasks_from_templates) مع المهام والفرعية.'
+                ],
+                tipsTitle: 'نصائح',
+                tips: [
+                    'اضبط "الفئة → قالب المشروع" في الإعدادات قبل الفوز لتفعيل إنشاء المهام تلقائياً.',
+                    'يمكن ربط كل فئة بقالب مهام ICS أو بقالب خارجي (إن كان الوحدة الخارجية مثبتة).',
+                    'مرحلة "دراسة مالية" تتطلب BoQ ثم إنشاء طلب عروض لمقارنة الموردين.'
+                ],
+                footer: 'إدارة المناقصات ICS - iCloud Solutions - جميع الحقوق محفوظة'
+            },
+            en: {
+                dir: 'ltr',
+                class: 'en-mode',
+                title: 'Tender Lifecycle',
+                subTitle: 'From draft to award and project creation',
+                features: [
+                    { title: 'Kanban Phases', desc: 'Six stages from Draft to Won/Lost with clear transitions.', icon: 'M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 01-2 2H9a2 2 0 01-2-2z', bg: 'bg-indigo-100', text: 'text-indigo-600' },
+                    { title: 'Project on Win', desc: 'On "Mark as Won", a linked project is created with tasks from the category template.', icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10', bg: 'bg-emerald-100', text: 'text-emerald-600' },
+                    { title: 'Category → Project Template', desc: 'Map tender category to a task template for automatic task creation on win.', icon: 'M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6z', bg: 'bg-amber-100', text: 'text-amber-600' }
+                ],
+                phasesTitle: 'The Six Phases',
+                phases: [
+                    { name: 'Draft', desc: 'Create tender or link from opportunity/Etimad. Set team and category.' },
+                    { name: 'Technical Study', desc: 'Bill of Quantities (BoQ), Excel import, technical specs.' },
+                    { name: 'Financial Study', desc: 'RFQs, vendor comparison, best offer selection.' },
+                    { name: 'Quotation Prepared', desc: 'Margin calculation, quotation generation, internal approvals.' },
+                    { name: 'Submitted / Under Evaluation', desc: 'Track submission, clarifications, and evaluation result.' },
+                    { name: 'Won / Lost / Cancelled', desc: 'Award and project creation, or document loss/decline reason.' }
+                ],
+                wontoprojectTitle: 'From Won to Project',
+                wontoprojectSteps: [
+                    'Click "Mark as Won" on the tender.',
+                    'System looks up "Category → Project Template" in Configuration.',
+                    'Creates a new project linked to the tender and sale order (if any).',
+                    'Creates tasks from the template: either ICS template (Supply/Maintenance/General) or external template (project_tasks_from_templates) with tasks and subtasks.'
+                ],
+                tipsTitle: 'Tips',
+                tips: [
+                    'Set "Category → Project Template" in Configuration before marking as won to enable automatic task creation.',
+                    'Each category can use an ICS task template or an external one if the external module is installed.',
+                    'Financial Study requires a BoQ, then create an RFQ to compare vendors.'
+                ],
+                footer: 'ICS Tender Management - iCloud Solutions - All Rights Reserved'
+            }
+        };
+
+        function switchLang(lang) {
+            const data = content[lang];
+            document.documentElement.lang = lang === 'ar' ? 'ar' : 'en';
+            document.documentElement.dir = data.dir;
+            document.body.className = 'text-slate-800 ' + (data.class || '');
+
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-' + lang).classList.add('active');
+
+            document.getElementById('main-title').innerText = data.title;
+            document.getElementById('sub-title').innerText = data.subTitle;
+            document.getElementById('header-content').className = 'max-w-5xl mx-auto text-center ' + (lang === 'ar' ? 'md:text-right' : 'md:text-left');
+
+            document.getElementById('features-grid').innerHTML = data.features.map(f => `
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 phase-card">
+                    <div class="w-12 h-12 ${f.bg} ${f.text} rounded-lg flex items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${f.icon}" />
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">${f.title}</h3>
+                    <p class="text-sm text-slate-600">${f.desc}</p>
+                </div>
+            `).join('');
+
+            document.getElementById('phases-title-text').innerText = data.phasesTitle;
+            document.getElementById('phases-section').innerHTML = `
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    ${data.phases.map((p, i) => `
+                        <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold">${i + 1}</span>
+                                <span class="font-semibold text-indigo-700">${p.name}</span>
+                            </div>
+                            <p class="text-sm text-slate-600">${p.desc}</p>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            document.getElementById('wontoproject-title-text').innerText = data.wontoprojectTitle;
+            document.getElementById('wontoproject-section').innerHTML = `
+                <ol class="list-decimal ${lang === 'ar' ? 'pr-6' : 'pl-6'} space-y-3 text-slate-700">
+                    ${data.wontoprojectSteps.map(s => '<li>' + s + '</li>').join('')}
+                </ol>
+            `;
+
+            document.getElementById('tips-section').innerHTML = `
+                <h3 class="font-bold mb-3 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                    </svg>
+                    ${data.tipsTitle}
+                </h3>
+                <ul class="text-sm text-slate-700 space-y-2 list-disc ${lang === 'ar' ? 'pr-5' : 'pl-5'}">
+                    ${data.tips.map(tip => '<li>' + tip + '</li>').join('')}
+                </ul>
+            `;
+
+            document.getElementById('footer-text').innerText = data.footer;
+        }
+
+        window.onload = function() { switchLang('ar'); };
+    </script>
+</body>
+</html>

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مميزات إدارة المناقصات ICS - ICS Tender Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --ar-font: 'Noto Sans Arabic', sans-serif; --en-font: 'Inter', sans-serif; }
+        body { font-family: var(--ar-font); background-color: #f8fafc; transition: all 0.3s ease; }
+        .en-mode { font-family: var(--en-font); direction: ltr; }
+        .feature-card:hover { transform: translateY(-4px); transition: all 0.3s ease; }
+        .tab-btn { padding: 0.5rem 1.5rem; border-radius: 0.5rem; font-weight: 600; transition: all 0.2s; }
+        .tab-btn.active { background-color: white; color: #4338ca; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .workflow-step { position: relative; }
+        .workflow-step:not(:last-child)::after {
+            content: ''; position: absolute; bottom: -1rem; left: 50%;
+            width: 2px; height: 1rem; background: linear-gradient(to bottom, #c7d2fe, transparent);
+            transform: translateX(-50%);
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <div class="fixed top-4 left-4 right-4 z-50 flex justify-center pointer-events-none">
+        <div class="bg-slate-200/80 backdrop-blur p-1 rounded-lg flex gap-1 pointer-events-auto shadow-sm">
+            <button onclick="switchLang('ar')" id="btn-ar" class="tab-btn active">العربية</button>
+            <button onclick="switchLang('en')" id="btn-en" class="tab-btn">English</button>
+        </div>
+    </div>
+
+    <header class="bg-indigo-700 text-white py-16 px-6 shadow-lg mb-10">
+        <div class="max-w-5xl mx-auto text-center md:text-right" id="header-content">
+            <h1 class="text-4xl font-bold mb-4" id="main-title">إدارة المناقصات ICS</h1>
+            <p class="text-xl opacity-90" id="sub-title">نظام إدارة مناقصات متكامل من الفرصة حتى المشروع</p>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-6 pb-20">
+
+        <section class="mb-12">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+                <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                    <span class="w-2 h-8 bg-indigo-600 rounded-full"></span>
+                    <span id="overview-title-text">نظرة عامة</span>
+                </h2>
+                <p class="text-slate-600 leading-relaxed" id="overview-desc"></p>
+            </div>
+        </section>
+
+        <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+            <span class="w-2 h-8 bg-emerald-500 rounded-full"></span>
+            <span id="features-title-text">المميزات الرئيسية</span>
+        </h2>
+        <section class="mb-12 grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="features-grid"></section>
+
+        <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+            <span class="w-2 h-8 bg-amber-500 rounded-full"></span>
+            <span id="workflow-title-text">مراحل المناقصة</span>
+        </h2>
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 mb-12" id="workflow-section"></div>
+
+        <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+            <span class="w-2 h-8 bg-violet-500 rounded-full"></span>
+            <span id="integration-title-text">التكامل مع مناقصات اعتماد</span>
+        </h2>
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 mb-12" id="integration-section"></div>
+
+        <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+            <span class="w-2 h-8 bg-slate-600 rounded-full"></span>
+            <span id="config-docs-title-text">الإعدادات والمراجع</span>
+        </h2>
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden mb-12" id="config-docs-section"></div>
+
+        <div class="bg-indigo-50 p-6 rounded-2xl border border-indigo-100" id="tips-section"></div>
+
+    </main>
+
+    <footer class="text-center py-10 text-slate-400 text-xs border-t" id="footer-text"></footer>
+
+    <script>
+        const content = {
+            ar: {
+                dir: 'rtl',
+                class: '',
+                mainTitle: 'إدارة المناقصات ICS',
+                subTitle: 'نظام إدارة مناقصات متكامل من الفرصة حتى المشروع',
+                overviewTitle: 'نظرة عامة',
+                overviewDesc: 'وحدة إدارة المناقصات ICS تغطي دورة حياة المناقصة بالكامل: من إنشاء الفرصة أو استيراد المناقصة من اعتماد، مروراً بالدراسة الفنية والمالية وإعداد العروض ومقارنة الموردين، وصولاً إلى الترسية وإنشاء المشروع ومهامه تلقائياً. الوحدة متوافقة مع إجراءات ICS لمشاريع التوريد والصيانة والتشغيل.',
+                featuresTitle: 'المميزات الرئيسية',
+                features: [
+                    { title: 'لوحة التحكم', desc: 'إحصائيات مباشرة ورسوم بيانية: المناقصات، الفوز/الخسارة، المالية، ومشاريع الاعتماد.', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z', bg: 'bg-indigo-100', text: 'text-indigo-600' },
+                    { title: 'قائمة الكميات (BoQ)', desc: 'رفع وإدارة قوائم الكميات، استيراد من Excel، وربطها بالمنتجات والعروض.', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01', bg: 'bg-emerald-100', text: 'text-emerald-600' },
+                    { title: 'مقارنة الموردين', desc: 'إنشاء طلبات عروض (RFQ)، مقارنة عروض الموردين جنباً إلى جنب، واختيار أفضل سعر.', icon: 'M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z', bg: 'bg-amber-100', text: 'text-amber-600' },
+                    { title: 'عرض السعر والترسية', desc: 'حساب الهوامش، إنشاء عرض سعر مبيعات، وربط الترسية بأمر البيع والمشروع.', icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z', bg: 'bg-rose-100', text: 'text-rose-600' },
+                    { title: 'إنشاء المشروع تلقائياً', desc: 'عند الفوز: إنشاء مشروع مرتبط مع قائمة مهام جاهزة حسب فئة المناقصة والقالب المحدد.', icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10', bg: 'bg-violet-100', text: 'text-violet-600' },
+                    { title: 'فئة المناقصة → قالب المشروع', desc: 'ربط كل فئة (توريد، خدمات، صيانة...) بقالب مهام ICS أو قالب خارجي لإنشاء المهام عند الفوز.', icon: 'M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z', bg: 'bg-sky-100', text: 'text-sky-600' }
+                ],
+                workflowTitle: 'مراحل المناقصة',
+                workflowSteps: [
+                    'مسودة: إنشاء المناقصة أو ربطها بفرصة/اعتماد',
+                    'دراسة فنية: إعداد BoQ والمواصفات',
+                    'دراسة مالية: RFQ ومقارنة الموردين',
+                    'عرض جاهز: عرض السعر والموافقات',
+                    'مقدّم / قيد التقييم: متابعة التقديم والاستيضاحات',
+                    'فوز / خسارة / إلغاء: الترسية أو توثيق الخسارة'
+                ],
+                integrationTitle: 'التكامل مع مناقصات اعتماد',
+                integrationIntro: 'عند تثبيت وحدة مناقصات اعتماد (ICS Etimad Tenders CRM) مع إدارة المناقصات، يمكن إنشاء مناقصة داخلية من مناقصة اعتماد مباشرة، وربط الفرص بمناقصات اعتماد لنسخ البيانات عند التحويل.',
+                integrationPoints: [
+                    { title: 'إنشاء مناقصة من اعتماد', desc: 'من نموذج مناقصة اعتماد يظهر زر "إنشاء مناقصة" لإنشاء سجل مناقصة (ics.tender) مع نسخ البيانات والربط الثنائي.' },
+                    { title: 'الفرصة ← مناقصة اعتماد', desc: 'ربط الفرصة (crm.lead) بمناقصة اعتماد؛ عند التحويل إلى مناقصة تُنسخ بيانات الاعتماد تلقائياً.' },
+                    { title: 'حقل المناقصة والرابط', desc: 'المناقصة الداخلية تحتوي على حقل "مناقصة اعتماد" ورابط البوابة وبيانات الجهة والنشاط للاستعلام.' },
+                    { title: 'إحصائيات الاعتماد في لوحة التحكم', desc: 'عرض إجمالي مناقصات اعتماد والمناقصات الجديدة عند تفعيل الوحدتين معاً.' }
+                ],
+                configDocsTitle: 'الإعدادات والمراجع',
+                configDocs: [
+                    { label: 'فئة المناقصة → قالب المشروع', path: 'إدارة المناقصات ← الإعدادات ← الفئة ← قالب المشروع', desc: 'ربط فئة المناقصة بقالب مهام ICS أو قالب خارجي (project_tasks_from_templates).' },
+                    { label: 'قواعد الموافقة', path: 'إدارة المناقصات ← الإعدادات ← قواعد الموافقة', desc: 'تحديد قواعد الموافقة على المناقصات حسب المبلغ أو الفئة.' },
+                    { label: 'أسباب الرفض والاعتذار', path: 'إدارة المناقصات ← الإعدادات', desc: 'إدارة أسباب الرفض وأسباب الاعتذار عن المناقصة.' },
+                    { label: 'دليل دورة حياة المناقصة', path: 'tender_lifecycle.html', desc: 'شرح المراحل الست ومن الفوز إلى إنشاء المشروع والمهام.', link: 'tender_lifecycle.html' }
+                ],
+                tipsTitle: 'نصائح سريعة',
+                tips: [
+                    'استخدم "إنشاء مناقصة" من مناقصة اعتماد لبدء مناقصة داخلية دون إدخال البيانات يدوياً.',
+                    'قبل "تم كمناقصة فائزة" تأكد من ضبط قالب المشروع للفئة في الإعدادات لإنشاء المهام تلقائياً.',
+                    'مقارنة الموردين متاحة في مرحلة الدراسة المالية بعد إنشاء طلب عروض من BoQ.',
+                    'المناقصات المرتبطة بفرصة أو بمناقصة اعتماد تعرض الرابط في نموذج المناقصة.'
+                ],
+                footer: 'إدارة المناقصات ICS - iCloud Solutions - جميع الحقوق محفوظة'
+            },
+            en: {
+                dir: 'ltr',
+                class: 'en-mode',
+                mainTitle: 'ICS Tender Management',
+                subTitle: 'Complete tender lifecycle from opportunity to project',
+                overviewTitle: 'Overview',
+                overviewDesc: 'ICS Tender Management covers the full tender lifecycle: from creating an opportunity or importing a tender from Etimad, through technical and financial study, BoQ, vendor comparison and quotation preparation, to award and automatic project creation with task templates. The module is aligned with ICS procedures for Supply and O&M projects.',
+                featuresTitle: 'Key Features',
+                features: [
+                    { title: 'Dashboard', desc: 'Real-time stats and charts: tenders, win/loss, financials, and Etimad integration.', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z', bg: 'bg-indigo-100', text: 'text-indigo-600' },
+                    { title: 'Bill of Quantities (BoQ)', desc: 'Upload and manage BoQ, import from Excel, link to products and quotations.', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01', bg: 'bg-emerald-100', text: 'text-emerald-600' },
+                    { title: 'Vendor Comparison', desc: 'Create RFQs, compare vendor offers side-by-side, and select best price.', icon: 'M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z', bg: 'bg-amber-100', text: 'text-amber-600' },
+                    { title: 'Quotation & Award', desc: 'Margin calculation, sales quotation generation, and link award to sale order and project.', icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z', bg: 'bg-rose-100', text: 'text-rose-600' },
+                    { title: 'Auto Project Creation', desc: 'On win: create linked project with task list from category template (ICS or external).', icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10', bg: 'bg-violet-100', text: 'text-violet-600' },
+                    { title: 'Category → Project Template', desc: 'Map each tender category to an ICS or external task template for automatic tasks on win.', icon: 'M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z', bg: 'bg-sky-100', text: 'text-sky-600' }
+                ],
+                workflowTitle: 'Tender Phases',
+                workflowSteps: [
+                    'Draft: Create tender or link from opportunity/Etimad',
+                    'Technical Study: BoQ and specifications',
+                    'Financial Study: RFQ and vendor comparison',
+                    'Quotation Prepared: Pricing and approvals',
+                    'Submitted / Under Evaluation: Follow-up and clarifications',
+                    'Won / Lost / Cancelled: Award or document loss'
+                ],
+                integrationTitle: 'Integration with Etimad Tenders CRM',
+                integrationIntro: 'When ICS Etimad Tenders CRM is installed with Tender Management, you can create an internal tender directly from an Etimad tender, and link CRM opportunities to Etimad tenders so data is copied on convert.',
+                integrationPoints: [
+                    { title: 'Create Tender from Etimad', desc: 'From an Etimad tender form, a "Create Tender" button creates an ics.tender with data copied and a two-way link.' },
+                    { title: 'Opportunity → Etimad Tender', desc: 'Link a lead to an Etimad tender; when converting to tender, Etimad data is copied into the internal tender.' },
+                    { title: 'Tender Link & Reference', desc: 'The internal tender stores the Etimad tender link and agency/activity data for traceability.' },
+                    { title: 'Etimad Stats on Dashboard', desc: 'Total and new Etimad tenders are shown on the Tender Management dashboard when both modules are installed.' }
+                ],
+                configDocsTitle: 'Configuration & Reference',
+                configDocs: [
+                    { label: 'Category → Project Template', path: 'Tender Management → Configuration → Category → Project Template', desc: 'Map tender category to ICS or external task template for auto tasks on win.' },
+                    { label: 'Approval Rules', path: 'Tender Management → Configuration → Approval Rules', desc: 'Define approval rules by amount or category.' },
+                    { label: 'Decline & Lost Reasons', path: 'Tender Management → Configuration', desc: 'Manage decline reasons and mark-as-lost reasons.' },
+                    { label: 'Tender Lifecycle Guide', path: 'tender_lifecycle.html', desc: 'Six phases and from Won to project/task creation.', link: 'tender_lifecycle.html' }
+                ],
+                tipsTitle: 'Quick Tips',
+                tips: [
+                    'Use "Create Tender" from an Etimad tender to start an internal tender without re-entering data.',
+                    'Before "Mark as Won", ensure the category has a project template set so tasks are created automatically.',
+                    'Vendor comparison is available in Financial Study after creating an RFQ from the BoQ.',
+                    'Tenders linked to an opportunity or Etimad tender show the link on the tender form.'
+                ],
+                footer: 'ICS Tender Management - iCloud Solutions - All Rights Reserved'
+            }
+        };
+
+        function switchLang(lang) {
+            const data = content[lang];
+            document.documentElement.lang = lang === 'ar' ? 'ar' : 'en';
+            document.documentElement.dir = data.dir;
+            document.body.className = 'text-slate-800 ' + (data.class || '');
+
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-' + lang).classList.add('active');
+
+            document.getElementById('main-title').innerText = data.mainTitle;
+            document.getElementById('sub-title').innerText = data.subTitle;
+            document.getElementById('header-content').className = 'max-w-5xl mx-auto text-center ' + (lang === 'ar' ? 'md:text-right' : 'md:text-left');
+
+            document.getElementById('overview-title-text').innerText = data.overviewTitle;
+            document.getElementById('overview-desc').innerText = data.overviewDesc;
+
+            document.getElementById('features-title-text').innerText = data.featuresTitle;
+            document.getElementById('features-grid').innerHTML = data.features.map(f => `
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 feature-card">
+                    <div class="w-12 h-12 ${f.bg} ${f.text} rounded-lg flex items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${f.icon}" />
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">${f.title}</h3>
+                    <p class="text-sm text-slate-600">${f.desc}</p>
+                </div>
+            `).join('');
+
+            document.getElementById('workflow-title-text').innerText = data.workflowTitle;
+            document.getElementById('workflow-section').innerHTML = `
+                <div class="grid md:grid-cols-3 lg:grid-cols-6 gap-4 text-center">
+                    ${data.workflowSteps.map((step, i) => `
+                        <div class="workflow-step">
+                            <div class="bg-indigo-50 text-indigo-700 w-10 h-10 rounded-full flex items-center justify-center font-bold mx-auto mb-3">${i + 1}</div>
+                            <p class="text-sm font-medium text-slate-700">${step}</p>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            document.getElementById('integration-title-text').innerText = data.integrationTitle;
+            document.getElementById('integration-section').innerHTML = `
+                <p class="text-slate-600 mb-6 leading-relaxed">${data.integrationIntro}</p>
+                <div class="grid md:grid-cols-2 gap-4">
+                    ${data.integrationPoints.map(p => `
+                        <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50">
+                            <h4 class="font-semibold text-violet-700 mb-2">${p.title}</h4>
+                            <p class="text-sm text-slate-600">${p.desc}</p>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            document.getElementById('config-docs-title-text').innerText = data.configDocsTitle;
+            document.getElementById('config-docs-section').innerHTML = `
+                <div class="divide-y divide-slate-100">
+                    ${data.configDocs.map((row, i) => `
+                        <div class="p-6 flex flex-col md:flex-row md:items-center gap-4 ${i % 2 === 1 ? 'bg-slate-50/50' : ''} ${row.link ? 'hover:bg-indigo-50/30' : ''}">
+                            <div class="md:w-1/3">
+                                ${row.link
+                                    ? '<a href="' + row.link + '" target="_blank" class="font-semibold text-indigo-600 hover:underline">' + row.label + ' ↗</a>'
+                                    : '<span class="font-semibold text-indigo-700">' + row.label + '</span>'}
+                                <p class="text-xs text-slate-500 mt-1 font-mono">${row.path}</p>
+                            </div>
+                            <div class="md:flex-1 text-sm text-slate-600">${row.desc}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            document.getElementById('tips-section').innerHTML = `
+                <h3 class="font-bold mb-3 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                    </svg>
+                    ${data.tipsTitle}
+                </h3>
+                <ul class="text-sm text-slate-700 space-y-2 list-disc ${lang === 'ar' ? 'pr-5' : 'pl-5'}">
+                    ${data.tips.map(tip => '<li>' + tip + '</li>').join('')}
+                </ul>
+            `;
+
+            document.getElementById('footer-text').innerText = data.footer;
+        }
+
+        window.onload = function() { switchLang('ar'); };
+    </script>
+</body>
+</html>

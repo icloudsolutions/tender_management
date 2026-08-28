@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from markupsafe import Markup
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError, ValidationError
 import requests
@@ -25,6 +26,10 @@ class EtimadTender(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _rec_name = "name"
     _order = "published_at desc"
+    _sql_constraints = [
+        ('reference_number_unique', 'UNIQUE(reference_number)',
+         'Reference number must be unique! A tender with this reference already exists.'),
+    ]
     
     # Basic Information
     name = fields.Char("Tender Name", required=True, tracking=True)
@@ -38,7 +43,7 @@ class EtimadTender(models.Model):
     branch_name = fields.Char("Branch")
     
     # Tender Details
-    tender_type = fields.Char("Tender Type", tracking=True)
+    etimad_tender_type = fields.Char("Etimad Tender Type", tracking=True)
     activity_name = fields.Char("Tender Activity", tracking=True)
     activity_id = fields.Integer("Activity ID")
     
@@ -53,10 +58,8 @@ class EtimadTender(models.Model):
     # Financial
     currency_id = fields.Many2one('res.currency', string='Currency', 
                                    default=lambda self: self.env.ref('base.SAR'))
-    invitation_cost = fields.Monetary("Invitation Cost", currency_field='currency_id')
-    financial_fees = fields.Monetary("Financial Fees", currency_field='currency_id')
-    total_fees = fields.Monetary("Total Fees", compute='_compute_total_fees', 
-                                  store=True, currency_field='currency_id')
+    document_cost_amount = fields.Monetary("Document Cost", currency_field='currency_id',
+                                            help="قيمة وثائق المنافسة - Scraped from Etimad detail page")
     estimated_amount = fields.Monetary("Estimated Amount", currency_field='currency_id')
     
     # URLs and External References
@@ -69,7 +72,15 @@ class EtimadTender(models.Model):
     # CRM Integration
     opportunity_id = fields.Many2one('crm.lead', string="Opportunity", tracking=True)
     opportunity_count = fields.Integer("Opportunities", compute='_compute_opportunity_count')
-    
+    assigned_user_id = fields.Many2one(
+        'res.users', string="Assigned To", tracking=True,
+        help="User assigned by smart matching rules or manually."
+    )
+    dynamic_match_reasons = fields.Text(
+        "Dynamic Match Reasons",
+        help="Reasons added by matching rules (in addition to computed match score reasons)."
+    )
+
     # Additional Info
     description = fields.Text("Description")
     notes = fields.Text("Internal Notes")
@@ -93,11 +104,10 @@ class EtimadTender(models.Model):
     insurance_required = fields.Boolean("Insurance Required")
     initial_guarantee_required = fields.Boolean("Initial Guarantee Required")
     initial_guarantee_type = fields.Char("Initial Guarantee Type")
+    initial_guarantee_address = fields.Text("Initial Guarantee Address")
     final_guarantee_percentage = fields.Float("Final Guarantee Pct")
     final_guarantee_required = fields.Boolean("Final Guarantee Required", compute='_compute_final_guarantee_required', store=True)
     
-    document_cost_type = fields.Selection([('free', 'Free'), ('paid', 'Paid')], string="Document Cost Type")
-    document_cost_amount = fields.Monetary("Document Cost Amount", currency_field='currency_id')
     tender_status_text = fields.Char("Tender Status Text")
     tender_status_approved = fields.Boolean("Tender Approved", compute='_compute_tender_status_approved', store=True)
     submission_method = fields.Selection([('single_file', 'Single File'), ('separate_files', 'Separate Files'), ('electronic', 'Electronic'), ('manual', 'Manual')], string="Submission Method")
@@ -122,8 +132,6 @@ class EtimadTender(models.Model):
     award_announcement_date = fields.Date("Award Announcement Date")
     awarded_company_name = fields.Char("Awarded Company Name")
     awarded_amount = fields.Monetary("Awarded Amount", currency_field='currency_id')
-    agency_code = fields.Char("Agency Code")
-    tender_type_id = fields.Integer("Tender Type ID")
     local_content_required = fields.Boolean("Local Content Required")
     local_content_percentage = fields.Float("Local Content Pct")
     local_content_mechanism = fields.Char("Local Content Mechanism")
@@ -142,12 +150,6 @@ class EtimadTender(models.Model):
                 record.tender_url = f"https://tenders.etimad.sa/Tender/Details/{record.tender_id_string}"
             else:
                 record.tender_url = False
-
-    @api.depends('invitation_cost', 'financial_fees')
-    def _compute_total_fees(self):
-        """Calculate total fees"""
-        for record in self:
-            record.total_fees = record.invitation_cost + record.financial_fees
 
     @api.depends('offers_deadline')
     def _compute_remaining_days(self):
@@ -182,6 +184,59 @@ class EtimadTender(models.Model):
         """Count related opportunities"""
         for record in self:
             record.opportunity_count = 1 if record.opportunity_id else 0
+
+    def _apply_matching_rules(self):
+        """Apply active dynamic matching rules to tenders. Only runs if smart matching is enabled."""
+        if not self or self.env.context.get('skip_matching_rules'):
+            return
+        params = self.env['ir.config_parameter'].sudo()
+        if params.get_param('ics_etimad_tenders_crm.etimad_enable_matching', 'True') != 'True':
+            return
+        Rule = self.env['ics.etimad.matching.rule'].sudo()
+        rules = Rule.search([('active', '=', True)], order='sequence, id')
+        if not rules:
+            return
+        for tender in self:
+            updates = {}
+            for rule in rules:
+                try:
+                    rule_updates = rule._get_action_updates(tender)
+                    if rule_updates:
+                        for k, v in rule_updates.items():
+                            if k not in updates:
+                                updates[k] = v
+                            elif k in ('notes', 'dynamic_match_reasons') and updates[k]:
+                                updates[k] = f"{updates[k]}\n{v}".strip()
+                except Exception as e:
+                    _logger.warning('Matching rule "%s" failed for tender %s: %s', rule.name, tender.id, e)
+            if updates:
+                tender.with_context(skip_matching_rules=True).write(updates)
+
+    def action_apply_matching_rules(self):
+        """Re-run dynamic matching rules on selected tenders (manual trigger)."""
+        count = len(self)
+        self._apply_matching_rules()
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Matching Rules Applied'),
+                'message': _('Rules applied to %s tender(s).') % count,
+                'type': 'success',
+                'sticky': False,
+            },
+        }
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        tenders = super().create(vals_list)
+        tenders._apply_matching_rules()
+        return tenders
+
+    def write(self, vals):
+        res = super().write(vals)
+        self._apply_matching_rules()
+        return res
 
     is_urgent = fields.Boolean("Urgent", compute='_compute_is_urgent', store=True)
     is_hot_tender = fields.Boolean("Hot Tender", compute='_compute_is_hot_tender', store=True)
@@ -231,7 +286,7 @@ class EtimadTender(models.Model):
             else:
                 record.estimated_value_category = 'mega'
     
-    @api.depends('activity_name', 'tender_type', 'agency_name', 'estimated_amount')
+    @api.depends('activity_name', 'etimad_tender_type', 'agency_name', 'estimated_amount')
     def _compute_matching_score(self):
         """Calculate matching score based on company profile and preferences from settings"""
         for record in self:
@@ -249,32 +304,55 @@ class EtimadTender(models.Model):
             
             # Get configuration parameters
             preferred_agencies = params.get_param('ics_etimad_tenders_crm.etimad_preferred_agencies', '')
-            preferred_activities = params.get_param('ics_etimad_tenders_crm.etimad_preferred_activities', '')
             preferred_categories_str = params.get_param('ics_etimad_tenders_crm.etimad_preferred_categories', '')
-            min_value = float(params.get_param('ics_etimad_tenders_crm.etimad_min_value_target', '50000') or 0)
-            max_value = float(params.get_param('ics_etimad_tenders_crm.etimad_max_value_target', '5000000') or 0)
             min_prep_days = int(params.get_param('ics_etimad_tenders_crm.etimad_min_preparation_days', '7') or 7)
+            
+            # Get preferred activities from res.company (persisted Many2many)
+            company = self.env.company
+            preferred_activities_records = company.sudo().etimad_preferred_activities_ids
+            
+            # Fallback to legacy comma-separated field if no activities selected
+            preferred_activities_legacy = params.get_param('ics_etimad_tenders_crm.etimad_preferred_activities', '')
             
             # Parse comma-separated lists
             agencies_list = [a.strip().lower() for a in preferred_agencies.split(',') if a.strip()] if preferred_agencies else []
-            activities_list = [a.strip().lower() for a in preferred_activities.split(',') if a.strip()] if preferred_activities else []
             categories_list = [c.strip().lower() for c in preferred_categories_str.split(',') if c.strip()] if preferred_categories_str else []
             
-            # Activity matching (30 points)
+            # Build activities list from both new Many2many and legacy text field
+            activities_list = []
+            
+            # From Many2many records (preferred method)
+            if preferred_activities_records:
+                for activity_rec in preferred_activities_records:
+                    # Add Arabic name
+                    activities_list.append(activity_rec.name.lower())
+                    # Add English name if available
+                    if activity_rec.name_en:
+                        activities_list.append(activity_rec.name_en.lower())
+                    # Add keywords if available
+                    if activity_rec.keywords:
+                        keywords = [k.strip().lower() for k in activity_rec.keywords.split(',') if k.strip()]
+                        activities_list.extend(keywords)
+            
+            # Fallback to legacy text field
+            elif preferred_activities_legacy:
+                activities_list = [a.strip().lower() for a in preferred_activities_legacy.split(',') if a.strip()]
+            
+            # Activity matching (40 points - increased from 30)
             if record.activity_name and activities_list:
                 activity_lower = record.activity_name.lower()
                 # Check for exact or partial match
                 if activity_lower in activities_list:
-                    score += 30
+                    score += 40
                     reasons.append(f'Activity "{record.activity_name}" matches preferences')
                 elif any(pref in activity_lower or activity_lower in pref for pref in activities_list):
-                    score += 20
+                    score += 25
                     reasons.append(f'Activity "{record.activity_name}" partially matches preferences')
             
-            # Tender type / Category matching (20 points)
+            # Tender type / Category matching (30 points - increased from 20)
             # Check if tender matches any of the preferred categories
             if categories_list:
-                type_lower = (record.tender_type or '').lower()
+                type_lower = (record.etimad_tender_type or '').lower()
                 matched_categories = []
                 
                 # Category keywords mapping
@@ -294,7 +372,7 @@ class EtimadTender(models.Model):
                             matched_categories.append(category)
                 
                 if matched_categories:
-                    score += 20
+                    score += 30
                     category_names = {
                         'supply': 'Supply',
                         'services': 'Services',
@@ -304,20 +382,6 @@ class EtimadTender(models.Model):
                     }
                     matched_names = [category_names.get(c, c) for c in matched_categories]
                     reasons.append(f'Tender type matches category: {", ".join(matched_names)}')
-            
-            # Value range matching (20 points)
-            if record.estimated_amount:
-                if min_value <= record.estimated_amount <= max_value:
-                    score += 20
-                    reasons.append(f'Tender value ({record.estimated_amount:,.0f} SAR) within target range')
-                elif record.estimated_amount < min_value:
-                    # Below minimum - partial points
-                    score += 5
-                    reasons.append('Tender value below target range')
-                elif record.estimated_amount > max_value:
-                    # Above maximum - still interested but challenging
-                    score += 10
-                    reasons.append('Tender value above target range (challenging)')
             
             # Agency experience (15 points)
             # Check if agency is in preferred list OR we've won tenders from them
@@ -363,11 +427,11 @@ class EtimadTender(models.Model):
         return session
 
     @api.model
-    def fetch_etimad_tenders(self, page_size=20, page_number=1, max_pages=None):
+    def fetch_etimad_tenders(self, page_size=50, page_number=1, max_pages=None):
         """Fetch tenders from Etimad platform with retry mechanism and pagination support
         
         Args:
-            page_size: Number of tenders per page (default: 20, max: 50)
+            page_size: Number of tenders per page (default: 50, max: 50)
             page_number: Starting page number (default: 1)
             max_pages: Maximum number of pages to fetch (default: None = single page)
         
@@ -375,7 +439,13 @@ class EtimadTender(models.Model):
             Notification action dict with fetch results
         """
         session = self._setup_scraper_session()
-        max_retries = 3
+        
+        # Get settings
+        params = self.env['ir.config_parameter'].sudo()
+        max_retries = int(params.get_param('ics_etimad_tenders_crm.etimad_max_retries', '3') or 3)
+        # PublishDateId filter: 0=All, 1=Today, 2=Yesterday, 3=Last Week, 4=Last Month, 5=Last 3 Months
+        publish_date_id = int(params.get_param('ics_etimad_tenders_crm.etimad_publish_date_filter', '0') or 0)
+        
         total_created = 0
         total_updated = 0
         total_errors = 0
@@ -402,11 +472,13 @@ class EtimadTender(models.Model):
                     url = "https://tenders.etimad.sa/Tender/AllSupplierTendersForVisitorAsync"
                     
                     params = {
-                        'PublishDateId': 5,  # Recent tenders
                         'PageSize': min(page_size, 50),  # Cap at 50
                         'PageNumber': current_page,
                         '_': timestamp
                     }
+                    # Only add PublishDateId filter if non-zero (0 = all tenders)
+                    if publish_date_id:
+                        params['PublishDateId'] = publish_date_id
                     
                     response = session.get(url, params=params, timeout=30)
                     
@@ -490,7 +562,7 @@ class EtimadTender(models.Model):
     @api.model
     def action_fetch_batch(self):
         """Fetch multiple pages of tenders (batch operation)"""
-        return self.fetch_etimad_tenders(page_size=50, page_number=1, max_pages=3)
+        return self.fetch_etimad_tenders(page_size=50, page_number=1, max_pages=5)
 
     def _process_tender_data(self, raw_data):
         """Process and create/update tender record with change detection and notifications"""
@@ -509,21 +581,24 @@ class EtimadTender(models.Model):
                 'tender_id_string': raw_data.get('tenderIdString'),
                 'agency_name': raw_data.get('agencyName'),
                 'branch_name': raw_data.get('branchName'),
-                'tender_type': raw_data.get('tenderTypeName'),
+                'etimad_tender_type': raw_data.get('tenderTypeName'),
                 'activity_name': raw_data.get('tenderActivityName'),
                 'activity_id': raw_data.get('tenderActivityId'),
                 'last_enquiry_date': new_enquiry_deadline,
                 'offers_deadline': new_offers_deadline,
                 'submission_date': self._parse_date(raw_data.get('submitionDate')),
-                'invitation_cost': float(raw_data.get('invitationCost', 0) or 0),
-                'financial_fees': float(raw_data.get('financialFees', 0) or 0),
                 'estimated_amount': new_estimated_amount,
                 'tender_status_id': raw_data.get('tenderStatusId'),
+                'tender_status_text': (
+                    raw_data.get('tenderStatusName')
+                    or raw_data.get('tenderStatus')
+                    or raw_data.get('statusName')
+                    or raw_data.get('statusText')
+                    or raw_data.get('status')
+                ),
                 'last_enquiry_date_hijri': raw_data.get('lastEnqueriesDateHijri'),
                 'last_offer_date_hijri': raw_data.get('lastOfferPresentationDateHijri'),
                 'description': self._generate_description(raw_data),
-                'agency_code': raw_data.get('agencyCode'),
-                'tender_type_id': raw_data.get('tenderTypeId'),
                 # Scraping metadata
                 'last_scraped_at': fields.Datetime.now(),
                 'scraping_status': 'success',
@@ -548,27 +623,27 @@ class EtimadTender(models.Model):
                 if new_offers_deadline and existing.offers_deadline:
                     if new_offers_deadline > existing.offers_deadline:
                         days_extended = (new_offers_deadline - existing.offers_deadline).days
-                        changes.append(f"⏰ Offers deadline EXTENDED by {days_extended} days (new: {new_offers_deadline.strftime('%Y-%m-%d %H:%M')})")
+                        changes.append(f"Offers deadline EXTENDED by {days_extended} days (new: {new_offers_deadline.strftime('%Y-%m-%d %H:%M')})")
                         vals['previous_offers_deadline'] = existing.offers_deadline
                         vals['deadline_extended'] = True
                         vals['deadline_extensions_count'] = existing.deadline_extensions_count + 1
                         vals['last_deadline_extension_date'] = fields.Datetime.now()
                     elif new_offers_deadline < existing.offers_deadline:
                         days_reduced = (existing.offers_deadline - new_offers_deadline).days
-                        changes.append(f"⚠️ Offers deadline REDUCED by {days_reduced} days (new: {new_offers_deadline.strftime('%Y-%m-%d %H:%M')})")
+                        changes.append(f"Offers deadline REDUCED by {days_reduced} days (new: {new_offers_deadline.strftime('%Y-%m-%d %H:%M')})")
                         vals['previous_offers_deadline'] = existing.offers_deadline
                 
                 # Check enquiry deadline changes
                 if new_enquiry_deadline and existing.last_enquiry_date:
                     if new_enquiry_deadline != existing.last_enquiry_date:
-                        changes.append(f"📝 Enquiry deadline changed to {new_enquiry_deadline.strftime('%Y-%m-%d %H:%M')}")
+                        changes.append(f"Enquiry deadline changed to {new_enquiry_deadline.strftime('%Y-%m-%d %H:%M')}")
                         vals['previous_last_enquiry_date'] = existing.last_enquiry_date
                 
                 # Check estimated amount changes
                 if new_estimated_amount and existing.estimated_amount:
                     if abs(new_estimated_amount - existing.estimated_amount) > 1000:  # Significant if > 1000 SAR
                         change_pct = ((new_estimated_amount - existing.estimated_amount) / existing.estimated_amount) * 100
-                        changes.append(f"💰 Estimated amount changed: {existing.estimated_amount:,.0f} → {new_estimated_amount:,.0f} SAR ({change_pct:+.1f}%)")
+                        changes.append(f"Estimated amount changed: {existing.estimated_amount:,.0f} to {new_estimated_amount:,.0f} SAR ({change_pct:+.1f}%)")
                         vals['previous_estimated_amount'] = existing.estimated_amount
                 
                 # Update record with change tracking
@@ -580,10 +655,11 @@ class EtimadTender(models.Model):
                     # Post to chatter
                     existing.sudo().write(vals)
                     existing.message_post(
-                        body=f"<strong>🔄 Etimad Tender Updated</strong><br/><br/>{'<br/>'.join(changes)}",
+                        body=Markup("<strong><i class='fa fa-refresh'/> Etimad Tender Updated</strong><br/><br/>%s") % Markup('<br/>').join(changes),
                         subject='Etimad Update Detected',
                         message_type='notification',
                         subtype_xmlid='mail.mt_note',
+                        body_is_html=True,
                     )
                     
                     # Create activity for deadline extension (important!)
@@ -598,9 +674,33 @@ class EtimadTender(models.Model):
                 
                 return False
             else:
-                # New tender
-                self.create(vals)
+                # New tender - create and fetch full details immediately
+                new_tender = self.create(vals)
                 _logger.info(f"Created tender: {vals['name'][:50]}")
+                
+                # Auto-fetch detailed info for new tenders (if tender_id_string exists)
+                if new_tender.tender_id_string:
+                    try:
+                        _logger.info(f"Starting auto-fetch details for new tender: {vals['name'][:50]}")
+                        new_tender._fetch_detailed_info_silent()
+                        _logger.info(f"Successfully auto-fetched details for new tender: {vals['name'][:50]}")
+                        
+                        # Post notification to chatter
+                        new_tender.message_post(
+                            body=Markup("<i class='fa fa-download'/> Detailed information automatically fetched from Etimad portal"),
+                            message_type='notification',
+                            subtype_xmlid='mail.mt_note',
+                            body_is_html=True,
+                        )
+                    except Exception as e:
+                        _logger.warning(f"Could not auto-fetch details for {vals['name'][:50]}: {e}")
+                        new_tender.message_post(
+                            body=Markup("<i class='fa fa-exclamation-triangle'/> Could not auto-fetch details: %s") % str(e),
+                            message_type='notification',
+                            subtype_xmlid='mail.mt_note',
+                            body_is_html=True,
+                        )
+                
                 return True
                 
         except Exception as e:
@@ -647,18 +747,32 @@ class EtimadTender(models.Model):
         )
     
     def _parse_contract_duration(self, duration_text):
-        """Parse contract duration text to extract days (e.g., '10 يوم' -> 10)"""
+        """Parse contract duration text to extract days (e.g., '1 سنة' -> 365, '6 أشهر' -> 180)"""
         if not duration_text:
-            return False, 0
+            return 0
         
         import re
-        # Try to extract number from text
-        numbers = re.findall(r'\d+', duration_text)
-        if numbers:
-            days = int(numbers[0])
-            return duration_text, days
+        duration_lower = duration_text.lower()
         
-        return duration_text, 0
+        # Extract number
+        numbers = re.findall(r'\d+', duration_text)
+        if not numbers:
+            return 0
+        
+        number = int(numbers[0])
+        
+        # Determine unit and calculate days
+        if 'سنة' in duration_lower or 'year' in duration_lower:
+            return number * 365
+        elif 'شهر' in duration_lower or 'month' in duration_lower:
+            return number * 30
+        elif 'أسبوع' in duration_lower or 'week' in duration_lower:
+            return number * 7
+        elif 'يوم' in duration_lower or 'day' in duration_lower:
+            return number
+        else:
+            # Default to days if no unit found
+            return number
 
     def _parse_date(self, date_str):
         """Parse date string to datetime"""
@@ -692,10 +806,6 @@ class EtimadTender(models.Model):
 - Last Enquiry: {tender_data.get('lastEnqueriesDateHijri', 'N/A')} (Hijri)
 - Last Offer: {tender_data.get('lastOfferPresentationDateHijri', 'N/A')} (Hijri)
 
-**Financial Information**
-- Invitation Cost: {tender_data.get('invitationCost', 0)} SAR
-- Financial Fees: {tender_data.get('financialFees', 0)} SAR
-
 **Time Remaining:** {tender_data.get('remainingDays', 0)} days
         """
         return desc.strip()
@@ -711,7 +821,8 @@ class EtimadTender(models.Model):
             }
 
     def action_create_opportunity(self):
-        """Create CRM opportunity from tender"""
+        """Create CRM opportunity from tender.
+        Fetches detailed info from Etimad first to ensure all data is available."""
         self.ensure_one()
         
         if self.opportunity_id:
@@ -724,13 +835,20 @@ class EtimadTender(models.Model):
                 'target': 'current',
             }
         
+        # Fetch detailed info from Etimad before creating opportunity
+        if self.tender_id_string:
+            try:
+                self._fetch_detailed_info_silent()
+            except Exception as e:
+                _logger.warning(f"Could not fetch details before creating opportunity: {e}")
+        
         # Create new opportunity
         opportunity_vals = {
             'name': self.name,
             'type': 'opportunity',
             'partner_name': self.agency_name,
             'description': self.description,
-            'expected_revenue': self.total_fees,
+            'expected_revenue': self.estimated_amount or 0.0,
             'date_deadline': self.offers_deadline,
             'priority': '2' if self.remaining_days < 7 else '1',
         }
@@ -740,8 +858,9 @@ class EtimadTender(models.Model):
         
         # Log activity
         self.message_post(
-            body=_('Opportunity created: <a href="/web#id=%s&model=crm.lead">%s</a>') % (opportunity.id, opportunity.name),
-            subject=_('Opportunity Created')
+            body=Markup(_('Opportunity created: <a href="/web#id=%s&model=crm.lead">%s</a>')) % (opportunity.id, opportunity.name),
+            subject=_('Opportunity Created'),
+            body_is_html=True,
         )
         
         return {
@@ -841,198 +960,128 @@ class EtimadTender(models.Model):
 
     @api.model
     def action_fetch_tenders_cron(self):
-        """Scheduled action to fetch tenders automatically"""
+        """Scheduled action to fetch tenders automatically with configurable settings"""
         try:
-            _logger.info("Starting scheduled tender fetch...")
-            self.fetch_etimad_tenders(page_size=50, page_number=1)
+            # Get configuration parameters
+            params = self.env['ir.config_parameter'].sudo()
+            auto_sync = params.get_param('ics_etimad_tenders_crm.etimad_auto_sync', 'True') == 'True'
+            
+            # Check if auto sync is enabled
+            if not auto_sync:
+                _logger.info("Auto sync is disabled in settings. Skipping scheduled fetch.")
+                return
+            
+            page_size = int(params.get_param('ics_etimad_tenders_crm.etimad_fetch_page_size', '50') or 50)
+            pages = int(params.get_param('ics_etimad_tenders_crm.etimad_fetch_pages', '1') or 1)
+            
+            # Ensure page_size doesn't exceed Etimad's limit
+            page_size = min(page_size, 50)
+            
+            _logger.info(f"Starting scheduled tender fetch (page_size={page_size}, pages={pages})...")
+            self.fetch_etimad_tenders(page_size=page_size, page_number=1, max_pages=pages)
             _logger.info("Scheduled tender fetch completed successfully")
         except Exception as e:
             _logger.error(f"Scheduled tender fetch failed: {e}")
+    
+    @api.model
+    def update_cron_interval(self):
+        """Update the cron job interval based on settings"""
+        try:
+            params = self.env['ir.config_parameter'].sudo()
+            sync_interval = int(params.get_param('ics_etimad_tenders_crm.etimad_sync_interval', '24') or 24)
+            auto_sync = params.get_param('ics_etimad_tenders_crm.etimad_auto_sync', 'True') == 'True'
+            
+            # Find the cron job
+            cron = self.env.ref('ics_etimad_tenders_crm.ir_cron_fetch_etimad_tenders_daily', raise_if_not_found=False)
+            
+            if cron:
+                # Update cron active state
+                cron.active = auto_sync
+                
+                # Update interval
+                if sync_interval >= 24:
+                    # Daily interval
+                    cron.interval_number = sync_interval // 24
+                    cron.interval_type = 'days'
+                else:
+                    # Hourly interval
+                    cron.interval_number = sync_interval
+                    cron.interval_type = 'hours'
+                
+                _logger.info(f"Cron interval updated: {cron.interval_number} {cron.interval_type}, active={auto_sync}")
+            
+        except Exception as e:
+            _logger.error(f"Failed to update cron interval: {e}")
 
     def action_toggle_participating(self):
         """Toggle participation status"""
         self.ensure_one()
         self.is_participating = not self.is_participating
         if self.is_participating:
-            self.message_post(body=_('✅ Marked as participating in this tender'))
+            self.message_post(body=Markup(_('<i class="fa fa-check"/> Marked as participating in this tender')), body_is_html=True)
         else:
-            self.message_post(body=_('⬜ Unmarked as participating'))
+            self.message_post(body=_('Unmarked as participating'))
+    
+    def _fetch_detailed_info_silent(self):
+        """Fetch detailed info without showing notification (for batch operations)"""
+        self.ensure_one()
+        if not self.tender_id_string:
+            return
+        
+        try:
+            session = self._setup_scraper_session()
+            update_vals = self._fetch_all_detail_endpoints(session)
+            
+            # Remove counter before writing
+            update_vals.pop('_fetched_count', None)
+            
+            if update_vals:
+                self.write(update_vals)
+                _logger.info(f"Fetched {len(update_vals)} detail fields for tender {self.name}")
+        except Exception as e:
+            _logger.warning(f"Error in silent detail fetch for {self.name}: {e}")
     
     def action_fetch_detailed_info(self):
-        # Fetch detailed tender information from all Etimad API endpoints
+        """Fetch detailed tender information from all Etimad API endpoints (with notification and view refresh)"""
         self.ensure_one()
         if not self.tender_id_string:
             raise UserError(_('Tender ID String is required to fetch detailed information.'))
         
         try:
             session = self._setup_scraper_session()
-            update_vals = {}
-            fetched_count = 0
+            update_vals = self._fetch_all_detail_endpoints(session)
             
-            # 1. Fetch Relations/Details
-            try:
-                url = "https://tenders.etimad.sa/Tender/GetRelationsDetailsViewComponenet"
-                params = {'tenderIdStr': self.tender_id_string}
-                response = session.get(url, params=params, timeout=30)
-                
-                if response.status_code == 200 and response.text:
-                    parsed_data = self._parse_relations_details_html(response.text)
-                    
-                    # Classification
-                    if parsed_data.get('classification_field'):
-                        update_vals['classification_field'] = parsed_data['classification_field']
-                        update_vals['classification_required'] = 'غير مطلوب' not in parsed_data['classification_field']
-                    
-                    # Execution location
-                    if parsed_data.get('execution_location_type'):
-                        update_vals['execution_location_type'] = parsed_data['execution_location_type']
-                    if parsed_data.get('execution_regions'):
-                        update_vals['execution_regions'] = parsed_data['execution_regions']
-                    if parsed_data.get('execution_cities'):
-                        update_vals['execution_cities'] = parsed_data['execution_cities']
-                    
-                    # Details
-                    if parsed_data.get('details'):
-                        update_vals['tender_purpose'] = parsed_data['details']
-                    
-                    # Activity details
-                    if parsed_data.get('activity_details'):
-                        update_vals['activity_details'] = parsed_data['activity_details']
-                    
-                    # Supply items
-                    if parsed_data.get('includes_supply_items') is not None:
-                        update_vals['includes_supply_items'] = parsed_data['includes_supply_items']
-                    
-                    # Construction works
-                    if parsed_data.get('construction_works'):
-                        update_vals['construction_works'] = parsed_data['construction_works']
-                    
-                    # Maintenance works
-                    if parsed_data.get('maintenance_works'):
-                        update_vals['maintenance_works'] = parsed_data['maintenance_works']
-                    
-                    # Final guarantee
-                    if parsed_data.get('final_guarantee_percentage'):
-                        update_vals['final_guarantee_percentage'] = parsed_data['final_guarantee_percentage']
-                    
-                    fetched_count += 1
-            except Exception as e:
-                _logger.warning(f"Error fetching relations details: {e}")
+            fetched_count = update_vals.pop('_fetched_count', 0) if update_vals else 0
             
-            # 2. Fetch Dates
-            try:
-                url = "https://tenders.etimad.sa/Tender/GetTenderDatesViewComponenet"
-                params = {'tenderIdStr': self.tender_id_string}
-                response = session.get(url, params=params, timeout=30)
-                
-                if response.status_code == 200 and response.text:
-                    dates_data = self._parse_dates_html(response.text)
-                    
-                    # Parse dates
-                    if dates_data.get('last_enquiry_date'):
-                        update_vals['last_enquiry_date'] = dates_data['last_enquiry_date']
-                    if dates_data.get('offers_deadline'):
-                        update_vals['offers_deadline'] = dates_data['offers_deadline']
-                    if dates_data.get('offer_opening_date'):
-                        update_vals['offer_opening_date'] = dates_data['offer_opening_date']
-                    if dates_data.get('offer_examination_date'):
-                        update_vals['offer_examination_date'] = dates_data['offer_examination_date']
-                    if dates_data.get('expected_award_date'):
-                        update_vals['expected_award_date'] = dates_data['expected_award_date']
-                    if dates_data.get('work_start_date'):
-                        update_vals['work_start_date'] = dates_data['work_start_date']
-                    if dates_data.get('inquiry_start_date'):
-                        update_vals['inquiry_start_date'] = dates_data['inquiry_start_date']
-                    if dates_data.get('max_inquiry_response_days'):
-                        update_vals['max_inquiry_response_days'] = dates_data['max_inquiry_response_days']
-                    if dates_data.get('suspension_period_days'):
-                        update_vals['suspension_period_days'] = dates_data['suspension_period_days']
-                    if dates_data.get('opening_location'):
-                        update_vals['opening_location'] = dates_data['opening_location']
-                    
-                    fetched_count += 1
-            except Exception as e:
-                _logger.warning(f"Error fetching dates: {e}")
-            
-            # 3. Fetch Award Results
-            try:
-                url = "https://tenders.etimad.sa/Tender/GetAwardingResultsForVisitorViewComponenet"
-                params = {'tenderIdStr': self.tender_id_string}
-                response = session.get(url, params=params, timeout=30)
-                
-                if response.status_code == 200 and response.text:
-                    award_data = self._parse_award_results_html(response.text)
-                    
-                    if award_data.get('award_announced') is not None:
-                        update_vals['award_announced'] = award_data['award_announced']
-                    if award_data.get('award_announcement_date'):
-                        update_vals['award_announcement_date'] = award_data['award_announcement_date']
-                    if award_data.get('awarded_company_name'):
-                        update_vals['awarded_company_name'] = award_data['awarded_company_name']
-                    if award_data.get('awarded_amount'):
-                        update_vals['awarded_amount'] = award_data['awarded_amount']
-                    
-                    fetched_count += 1
-            except Exception as e:
-                _logger.warning(f"Error fetching award results: {e}")
-            
-            # 4. Fetch Local Content Details (المحتوى المحلي)
-            try:
-                url = "https://tenders.etimad.sa/Tender/GetLocalContentDetailsViewComponenet"
-                params = {'tenderIdStr': self.tender_id_string}
-                response = session.get(url, params=params, timeout=30)
-                
-                if response.status_code == 200 and response.text:
-                    local_content_data = self._parse_local_content_html(response.text)
-                    
-                    if local_content_data.get('local_content_required') is not None:
-                        update_vals['local_content_required'] = local_content_data['local_content_required']
-                    if local_content_data.get('local_content_percentage'):
-                        update_vals['local_content_percentage'] = local_content_data['local_content_percentage']
-                    if local_content_data.get('local_content_mechanism'):
-                        update_vals['local_content_mechanism'] = local_content_data['local_content_mechanism']
-                    if local_content_data.get('local_content_target_percentage'):
-                        update_vals['local_content_target_percentage'] = local_content_data['local_content_target_percentage']
-                    if local_content_data.get('local_content_baseline_weight'):
-                        update_vals['local_content_baseline_weight'] = local_content_data['local_content_baseline_weight']
-                    if local_content_data.get('sme_participation_allowed') is not None:
-                        update_vals['sme_participation_allowed'] = local_content_data['sme_participation_allowed']
-                    if local_content_data.get('sme_price_preference'):
-                        update_vals['sme_price_preference'] = local_content_data['sme_price_preference']
-                    if local_content_data.get('sme_qualification_mandatory') is not None:
-                        update_vals['sme_qualification_mandatory'] = local_content_data['sme_qualification_mandatory']
-                    if local_content_data.get('local_content_notes'):
-                        update_vals['local_content_notes'] = local_content_data['local_content_notes']
-                    
-                    fetched_count += 1
-            except Exception as e:
-                _logger.warning(f"Error fetching local content details: {e}")
-            
-            # Update tender with all fetched data
             if update_vals:
                 self.write(update_vals)
-                msg = _('Detailed information fetched from {} Etimad API endpoint(s).').format(fetched_count)
-                self.message_post(body=msg, subject=_('Details Updated'))
+                self.message_post(
+                    body=_('Detailed information fetched from {count} Etimad API endpoint(s)').format(count=fetched_count),
+                    subject=_('Details Updated')
+                )
                 
-                success_msg = _('Detailed information has been fetched and updated from {} endpoint(s).').format(fetched_count)
+                # Success notification with view refresh
+                success_msg = _('Successfully fetched and updated {count} detail fields from {endpoints} endpoint(s)').format(
+                    count=len(update_vals),
+                    endpoints=fetched_count
+                )
+                
+                # Return action to reload the current record
                 return {
-                    'type': 'ir.actions.client',
-                    'tag': 'display_notification',
-                    'params': {
-                        'title': _('Success'),
-                        'message': success_msg,
-                        'type': 'success',
-                        'sticky': False,
-                    }
+                    'type': 'ir.actions.act_window',
+                    'res_model': 'ics.etimad.tender',
+                    'res_id': self.id,
+                    'view_mode': 'form',
+                    'target': 'current',
+                    'context': {'form_view_initial_mode': 'readonly'},
                 }
             else:
-                no_update_title = _('No Updates')
-                no_update_msg = _('No new information found to update.')
+                no_update_msg = _('No new data found or all fields already up to date')
                 return {
                     'type': 'ir.actions.client',
                     'tag': 'display_notification',
                     'params': {
-                        'title': no_update_title,
+                        'title': _('No Updates'),
                         'message': no_update_msg,
                         'type': 'info',
                         'sticky': False,
@@ -1044,6 +1093,239 @@ class EtimadTender(models.Model):
             error_msg = _('Error fetching detailed information: {}').format(str(e))
             raise UserError(error_msg)
     
+    def _fetch_all_detail_endpoints(self, session):
+        """Fetch data from all detail API endpoints and return update values"""
+        update_vals = {}
+        fetched_count = 0
+        
+        # 1. Fetch Relations/Details
+        try:
+            url = "https://tenders.etimad.sa/Tender/GetRelationsDetailsViewComponenet"
+            params = {'tenderIdStr': self.tender_id_string}
+            response = session.get(url, params=params, timeout=30)
+            
+            _logger.info(f"Relations Details API Response Status: {response.status_code}")
+            
+            if response.status_code == 200 and response.text:
+                _logger.info(f"Relations Details HTML length: {len(response.text)} chars")
+                
+                # Log if we can find the submission method text in HTML
+                if 'طريقة تقديم العروض' in response.text:
+                    _logger.info("Found 'طريقة تقديم العروض' in HTML")
+                else:
+                    _logger.warning("'طريقة تقديم العروض' NOT found in HTML")
+                
+                parsed_data = self._parse_relations_details_html(response.text)
+                
+                # Tender status text (حالة المنافسة)
+                if parsed_data.get('tender_status_text'):
+                    update_vals['tender_status_text'] = parsed_data['tender_status_text']
+                
+                # Submission method (طريقة تقديم العروض)
+                if parsed_data.get('submission_method'):
+                    update_vals['submission_method'] = parsed_data['submission_method']
+                    _logger.info(f"Setting submission_method to: {parsed_data['submission_method']}")
+                else:
+                    _logger.warning("Submission method not found in parsed data")
+                
+                # Classification
+                if parsed_data.get('classification_field'):
+                    update_vals['classification_field'] = parsed_data['classification_field']
+                    update_vals['classification_required'] = 'غير مطلوب' not in parsed_data['classification_field']
+                
+                # Execution location
+                if parsed_data.get('execution_location_type'):
+                    update_vals['execution_location_type'] = parsed_data['execution_location_type']
+                if parsed_data.get('execution_regions'):
+                    update_vals['execution_regions'] = parsed_data['execution_regions']
+                if parsed_data.get('execution_cities'):
+                    update_vals['execution_cities'] = parsed_data['execution_cities']
+                
+                # Details
+                if parsed_data.get('details'):
+                    update_vals['tender_purpose'] = parsed_data['details']
+                
+                # Activity details
+                if parsed_data.get('activity_details'):
+                    update_vals['activity_details'] = parsed_data['activity_details']
+                    # Also populate activity_name if it's empty (tenderActivityName is often null in API)
+                    if not self.activity_name:
+                        # Use first line of activity_details as the activity name
+                        first_activity = parsed_data['activity_details'].split('\n')[0].strip()
+                        if first_activity:
+                            update_vals['activity_name'] = first_activity[:255]
+                
+                # Supply items
+                if parsed_data.get('includes_supply_items') is not None:
+                    update_vals['includes_supply_items'] = parsed_data['includes_supply_items']
+                
+                # Construction works
+                if parsed_data.get('construction_works'):
+                    update_vals['construction_works'] = parsed_data['construction_works']
+                
+                # Maintenance works
+                if parsed_data.get('maintenance_works'):
+                    update_vals['maintenance_works'] = parsed_data['maintenance_works']
+                
+                # Final guarantee
+                if parsed_data.get('final_guarantee_percentage'):
+                    update_vals['final_guarantee_percentage'] = parsed_data['final_guarantee_percentage']
+                
+                # Tender purpose
+                if parsed_data.get('tender_purpose'):
+                    update_vals['tender_purpose'] = parsed_data['tender_purpose']
+                
+                # Document cost
+                if parsed_data.get('document_cost_amount') is not None:
+                    update_vals['document_cost_amount'] = parsed_data['document_cost_amount']
+                
+                
+                # Contract duration
+                if parsed_data.get('contract_duration'):
+                    update_vals['contract_duration'] = parsed_data['contract_duration']
+                if parsed_data.get('contract_duration_days'):
+                    update_vals['contract_duration_days'] = parsed_data['contract_duration_days']
+                
+                # Insurance
+                if parsed_data.get('insurance_required') is not None:
+                    update_vals['insurance_required'] = parsed_data['insurance_required']
+                
+                # Initial guarantee
+                if parsed_data.get('initial_guarantee_type'):
+                    update_vals['initial_guarantee_type'] = parsed_data['initial_guarantee_type']
+                if parsed_data.get('initial_guarantee_required') is not None:
+                    update_vals['initial_guarantee_required'] = parsed_data['initial_guarantee_required']
+                if parsed_data.get('initial_guarantee_address'):
+                    update_vals['initial_guarantee_address'] = parsed_data['initial_guarantee_address']
+                
+                fetched_count += 1
+        except Exception as e:
+            _logger.warning(f"Error fetching relations details: {e}")
+        
+        # 1.1 Fetch Basic Details page (fallback for missing fields)
+        try:
+            missing_basic_fields = [
+                'submission_method',
+                'tender_purpose',
+                'document_cost_amount',
+                'contract_duration',
+                'insurance_required',
+                'initial_guarantee_type',
+                'initial_guarantee_address',
+                'final_guarantee_percentage',
+                'tender_status_text',
+            ]
+            if any(update_vals.get(field) in (None, False) for field in missing_basic_fields):
+                details_pages = [
+                    f"https://tenders.etimad.sa/Tender/Details/{self.tender_id_string}",
+                    f"https://tenders.etimad.sa/Tender/DetailsForVisitor?STenderId={self.tender_id_string}",
+                ]
+                for details_url in details_pages:
+                    details_response = session.get(details_url, timeout=30)
+                    if details_response.status_code == 200 and details_response.text:
+                        basic_data = self._parse_basic_details_html(details_response.text)
+                        for key, value in basic_data.items():
+                            if update_vals.get(key) in (None, False) and value not in (None, False):
+                                update_vals[key] = value
+                        fetched_count += 1
+                        # Stop once we successfully parsed any basic data
+                        if basic_data:
+                            break
+        except Exception as e:
+            _logger.warning(f"Error fetching basic details page: {e}")
+            
+        # 2. Fetch Dates
+        try:
+            url = "https://tenders.etimad.sa/Tender/GetTenderDatesViewComponenet"
+            params = {'tenderIdStr': self.tender_id_string}
+            response = session.get(url, params=params, timeout=30)
+            
+            if response.status_code == 200 and response.text:
+                dates_data = self._parse_dates_html(response.text)
+                
+                # Parse dates
+                if dates_data.get('last_enquiry_date'):
+                    update_vals['last_enquiry_date'] = dates_data['last_enquiry_date']
+                if dates_data.get('offers_deadline'):
+                    update_vals['offers_deadline'] = dates_data['offers_deadline']
+                if dates_data.get('offer_opening_date'):
+                    update_vals['offer_opening_date'] = dates_data['offer_opening_date']
+                if dates_data.get('offer_examination_date'):
+                    update_vals['offer_examination_date'] = dates_data['offer_examination_date']
+                if dates_data.get('expected_award_date'):
+                    update_vals['expected_award_date'] = dates_data['expected_award_date']
+                if dates_data.get('work_start_date'):
+                    update_vals['work_start_date'] = dates_data['work_start_date']
+                if dates_data.get('inquiry_start_date'):
+                    update_vals['inquiry_start_date'] = dates_data['inquiry_start_date']
+                if dates_data.get('max_inquiry_response_days'):
+                    update_vals['max_inquiry_response_days'] = dates_data['max_inquiry_response_days']
+                if dates_data.get('suspension_period_days'):
+                    update_vals['suspension_period_days'] = dates_data['suspension_period_days']
+                if dates_data.get('opening_location'):
+                    update_vals['opening_location'] = dates_data['opening_location']
+                
+                fetched_count += 1
+        except Exception as e:
+            _logger.warning(f"Error fetching dates: {e}")
+            
+        # 3. Fetch Award Results
+        try:
+            url = "https://tenders.etimad.sa/Tender/GetAwardingResultsForVisitorViewComponenet"
+            params = {'tenderIdStr': self.tender_id_string}
+            response = session.get(url, params=params, timeout=30)
+            
+            if response.status_code == 200 and response.text:
+                award_data = self._parse_award_results_html(response.text)
+                
+                if award_data.get('award_announced') is not None:
+                    update_vals['award_announced'] = award_data['award_announced']
+                if award_data.get('award_announcement_date'):
+                    update_vals['award_announcement_date'] = award_data['award_announcement_date']
+                if award_data.get('awarded_company_name'):
+                    update_vals['awarded_company_name'] = award_data['awarded_company_name']
+                if award_data.get('awarded_amount'):
+                    update_vals['awarded_amount'] = award_data['awarded_amount']
+                
+                fetched_count += 1
+        except Exception as e:
+            _logger.warning(f"Error fetching award results: {e}")
+            
+        # 4. Fetch Local Content Details (المحتوى المحلي)
+        try:
+            url = "https://tenders.etimad.sa/Tender/GetLocalContentDetailsViewComponenet"
+            params = {'tenderIdStr': self.tender_id_string}
+            response = session.get(url, params=params, timeout=30)
+            
+            if response.status_code == 200 and response.text:
+                local_content_data = self._parse_local_content_html(response.text)
+                
+                if local_content_data.get('local_content_required') is not None:
+                    update_vals['local_content_required'] = local_content_data['local_content_required']
+                if local_content_data.get('local_content_percentage'):
+                    update_vals['local_content_percentage'] = local_content_data['local_content_percentage']
+                if local_content_data.get('local_content_mechanism'):
+                    update_vals['local_content_mechanism'] = local_content_data['local_content_mechanism']
+                if local_content_data.get('local_content_target_percentage'):
+                    update_vals['local_content_target_percentage'] = local_content_data['local_content_target_percentage']
+                if local_content_data.get('local_content_baseline_weight'):
+                    update_vals['local_content_baseline_weight'] = local_content_data['local_content_baseline_weight']
+                if local_content_data.get('sme_participation_allowed') is not None:
+                    update_vals['sme_participation_allowed'] = local_content_data['sme_participation_allowed']
+                if local_content_data.get('sme_price_preference'):
+                    update_vals['sme_price_preference'] = local_content_data['sme_price_preference']
+                if local_content_data.get('sme_qualification_mandatory') is not None:
+                    update_vals['sme_qualification_mandatory'] = local_content_data['sme_qualification_mandatory']
+                if local_content_data.get('local_content_notes'):
+                    update_vals['local_content_notes'] = local_content_data['local_content_notes']
+                
+                fetched_count += 1
+        except Exception as e:
+            _logger.warning(f"Error fetching local content details: {e}")
+            
+        update_vals['_fetched_count'] = fetched_count
+        return update_vals
+    
     def _parse_relations_details_html(self, html_content):
         """Parse HTML content from GetRelationsDetailsViewComponenet API"""
         parsed_data = {}
@@ -1052,6 +1334,29 @@ class EtimadTender(models.Model):
             if LXML_AVAILABLE:
                 # Use lxml for proper HTML parsing
                 tree = html.fromstring(html_content)
+                
+                # Extract tender status (حالة المنافسة)
+                status_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "حالة المنافسة")]/following-sibling::div[1]//span/text()')
+                if status_elements:
+                    parsed_data['tender_status_text'] = html_module.unescape(status_elements[0].strip())
+                
+                # Extract submission method (طريقة تقديم العروض)
+                submission_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "طريقة تقديم العروض")]/following-sibling::div[1]//span/text()')
+                if submission_elements:
+                    # Get all text and join, then clean
+                    submission_text = ' '.join([html_module.unescape(t.strip()) for t in submission_elements if t.strip()])
+                    submission_text = submission_text.strip()
+                    
+                    _logger.info(f"Extracted submission method text: '{submission_text}'")
+                    
+                    if 'ملف واحد' in submission_text or 'معا' in submission_text or 'معاً' in submission_text:
+                        parsed_data['submission_method'] = 'single_file'
+                    elif 'ملفين منفصلين' in submission_text or 'منفصل' in submission_text:
+                        parsed_data['submission_method'] = 'separate_files'
+                    elif 'إلكتروني' in submission_text:
+                        parsed_data['submission_method'] = 'electronic'
+                    elif 'يدوي' in submission_text:
+                        parsed_data['submission_method'] = 'manual'
                 
                 # Extract classification field
                 classification_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "مجال التصنيف")]/following-sibling::div[1]//span/text()')
@@ -1121,7 +1426,59 @@ class EtimadTender(models.Model):
                     # Extract number from "5.00" or "10.00" or "5"
                     guarantee_match = re.search(r'(\d+(?:\.\d+)?)', guarantee_str)
                     if guarantee_match:
-                        parsed_data['final_guarantee_percentage'] = float(guarantee_match.group(1))
+                        # Store as ratio for percentage widget (5.00 -> 0.05)
+                        parsed_data['final_guarantee_percentage'] = float(guarantee_match.group(1)) / 100.0
+                
+                # Extract tender purpose (الغرض من المنافسة)
+                # First try the full purpose span, then the truncated one
+                purpose_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "الغرض من المنافسة")]/following-sibling::div[1]//span[not(@hidden) and not(contains(@style, "display:none"))]//text()[not(contains(., "...عرض"))]')
+                if not purpose_elements:
+                    # Fallback to any span content
+                    purpose_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "الغرض من المنافسة")]/following-sibling::div[1]//span/text()')
+                
+                if purpose_elements:
+                    # Join all text nodes and clean up
+                    purpose_text = ' '.join([html_module.unescape(t.strip()) for t in purpose_elements if t.strip()])
+                    # Remove "...عرض المزيد..." or "...عرض الأقل..." text
+                    purpose_text = re.sub(r'\.\.\.عرض (المزيد|الأقل)\.\.\.', '', purpose_text).strip()
+                    if purpose_text:
+                        parsed_data['tender_purpose'] = purpose_text
+                
+                # Extract document cost (قيمة وثائق المنافسة)
+                doc_cost_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "قيمة وثائق المنافسة")]/following-sibling::div[1]//span/text()')
+                if doc_cost_elements:
+                    doc_cost_str = html_module.unescape(doc_cost_elements[0].strip())
+                    # Extract number from "700.00" or "0.00"
+                    cost_match = re.search(r'(\d+(?:\.\d+)?)', doc_cost_str)
+                    if cost_match:
+                        cost_value = float(cost_match.group(1))
+                        parsed_data['document_cost_amount'] = cost_value
+                
+                # Extract contract duration (مدة العقد)
+                duration_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "مدة العقد")]/following-sibling::div[1]//span/text()')
+                if duration_elements:
+                    duration_text = html_module.unescape(duration_elements[0].strip())
+                    parsed_data['contract_duration'] = duration_text
+                    # Parse duration to days (e.g., "1 سنة" = 365 days, "6 أشهر" = 180 days)
+                    parsed_data['contract_duration_days'] = self._parse_contract_duration(duration_text)
+                
+                # Extract insurance requirement (هل التأمين من متطلبات المنافسة)
+                insurance_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "هل التأمين من متطلبات المنافسة")]/following-sibling::div[1]//span/text()')
+                if insurance_elements:
+                    insurance_text = html_module.unescape(insurance_elements[0].strip())
+                    parsed_data['insurance_required'] = 'نعم' in insurance_text or 'yes' in insurance_text.lower()
+                
+                # Extract initial guarantee type (مطلوب ضمان الإبتدائي)
+                init_guarantee_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "مطلوب ضمان الإبتدائي")]/following-sibling::div[1]//span/text()')
+                if init_guarantee_elements:
+                    init_guarantee_text = html_module.unescape(init_guarantee_elements[0].strip())
+                    parsed_data['initial_guarantee_type'] = init_guarantee_text
+                    parsed_data['initial_guarantee_required'] = 'ضمان إبتدائى' in init_guarantee_text or 'مطلوب' in init_guarantee_text
+                
+                # Extract initial guarantee address (عنوان الضمان الإبتدائى)
+                guarantee_addr_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "عنوان الضمان الإبتدائى")]/following-sibling::div[1]//span/text()')
+                if guarantee_addr_elements:
+                    parsed_data['initial_guarantee_address'] = html_module.unescape(guarantee_addr_elements[0].strip())
             else:
                 # Fallback to regex parsing if lxml not available
                 parsed_data = self._parse_relations_details_regex(html_content)
@@ -1132,12 +1489,99 @@ class EtimadTender(models.Model):
             parsed_data = self._parse_relations_details_regex(html_content)
         
         return parsed_data
+
+    def _parse_basic_details_html(self, html_content):
+        """Parse HTML content from Tender Details page (basic details section)"""
+        parsed_data = {}
+        try:
+            if LXML_AVAILABLE:
+                tree = html.fromstring(html_content)
+                items = tree.xpath('//div[@id="basicDetials"]//li[contains(@class, "list-group-item")]')
+                for item in items:
+                    title = ''.join(item.xpath('.//div[contains(@class, "etd-item-title")]/text()')).strip()
+                    value_texts = item.xpath('.//div[contains(@class, "etd-item-info")]//text()')
+                    value = ' '.join([v.strip() for v in value_texts if v.strip()])
+                    if not title:
+                        continue
+
+                    if 'طريقة تقديم العروض' in title:
+                        if 'ملف واحد' in value or 'معا' in value or 'معاً' in value:
+                            parsed_data['submission_method'] = 'single_file'
+                        elif 'ملفين منفصلين' in value or 'منفصل' in value:
+                            parsed_data['submission_method'] = 'separate_files'
+                        elif 'إلكتروني' in value:
+                            parsed_data['submission_method'] = 'electronic'
+                        elif 'يدوي' in value:
+                            parsed_data['submission_method'] = 'manual'
+                    elif 'حالة المنافسة' in title:
+                        parsed_data['tender_status_text'] = value
+                    elif 'الغرض من المنافسة' in title:
+                        cleaned = re.sub(r'\.\.\.عرض (المزيد|الأقل)\.\.\.', '', value).strip()
+                        if cleaned:
+                            parsed_data['tender_purpose'] = cleaned
+                    elif 'قيمة وثائق المنافسة' in title:
+                        cost_match = re.search(r'(\d+(?:\.\d+)?)', value)
+                        if cost_match:
+                            cost_value = float(cost_match.group(1))
+                            parsed_data['document_cost_amount'] = cost_value
+                    elif 'مدة العقد' in title:
+                        parsed_data['contract_duration'] = value
+                        parsed_data['contract_duration_days'] = self._parse_contract_duration(value)
+                    elif 'هل التأمين من متطلبات المنافسة' in title:
+                        parsed_data['insurance_required'] = 'نعم' in value or 'yes' in value.lower()
+                    elif 'مطلوب ضمان الإبتدائي' in title:
+                        parsed_data['initial_guarantee_type'] = value
+                        value_lower = value.lower()
+                        if 'لا يوجد' in value or 'غير مطلوب' in value or 'not required' in value_lower:
+                            parsed_data['initial_guarantee_required'] = False
+                        else:
+                            parsed_data['initial_guarantee_required'] = 'ضمان' in value or 'مطلوب' in value or 'required' in value_lower
+                    elif 'عنوان الضمان الإبتدائى' in title:
+                        parsed_data['initial_guarantee_address'] = value
+                    elif 'الضمان النهائي' in title:
+                        guarantee_match = re.search(r'(\d+(?:\.\d+)?)', value)
+                        if guarantee_match:
+                            # Store as ratio for percentage widget (5.00 -> 0.05)
+                            parsed_data['final_guarantee_percentage'] = float(guarantee_match.group(1)) / 100.0
+            else:
+                # Minimal regex fallback for submission method
+                submission_match = re.search(r'طريقة تقديم العروض.*?<span>\s*(.*?)\s*</span>', html_content, re.DOTALL)
+                if submission_match:
+                    submission_text = html_module.unescape(re.sub(r'<[^>]+>', '', submission_match.group(1)).strip())
+                    if 'ملف واحد' in submission_text or 'معا' in submission_text or 'معاً' in submission_text:
+                        parsed_data['submission_method'] = 'single_file'
+        except Exception as e:
+            _logger.warning(f"Error parsing basic details HTML: {e}")
+        return parsed_data
     
     def _parse_relations_details_regex(self, html_content):
         """Fallback regex-based parsing if lxml is not available"""
         parsed_data = {}
         
         try:
+            # Extract tender status (حالة المنافسة)
+            status_match = re.search(r'حالة المنافسة.*?<span>\s*(.*?)\s*</span>', html_content, re.DOTALL)
+            if status_match:
+                status_text = re.sub(r'<[^>]+>', '', status_match.group(1)).strip()
+                if status_text:
+                    parsed_data['tender_status_text'] = html_module.unescape(status_text)
+            
+            # Extract submission method (طريقة تقديم العروض)
+            submission_match = re.search(r'طريقة تقديم العروض.*?<span>\s*(.*?)\s*</span>', html_content, re.DOTALL)
+            if submission_match:
+                submission_text = html_module.unescape(re.sub(r'<[^>]+>', '', submission_match.group(1)).strip())
+                
+                _logger.info(f"Extracted submission method text (regex): '{submission_text}'")
+                
+                if 'ملف واحد' in submission_text or 'معا' in submission_text or 'معاً' in submission_text:
+                    parsed_data['submission_method'] = 'single_file'
+                elif 'ملفين منفصلين' in submission_text or 'منفصل' in submission_text:
+                    parsed_data['submission_method'] = 'separate_files'
+                elif 'إلكتروني' in submission_text:
+                    parsed_data['submission_method'] = 'electronic'
+                elif 'يدوي' in submission_text:
+                    parsed_data['submission_method'] = 'manual'
+            
             # Extract classification field
             classification_match = re.search(r'مجال التصنيف.*?<span>\s*(.*?)\s*</span>', html_content, re.DOTALL)
             if classification_match:
@@ -1204,9 +1648,60 @@ class EtimadTender(models.Model):
             guarantee_match = re.search(r'الضمان النهائي.*?<span>\s*(\d+(?:\.\d+)?)', html_content, re.DOTALL)
             if guarantee_match:
                 try:
-                    parsed_data['final_guarantee_percentage'] = float(guarantee_match.group(1))
+                    # Store as ratio for percentage widget (5.00 -> 0.05)
+                    parsed_data['final_guarantee_percentage'] = float(guarantee_match.group(1)) / 100.0
                 except ValueError:
                     pass
+            
+            # Extract tender purpose (الغرض من المنافسة)
+            purpose_match = re.search(r'الغرض من المنافسة.*?<span[^>]*id="purposeSpan"[^>]*>(.*?)</span>|الغرض من المنافسة.*?<span[^>]*id="subPurposSapn"[^>]*>(.*?)</span>', html_content, re.DOTALL)
+            if purpose_match:
+                purpose_text = purpose_match.group(1) or purpose_match.group(2) or ''
+                purpose_text = re.sub(r'<[^>]+>', '', purpose_text).strip()
+                purpose_text = re.sub(r'\.\.\.عرض (المزيد|الأقل)\.\.\.', '', purpose_text).strip()
+                if purpose_text:
+                    parsed_data['tender_purpose'] = html_module.unescape(purpose_text)
+            
+            # Extract document cost (قيمة وثائق المنافسة)
+            doc_cost_match = re.search(r'قيمة وثائق المنافسة.*?<span>\s*(\d+(?:\.\d+)?)', html_content, re.DOTALL)
+            if doc_cost_match:
+                try:
+                    cost_value = float(doc_cost_match.group(1))
+                    parsed_data['document_cost_amount'] = cost_value
+                except ValueError:
+                    pass
+            
+            # Extract contract duration (مدة العقد)
+            duration_match = re.search(r'مدة العقد.*?<span>\s*(.*?)\s*</span>', html_content, re.DOTALL)
+            if duration_match:
+                duration_text = re.sub(r'<[^>]+>', '', duration_match.group(1)).strip()
+                if duration_text:
+                    parsed_data['contract_duration'] = html_module.unescape(duration_text)
+                    parsed_data['contract_duration_days'] = self._parse_contract_duration(duration_text)
+            
+            # Extract insurance requirement (هل التأمين من متطلبات المنافسة)
+            insurance_match = re.search(r'هل التأمين من متطلبات المنافسة.*?<span>\s*(.*?)\s*</span>', html_content, re.DOTALL)
+            if insurance_match:
+                insurance_text = re.sub(r'<[^>]+>', '', insurance_match.group(1)).strip()
+                parsed_data['insurance_required'] = 'نعم' in insurance_text or 'yes' in insurance_text.lower()
+            
+            # Extract initial guarantee type (مطلوب ضمان الإبتدائي)
+            init_guarantee_match = re.search(r'مطلوب ضمان الإبتدائي.*?<span>\s*(.*?)\s*</span>', html_content, re.DOTALL)
+            if init_guarantee_match:
+                init_guarantee_text = re.sub(r'<[^>]+>', '', init_guarantee_match.group(1)).strip()
+                parsed_data['initial_guarantee_type'] = html_module.unescape(init_guarantee_text)
+                text_lower = init_guarantee_text.lower()
+                if 'لا يوجد' in init_guarantee_text or 'غير مطلوب' in init_guarantee_text or 'not required' in text_lower:
+                    parsed_data['initial_guarantee_required'] = False
+                else:
+                    parsed_data['initial_guarantee_required'] = 'ضمان إبتدائى' in init_guarantee_text or 'مطلوب' in init_guarantee_text or 'required' in text_lower
+            
+            # Extract initial guarantee address (عنوان الضمان الإبتدائى)
+            guarantee_addr_match = re.search(r'عنوان الضمان الإبتدائى.*?<span>\s*(.*?)\s*</span>', html_content, re.DOTALL)
+            if guarantee_addr_match:
+                addr_text = re.sub(r'<[^>]+>', '', guarantee_addr_match.group(1)).strip()
+                if addr_text:
+                    parsed_data['initial_guarantee_address'] = html_module.unescape(addr_text)
             
         except Exception as e:
             _logger.error(f"Error in regex parsing: {e}")
@@ -1289,11 +1784,14 @@ class EtimadTender(models.Model):
                     except ValueError:
                         pass
                 
-                # Extract opening location
-                location_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "مكان فتح العرض")]/following-sibling::div[1]//span/text()')
+                # Extract opening location (مكان فتح العروض)
+                location_elements = tree.xpath(
+                    '//div[contains(@class, "etd-item-title") and (contains(text(), "مكان فتح العرض") or contains(text(), "مكان فتح العروض") or contains(text(), "موقع فتح العروض"))]'
+                    '/following-sibling::div[1]//span/text()'
+                )
                 if location_elements:
                     location_text = html_module.unescape(location_elements[0].strip())
-                    if 'لا يوجد' not in location_text:
+                    if location_text and 'لا يوجد' not in location_text:
                         parsed_data['opening_location'] = location_text
                 
                 # Extract offer opening date (تاريخ فحص العروض) - updated xpath
@@ -1375,9 +1873,11 @@ class EtimadTender(models.Model):
                     pass
             
             # Opening location
-            location_match = re.search(r'مكان فتح العرض.*?<span>\s*([^<]+?)\s*</span>', html_content, re.DOTALL)
+            location_match = re.search(r'(?:مكان فتح العرض|مكان فتح العروض|موقع فتح العروض).*?<span>\s*([^<]+?)\s*</span>', html_content, re.DOTALL)
             if location_match:
-                parsed_data['opening_location'] = html_module.unescape(re.sub(r'<[^>]+>', '', location_match.group(1)).strip())
+                location_text = html_module.unescape(re.sub(r'<[^>]+>', '', location_match.group(1)).strip())
+                if location_text and 'لا يوجد' not in location_text:
+                    parsed_data['opening_location'] = location_text
                 
         except Exception as e:
             _logger.error(f"Error in regex dates parsing: {e}")
@@ -1516,7 +2016,13 @@ class EtimadTender(models.Model):
         return parsed_data
     
     def _parse_local_content_html(self, html_content):
-        """Parse HTML content from GetLocalContentDetailsViewComponenet API"""
+        """Parse HTML content from GetLocalContentDetailsViewComponenet API
+        
+        The Etimad local content response uses various HTML structures:
+        - <span> for simple text values
+        - <ol><li> for list values (e.g., mechanisms, requirements)
+        - HTML entities (&#x...) for Arabic text
+        """
         parsed_data = {}
         
         try:
@@ -1530,71 +2036,86 @@ class EtimadTender(models.Model):
             if LXML_AVAILABLE:
                 tree = html.fromstring(html_content)
                 
-                # Extract minimum local content percentage
-                # Look for "نسبة المحتوى المحلي الدنيا" or "Minimum Local Content %"
-                percentage_elements = tree.xpath('//div[contains(@class, "etd-item-title") and (contains(text(), "نسبة المحتوى المحلي") or contains(text(), "المحتوى المحلي الدنيا"))]/following-sibling::div[1]//span/text()')
-                if percentage_elements:
-                    percentage_str = html_module.unescape(percentage_elements[0].strip())
-                    # Extract number from text like "30%" or "30 %" or "30"
-                    percentage_match = re.search(r'(\d+(?:\.\d+)?)', percentage_str)
-                    if percentage_match:
-                        parsed_data['local_content_percentage'] = float(percentage_match.group(1))
+                # Scan all list items generically for local content data
+                all_items = tree.xpath('//li[contains(@class, "list-group-item")]')
+                for item in all_items:
+                    title_parts = item.xpath('.//div[contains(@class, "etd-item-title")]//text()')
+                    title = ' '.join([t.strip() for t in title_parts if t.strip()])
+                    
+                    # Get value from span or ol/li
+                    value_parts = item.xpath('.//div[contains(@class, "etd-item-info")]//li/text()')
+                    if not value_parts:
+                        value_parts = item.xpath('.//div[contains(@class, "etd-item-info")]//span/text()')
+                    if not value_parts:
+                        value_parts = item.xpath('.//div[contains(@class, "etd-item-info")]//text()')
+                    
+                    value = '\n'.join([html_module.unescape(v.strip()) for v in value_parts if v.strip()])
+                    
+                    if not title or not value:
+                        continue
+                    
+                    _logger.info(f"Local content item: '{title}' = '{value[:100]}'")
+                    
+                    if 'نسبة المحتوى المحلي' in title and 'المستهدف' not in title:
+                        pct_match = re.search(r'(\d+(?:\.\d+)?)', value)
+                        if pct_match:
+                            parsed_data['local_content_percentage'] = float(pct_match.group(1))
+                    
+                    elif 'المستهدفة' in title or 'المستهدف' in title:
+                        pct_match = re.search(r'(\d+(?:\.\d+)?)', value)
+                        if pct_match:
+                            parsed_data['local_content_target_percentage'] = float(pct_match.group(1))
+                    
+                    elif 'وزن المحتوى المحلي' in title:
+                        pct_match = re.search(r'(\d+(?:\.\d+)?)', value)
+                        if pct_match:
+                            parsed_data['local_content_baseline_weight'] = float(pct_match.group(1))
+                    
+                    elif 'آلية احتساب' in title:
+                        if value and 'لا يوجد' not in value:
+                            parsed_data['local_content_mechanism'] = value
+                    
+                    elif 'آليات المحتوى المحلي' in title:
+                        if value and 'لا يوجد' not in value:
+                            parsed_data['local_content_mechanism'] = value
+                    
+                    elif 'الأفضلية السعرية' in title:
+                        pct_match = re.search(r'(\d+(?:\.\d+)?)', value)
+                        if pct_match:
+                            parsed_data['sme_price_preference'] = float(pct_match.group(1))
+                    
+                    elif 'شهادة المنشآت' in title:
+                        value_lower = value.lower()
+                        parsed_data['sme_qualification_mandatory'] = 'إلزامي' in value or 'مطلوب' in value or 'mandatory' in value_lower
+                    
+                    elif 'ملاحظات' in title:
+                        if value and 'لا يوجد' not in value:
+                            parsed_data['local_content_notes'] = value
                 
-                # Extract local content mechanism
-                # Look for "آلية احتساب المحتوى المحلي"
-                mechanism_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "آلية احتساب")]/following-sibling::div[1]//span/text()')
-                if mechanism_elements:
-                    mechanism_text = html_module.unescape(mechanism_elements[0].strip())
-                    if mechanism_text and 'لا يوجد' not in mechanism_text:
-                        parsed_data['local_content_mechanism'] = mechanism_text
+                # Also check H4 headers for section-level data
+                h4_elements = tree.xpath('//h4//text()')
+                h4_text = ' '.join([html_module.unescape(t.strip()) for t in h4_elements if t.strip()])
                 
-                # Extract target percentage for evaluation
-                # Look for "نسبة المحتوى المحلي المستهدفة للتقييم"
-                target_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "المستهدفة للتقييم")]/following-sibling::div[1]//span/text()')
-                if target_elements:
-                    target_str = html_module.unescape(target_elements[0].strip())
-                    target_match = re.search(r'(\d+(?:\.\d+)?)', target_str)
-                    if target_match:
-                        parsed_data['local_content_target_percentage'] = float(target_match.group(1))
+                # Check for SME preference in mechanisms list or as section
+                all_li_text = tree.xpath('//ol/li/text()')
+                all_li_values = [html_module.unescape(t.strip()) for t in all_li_text if t.strip()]
                 
-                # Extract local content weight in evaluation
-                # Look for "وزن المحتوى المحلي"
-                weight_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "وزن المحتوى المحلي")]/following-sibling::div[1]//span/text()')
-                if weight_elements:
-                    weight_str = html_module.unescape(weight_elements[0].strip())
-                    weight_match = re.search(r'(\d+(?:\.\d+)?)', weight_str)
-                    if weight_match:
-                        parsed_data['local_content_baseline_weight'] = float(weight_match.group(1))
+                for li_value in all_li_values:
+                    if 'تفضيل المنشآت الصغيرة' in li_value:
+                        parsed_data['sme_participation_allowed'] = True
+                        if not parsed_data.get('local_content_notes'):
+                            parsed_data['local_content_notes'] = li_value
+                    elif 'المنشآت الصغيرة' in li_value and ('مسموح' in li_value or 'نعم' in li_value):
+                        parsed_data['sme_participation_allowed'] = True
                 
-                # Extract SME (Small & Medium Enterprises) participation
-                # Look for "مشاركة المنشآت الصغيرة والمتوسطة"
-                sme_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "المنشآت الصغيرة")]/following-sibling::div[1]//span/text()')
-                if sme_elements:
-                    sme_text = html_module.unescape(sme_elements[0].strip()).lower()
-                    parsed_data['sme_participation_allowed'] = 'نعم' in sme_text or 'yes' in sme_text or 'مسموح' in sme_text
+                # If we found mechanisms as list items, collect them all
+                if not parsed_data.get('local_content_mechanism'):
+                    mechanism_items = tree.xpath('//div[contains(@class, "etd-item-info")]//ol/li/text()')
+                    if mechanism_items:
+                        mechanisms = [html_module.unescape(m.strip()) for m in mechanism_items if m.strip()]
+                        if mechanisms:
+                            parsed_data['local_content_mechanism'] = '\n'.join(mechanisms)
                 
-                # Extract SME price preference
-                # Look for "الأفضلية السعرية"
-                sme_preference_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "الأفضلية السعرية")]/following-sibling::div[1]//span/text()')
-                if sme_preference_elements:
-                    preference_str = html_module.unescape(sme_preference_elements[0].strip())
-                    preference_match = re.search(r'(\d+(?:\.\d+)?)', preference_str)
-                    if preference_match:
-                        parsed_data['sme_price_preference'] = float(preference_match.group(1))
-                
-                # Extract SME qualification mandatory
-                # Look for "شهادة المنشآت" or "SME Certificate"
-                sme_cert_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "شهادة المنشآت")]/following-sibling::div[1]//span/text()')
-                if sme_cert_elements:
-                    cert_text = html_module.unescape(sme_cert_elements[0].strip()).lower()
-                    parsed_data['sme_qualification_mandatory'] = 'إلزامي' in cert_text or 'mandatory' in cert_text or 'مطلوب' in cert_text
-                
-                # Collect any additional notes about local content
-                notes_elements = tree.xpath('//div[contains(@class, "etd-item-title") and contains(text(), "ملاحظات")]/following-sibling::div[1]//span/text()')
-                if notes_elements:
-                    notes_text = html_module.unescape(notes_elements[0].strip())
-                    if notes_text and 'لا يوجد' not in notes_text:
-                        parsed_data['local_content_notes'] = notes_text
             else:
                 # Fallback to regex parsing
                 parsed_data.update(self._parse_local_content_regex(html_content))
@@ -1609,40 +2130,66 @@ class EtimadTender(models.Model):
         return parsed_data
     
     def _parse_local_content_regex(self, html_content):
-        """Fallback regex parsing for local content"""
+        """Fallback regex parsing for local content.
+        
+        Handles both <span> values and <ol><li> list values.
+        """
         parsed_data = {'local_content_required': True}
+        
+        def _extract_value(pattern, content):
+            """Extract value following a title pattern - check span, li, and generic text"""
+            # Try <span> value
+            match = re.search(pattern + r'.*?<span>\s*([^<]+?)\s*</span>', content, re.DOTALL)
+            if match:
+                return html_module.unescape(re.sub(r'<[^>]+>', '', match.group(1)).strip())
+            # Try <li> value (list items)
+            match = re.search(pattern + r'.*?<ol>\s*(<li>.*?</li>\s*)+\s*</ol>', content, re.DOTALL)
+            if match:
+                items = re.findall(r'<li>\s*([^<]+?)\s*</li>', match.group(0))
+                return '\n'.join([html_module.unescape(item.strip()) for item in items if item.strip()])
+            return None
         
         try:
             # Extract minimum percentage
-            percentage_match = re.search(r'(?:نسبة المحتوى المحلي|المحتوى المحلي الدنيا).*?<span>\s*(\d+(?:\.\d+)?)', html_content, re.DOTALL)
+            percentage_match = re.search(r'(?:نسبة المحتوى المحلي|المحتوى المحلي الدنيا).*?(\d+(?:\.\d+)?)\s*%?', html_content, re.DOTALL)
             if percentage_match:
                 parsed_data['local_content_percentage'] = float(percentage_match.group(1))
             
-            # Extract mechanism
-            mechanism_match = re.search(r'آلية احتساب.*?<span>\s*([^<]+?)\s*</span>', html_content, re.DOTALL)
-            if mechanism_match:
-                mechanism_text = html_module.unescape(re.sub(r'<[^>]+>', '', mechanism_match.group(1)).strip())
-                if mechanism_text and 'لا يوجد' not in mechanism_text:
-                    parsed_data['local_content_mechanism'] = mechanism_text
+            # Extract mechanism - from span or ol/li
+            mechanism_text = _extract_value(r'آلي(?:ة|ات)\s*(?:احتساب\s*)?المحتوى المحلي', html_content)
+            if mechanism_text and 'لا يوجد' not in mechanism_text:
+                parsed_data['local_content_mechanism'] = mechanism_text
             
             # Extract target percentage
-            target_match = re.search(r'المستهدفة للتقييم.*?<span>\s*(\d+(?:\.\d+)?)', html_content, re.DOTALL)
+            target_match = re.search(r'المستهدف(?:ة|ه).*?(\d+(?:\.\d+)?)', html_content, re.DOTALL)
             if target_match:
                 parsed_data['local_content_target_percentage'] = float(target_match.group(1))
             
             # Extract weight
-            weight_match = re.search(r'وزن المحتوى المحلي.*?<span>\s*(\d+(?:\.\d+)?)', html_content, re.DOTALL)
+            weight_match = re.search(r'وزن المحتوى المحلي.*?(\d+(?:\.\d+)?)', html_content, re.DOTALL)
             if weight_match:
                 parsed_data['local_content_baseline_weight'] = float(weight_match.group(1))
             
-            # Extract SME participation
-            sme_match = re.search(r'المنشآت الصغيرة.*?<span>\s*([^<]+?)\s*</span>', html_content, re.DOTALL)
-            if sme_match:
-                sme_text = html_module.unescape(re.sub(r'<[^>]+>', '', sme_match.group(1)).strip()).lower()
-                parsed_data['sme_participation_allowed'] = 'نعم' in sme_text or 'yes' in sme_text
+            # Extract SME participation / preference from li or span
+            # Check for "تفضيل المنشآت الصغيرة" in <li> items
+            sme_li_match = re.findall(r'<li>\s*([^<]*تفضيل المنشآت الصغيرة[^<]*)\s*</li>', html_content)
+            if sme_li_match:
+                parsed_data['sme_participation_allowed'] = True
+                sme_text = html_module.unescape(sme_li_match[0].strip())
+                if not parsed_data.get('local_content_notes'):
+                    parsed_data['local_content_notes'] = sme_text
+                sme_pct = re.search(r'(\d+(?:\.\d+)?)', sme_text)
+                if sme_pct:
+                    parsed_data['sme_price_preference'] = float(sme_pct.group(1))
+            else:
+                # Standard span-based SME
+                sme_match = re.search(r'المنشآت الصغيرة.*?<span>\s*([^<]+?)\s*</span>', html_content, re.DOTALL)
+                if sme_match:
+                    sme_text = html_module.unescape(re.sub(r'<[^>]+>', '', sme_match.group(1)).strip()).lower()
+                    parsed_data['sme_participation_allowed'] = 'نعم' in sme_text or 'yes' in sme_text or 'مسموح' in sme_text
             
             # Extract SME price preference
-            preference_match = re.search(r'الأفضلية السعرية.*?<span>\s*(\d+(?:\.\d+)?)', html_content, re.DOTALL)
+            preference_match = re.search(r'الأفضلية السعرية.*?(\d+(?:\.\d+)?)', html_content, re.DOTALL)
             if preference_match:
                 parsed_data['sme_price_preference'] = float(preference_match.group(1))
             

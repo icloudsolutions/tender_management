@@ -67,7 +67,7 @@ def action_toggle_participating(self):
 ```
 
 **New buttons in header:**
-- "✅ Mark as Participating" (when not participating)
+- "[OK] Mark as Participating" (when not participating)
 - "⬜ Unmark Participating" (when participating)
 
 #### 3. Updated Views
@@ -80,7 +80,7 @@ def action_toggle_participating(self):
 
 **Search Filters:**
 - Removed: "New", "In Progress", "Qualification", "Won", "Lost", "Cancelled"
-- Added: "👥 Participating", "✅ Approved (Etimad)", "🏆 With Award Results"
+- Added: "Participating", "[OK] Approved (Etimad)", "With Award Results"
 
 **Group By:**
 - Removed: "Status" (based on state)
@@ -176,7 +176,7 @@ The `ics_tender_management` module **is not affected** by this change:
 vals = {
     'tender_title': self.name,
     # ... other fields ...
-    'state': 'draft',  # ✅ This is the ICS Tender state, not Etimad state
+    'state': 'draft',  # [OK] This is the ICS Tender state, not Etimad state
 }
 ```
 

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
         <!-- BoQ Template Download Action -->
         <record id="action_download_boq_template" model="ir.actions.act_url">
             <field name="name">Download BoQ Template</field>
@@ -87,4 +88,5 @@
                 </form>
             </field>
         </record>
+
 </odoo>

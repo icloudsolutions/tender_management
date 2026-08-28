@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo noupdate="1">
+
         <menuitem id="menu_tender_root"
             name="Tender Management"
             sequence="60"
@@ -85,4 +86,17 @@
             parent="menu_tender_config"
             action="action_tender_approval_rule"
             sequence="20"/>
+
+        <menuitem id="menu_tender_decline_reason"
+            name="Decline Reasons"
+            parent="menu_tender_config"
+            action="action_tender_decline_reason"
+            sequence="30"/>
+
+        <menuitem id="menu_tender_category_template_mapping"
+            name="Category → Project Template"
+            parent="menu_tender_config"
+            action="action_tender_category_template_mapping"
+            sequence="40"/>
+
 </odoo>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
         <record id="view_create_project_wizard_form" model="ir.ui.view">
             <field name="name">ics.tender.project.wizard.form</field>
             <field name="model">ics.tender.project.wizard</field>
@@ -8,7 +9,7 @@
                     <sheet>
                         <!-- Warning for existing projects -->
                         <div class="alert alert-warning" role="alert" invisible="not has_existing_projects">
-                            <strong>⚠️ Warning: Project Already Exists!</strong>
+                            <strong><i class="fa fa-exclamation-triangle"/> Warning: Project Already Exists!</strong>
                             <p class="mb-0">
                                 This tender already has an active project. 
                                 Creating a duplicate may cause confusion and data fragmentation.
@@ -69,4 +70,5 @@
                 </form>
             </field>
         </record>
+
 </odoo>

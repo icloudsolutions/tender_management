@@ -43,15 +43,24 @@ class MarkLostWizard(models.TransientModel):
         # Update tender
         self.tender_id.write(vals)
         
-        # Show success message
+        # Build success message with appeal workflow hint
+        if self.immediate_appeal:
+            message = _(
+                'Tender marked as lost. Go to the Final Outcome tab (7) to submit your appeal, upload the letter, and track the response. If the appeal is accepted, use "Re-open Tender" to put it back under evaluation.'
+            )
+        else:
+            message = _(
+                'Tender marked as lost. You have the right to appeal: go to the Final Outcome tab (7), check Appeal Submitted, and track the response. If accepted, you can re-open the tender for re-evaluation.'
+            )
+        
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
                 'title': _('Tender Marked as Lost'),
-                'message': _('The tender has been marked as lost. An activity has been created to consider the appeal option.'),
+                'message': message,
                 'type': 'warning',
-                'sticky': False,
+                'sticky': True,
                 'next': {
                     'type': 'ir.actions.act_window_close',
                 },

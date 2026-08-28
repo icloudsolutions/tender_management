@@ -10,16 +10,16 @@ The user provided a screenshot showing the **"العناوين والمواعي�
 
 | # | Etimad Field (Arabic) | Etimad Field (English) | Value in Tender 2026/20 | Model Field | Status |
 |---|---------------------|----------------------|----------------------|-------------|---------|
-| 1 | آخر موعد لإستلام الإستفسارات | Last date to receive inquiries | 06/02/2026 (18/08/1447) | `last_enquiry_date` | ✅ Captured |
-| 2 | آخر موعد لتقديم العروض | Last date to submit offers | 19/02/2026 09:59 AM (02/09/1447) | `offers_deadline` | ✅ Captured |
-| 3 | تاريخ فتح العروض | Offer opening date | 19/02/2026 10:00 AM (02/09/1447) | `offer_opening_date` | ✅ Captured |
-| 4 | تاريخ فحص العروض | Offer examination date | لا يوجد (Not available) | `offer_examination_date` | ✅ Captured |
-| 5 | **فترة التوقيف** | **Suspension period** | **5** | ⚠️ **MISSING** | ⚠️ **Not captured** |
-| 6 | التاريخ المتوقع للترسية | Expected award date | 25/02/2026 (08/09/1447) | `expected_award_date` | ✅ Captured |
-| 7 | تاريخ بدء الأعمال / الخدمات | Work/services start date | 04/03/2026 (15/09/1447) | `work_start_date` | ✅ Captured |
-| 8 | بداية إرسال الأسئلة و الإستفسارات | Start of sending questions | 03/02/2026 (15/08/1447) | `inquiry_start_date` | ✅ Captured |
-| 9 | اقصى مدة للاجابة على الإستفسارات | Max duration to answer inquiries | 10 (days) | `max_inquiry_response_days` | ✅ Captured |
-| 10 | مكان فتح العروض | Place of opening offers | بلدية محافظة المزاحمية | `opening_location` | ✅ Captured |
+| 1 | آخر موعد لإستلام الإستفسارات | Last date to receive inquiries | 06/02/2026 (18/08/1447) | `last_enquiry_date` | [OK] Captured |
+| 2 | آخر موعد لتقديم العروض | Last date to submit offers | 19/02/2026 09:59 AM (02/09/1447) | `offers_deadline` | [OK] Captured |
+| 3 | تاريخ فتح العروض | Offer opening date | 19/02/2026 10:00 AM (02/09/1447) | `offer_opening_date` | [OK] Captured |
+| 4 | تاريخ فحص العروض | Offer examination date | لا يوجد (Not available) | `offer_examination_date` | [OK] Captured |
+| 5 | **فترة التوقيف** | **Suspension period** | **5** | [!] **MISSING** | [!] **Not captured** |
+| 6 | التاريخ المتوقع للترسية | Expected award date | 25/02/2026 (08/09/1447) | `expected_award_date` | [OK] Captured |
+| 7 | تاريخ بدء الأعمال / الخدمات | Work/services start date | 04/03/2026 (15/09/1447) | `work_start_date` | [OK] Captured |
+| 8 | بداية إرسال الأسئلة و الإستفسارات | Start of sending questions | 03/02/2026 (15/08/1447) | `inquiry_start_date` | [OK] Captured |
+| 9 | اقصى مدة للاجابة على الإستفسارات | Max duration to answer inquiries | 10 (days) | `max_inquiry_response_days` | [OK] Captured |
+| 10 | مكان فتح العروض | Place of opening offers | بلدية محافظة المزاحمية | `opening_location` | [OK] Captured |
 
 ---
 
@@ -88,7 +88,7 @@ Add to "Dates & Deadlines" tab:
 
 ## Complete Date Fields Inventory
 
-### ✅ Currently Captured (9 date fields)
+### [OK] Currently Captured (9 date fields)
 
 1. `last_enquiry_date` (Datetime) - Last date for questions
 2. `offers_deadline` (Datetime) - Submission deadline (with time)
@@ -100,7 +100,7 @@ Add to "Dates & Deadlines" tab:
 8. `max_inquiry_response_days` (Integer) - Days to answer questions
 9. `opening_location` (Char) - Physical location for opening
 
-### ⚠️ Missing (1 field)
+### [!] Missing (1 field)
 
 1. `suspension_period_days` (Integer) - **Suspension/standstill period**
 
@@ -124,7 +124,7 @@ Add to "Dates & Deadlines" tab:
 لا يوجد ← offer_examination_date
     ↓ (No specific exam date)
     
-[5 days suspension period] ⚠️ Missing field
+[5 days suspension period] [!] Missing field
     ↓
     
 25/02/2026 ← expected_award_date
@@ -151,7 +151,7 @@ Add to "Dates & Deadlines" tab:
 
 ## Business Impact
 
-### High Priority ⚠️
+### High Priority [!]
 
 The suspension period is **critical for timeline planning**:
 
@@ -183,10 +183,10 @@ The suspension period is **critical for timeline planning**:
 ### Priority: Medium
 
 While not blocking for basic functionality, this field:
-- ✅ Is displayed prominently in Etimad UI
-- ✅ Affects timeline understanding
-- ✅ Required for compliance awareness
-- ✅ Easy to implement (same pattern as other fields)
+- [OK] Is displayed prominently in Etimad UI
+- [OK] Affects timeline understanding
+- [OK] Required for compliance awareness
+- [OK] Easy to implement (same pattern as other fields)
 
 **Recommendation:** Add in next update
 
@@ -214,7 +214,7 @@ While not blocking for basic functionality, this field:
 After implementation:
 
 - [ ] Open tender 2026/20
-- [ ] Click "🔄 Fetch Details"
+- [ ] Click "Fetch Details"
 - [ ] Go to "Dates & Deadlines" tab
 - [ ] Verify shows: **Suspension Period: 5 days**
 - [ ] Verify timeline makes sense:
@@ -226,8 +226,8 @@ After implementation:
 
 ## Summary
 
-**Current Status:** 9 out of 10 date fields captured ✅  
-**Missing:** 1 field (Suspension Period) ⚠️  
+**Current Status:** 9 out of 10 date fields captured [OK]  
+**Missing:** 1 field (Suspension Period) [!]  
 **Impact:** Medium (affects timeline understanding)  
 **Implementation:** Easy (same pattern as existing fields)  
 

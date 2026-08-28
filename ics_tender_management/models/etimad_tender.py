@@ -1,7 +1,7 @@
-# Extension of ics.etimad.tender: add ICS Tender link and "Create ICS Tender" action.
-# This lives in ics_tender_management to break the circular dependency:
-# ics_etimad_tenders_crm no longer depends on ics_tender_management.
+# Extension of ics.etimad.tender: add Tender link and "Create Tender" action.
+# This lives in ics_tender_management to avoid circular dependency.
 
+from markupsafe import Markup
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
@@ -11,14 +11,15 @@ class EtimadTender(models.Model):
 
     tender_id_ics = fields.Many2one(
         'ics.tender',
-        string='ICS Tender',
+        string='Tender',
         readonly=True,
-        help='Direct link to ICS Tender (bypasses CRM)',
+        help='Linked Tender record',
         ondelete='set null',
     )
 
     def action_create_tender_direct(self):
-        """Create ICS Tender directly from Etimad (skip CRM)"""
+        """Create Tender from Etimad data.
+        Fetches detailed info from Etimad first to ensure all data is available."""
         self.ensure_one()
         if self.tender_id_ics:
             return {
@@ -29,12 +30,24 @@ class EtimadTender(models.Model):
                 'view_mode': 'form',
                 'target': 'current',
             }
+
+        # Fetch detailed info from Etimad before creating tender
+        if self.tender_id_string:
+            try:
+                self._fetch_detailed_info_silent()
+            except Exception as e:
+                raise UserError(
+                    _('Failed to fetch tender details from Etimad. '
+                      'Please try again or fetch details manually first.\n\nError: %s') % str(e)
+                )
+
         tender_vals = self._prepare_tender_vals_from_etimad()
         tender = self.env['ics.tender'].create(tender_vals)
         self.tender_id_ics = tender.id
         self.message_post(
-            body=_('ICS Tender created directly: <a href="/web#id=%s&model=ics.tender">%s</a>') % (tender.id, tender.name),
+            body=Markup(_('Tender created: <a href="/web#id=%s&model=ics.tender">%s</a>')) % (tender.id, tender.name),
             subject=_('Tender Created'),
+            body_is_html=True,
         )
         return {
             'type': 'ir.actions.act_window',
@@ -48,13 +61,13 @@ class EtimadTender(models.Model):
     def _prepare_tender_vals_from_etimad(self):
         """Prepare complete tender values from Etimad data"""
         self.ensure_one()
-        category = self._map_tender_category(self.activity_name or self.tender_type)
+        category = self._map_tender_category(self.activity_name or self.etimad_tender_type)
         partner = self._find_or_create_partner(self.agency_name)
         vals = {
             'tender_title': self.name,
             'tender_number': self.reference_number or self.tender_number or self.tender_id_string,
             'tender_category': category,
-            'tender_type': 'single_vendor',
+            'tender_type': 'product_wise',
             'description': self.description or '',
             'etimad_tender_id': self.id,
             'etimad_link': self.tender_url,
@@ -72,10 +85,9 @@ class EtimadTender(models.Model):
             'submission_deadline': self.offers_deadline or self.submission_date,
             'opening_date': self.submission_date,
             'last_inquiry_date': self.last_enquiry_date.date() if self.last_enquiry_date else False,
-            'expected_revenue': self.total_fees or 0.0,
-            'tender_booklet_price': self.invitation_cost or 0.0,
-            'etimad_financial_fees': self.financial_fees or 0.0,
-            'estimated_project_value': self.total_fees or 0.0,
+            'expected_revenue': self.estimated_amount or 0.0,
+            'tender_booklet_price': self.document_cost_amount or 0.0,
+            'estimated_project_value': self.estimated_amount or 0.0,
             'external_source': self.external_source or 'Etimad Portal',
             'etimad_tender_status_id': self.tender_status_id,
             'etimad_last_enquiry_date_hijri': self.last_enquiry_date_hijri,

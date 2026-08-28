@@ -3,3 +3,8 @@ node_modules/
 # Deploy SSH key (generated for GitHub Actions; never commit)
 deploy_key
 deploy_key.pub
+
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
