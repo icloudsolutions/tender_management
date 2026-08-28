@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<odoo>
-    <data noupdate="1">
+<odoo noupdate="1">
 
         <!-- ========== SUPPLY PROJECT TEMPLATE ========== -->
         <record id="task_template_supply" model="ics.project.task.template">
@@ -378,5 +377,4 @@
             <field name="delay_days">90</field>
         </record>
 
-    </data>
 </odoo>

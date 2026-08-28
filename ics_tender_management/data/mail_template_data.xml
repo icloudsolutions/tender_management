@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<odoo>
-    <data noupdate="1">
+<odoo noupdate="1">
 
         <!-- Tender Created Notification -->
         <record id="email_template_tender_created" model="mail.template">
@@ -175,5 +174,4 @@
             </field>
         </record>
 
-    </data>
 </odoo>

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<odoo>
-    <data noupdate="1">
+<odoo noupdate="1">
 
         <record id="view_tender_category_template_mapping_list" model="ir.ui.view">
             <field name="name">ics.tender.category.template.mapping.list</field>
@@ -92,5 +91,4 @@
             </field>
         </record>
 
-    </data>
 </odoo>

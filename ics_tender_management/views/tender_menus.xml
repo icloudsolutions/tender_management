@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<odoo>
-    <data noupdate="1">
+<odoo noupdate="1">
 
         <menuitem id="menu_tender_root"
             name="Tender Management"
@@ -100,5 +99,4 @@
             action="action_tender_category_template_mapping"
             sequence="40"/>
 
-    </data>
 </odoo>
