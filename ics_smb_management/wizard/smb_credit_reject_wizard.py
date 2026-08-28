@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import fields, models, _
+from odoo import fields, models, _lt
 
 
 class SmbCreditRejectWizard(models.TransientModel):
     _name = 'smb.credit.reject.wizard'
     _description = 'SMB Credit Reject Reason'
 
-    _DEFAULT_REASON = _(
+    _DEFAULT_REASON = _lt(
         'Rejected by Credit Control. '
         'Please follow up with customer for payment clearance or credit limit increase.'
     )
