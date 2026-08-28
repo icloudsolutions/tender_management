@@ -50,7 +50,7 @@
                     <field name="activity_state"/>
                     <progressbar field="state" colors='{"won": "success", "lost": "danger", "submitted": "info"}'/>
                     <templates>
-                        <t t-name="kanban-box">
+                        <t t-name="card">
                             <div t-attf-class="#{!selection_mode ? 'oe_kanban_color_' + kanban_getcolor(record.color.raw_value) : ''} oe_kanban_card oe_kanban_global_click">
                                 <div class="oe_kanban_content">
                                     <div class="o_kanban_record_top">
@@ -77,16 +77,16 @@
                                     <div class="o_kanban_record_body">
                                         <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
                                         <div t-if="record.partner_id.value">
-                                            <i class="fa fa-building-o"/> <field name="partner_id"/>
+                                            <i class="fa fa-building-o" title="Partner"/> <field name="partner_id"/>
                                         </div>
                                         <div t-if="record.submission_deadline.value">
-                                            <i class="fa fa-calendar"/> <field name="submission_deadline" widget="date"/>
+                                            <i class="fa fa-calendar" title="Submission Deadline"/> <field name="submission_deadline" widget="date"/>
                                             <t t-if="record.is_urgent.raw_value">
                                                 <span class="badge badge-danger ms-2">Urgent!</span>
                                             </t>
                                         </div>
                                         <div t-if="record.total_quotation_amount.value">
-                                            <i class="fa fa-money"/> <field name="total_quotation_amount" widget="monetary"/>
+                                            <i class="fa fa-money" title="Total Quotation Amount"/> <field name="total_quotation_amount" widget="monetary"/>
                                         </div>
                                     </div>
                                     <div class="o_kanban_record_bottom">
