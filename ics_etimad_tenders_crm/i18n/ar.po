@@ -1,0 +1,2497 @@
+# Arabic Translation for ics_etimad_tenders_crm
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* ics_etimad_tenders_crm
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-28 13:55+0000\n"
+"PO-Revision-Date: 2026-08-28 17:00+0300\n"
+"Last-Translator: iCloud Solutions <contact@icloud-solutions.net>\n"
+"Language-Team: Arabic\n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+
+#. module: ics_etimad_tenders_crm
+#. odoo-python
+#: code:addons/ics_etimad_tenders_crm/models/etimad_tender.py:0
+msgid " (%d errors)"
+msgstr " (%d أخطاء)"
+
+#. module: ics_etimad_tenders_crm
+#. odoo-python
+#: code:addons/ics_etimad_tenders_crm/models/etimad_tender.py:0
+msgid " from %d pages"
+msgstr " من %d صفحات"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_kanban
+msgid "% Match"
+msgstr "% تطابق"
+
+#. module: ics_etimad_tenders_crm
+#. odoo-python
+#: code:addons/ics_etimad_tenders_crm/models/etimad_tender.py:0
+msgid "%d created, %d updated"
+msgstr "تم إنشاء %d، تحديث %d"
+
+#. module: ics_etimad_tenders_crm
+#. odoo-python
+#: code:addons/ics_etimad_tenders_crm/models/etimad_tender.py:0
+msgid "%d opportunities created, %d already existed"
+msgstr "تم إنشاء %d فرصة، %d موجودة مسبقاً"
+
+#. module: ics_etimad_tenders_crm
+#. odoo-python
+#: code:addons/ics_etimad_tenders_crm/models/etimad_tender.py:0
+msgid "%d tenders added to favorites"
+msgstr "تم إضافة %d منافسة إلى المفضلة"
+
+#. module: ics_etimad_tenders_crm
+#. odoo-python
+#: code:addons/ics_etimad_tenders_crm/models/etimad_tender.py:0
+msgid "%d tenders marked as in progress"
+msgstr "تم تحديد %d منافسة قيد التنفيذ"
+
+#. module: ics_etimad_tenders_crm
+#. odoo-python
+#: code:addons/ics_etimad_tenders_crm/models/etimad_tender.py:0
+msgid "%d tenders marked as lost"
+msgstr "تم تحديد %d منافسة كخسارة"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "1. Basic Information"
+msgstr "١. المعلومات الأساسية"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "2. Dates & Deadlines"
+msgstr "٢. التواريخ والمواعيد النهائية"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "3. Location & Classification"
+msgstr "٣. الموقع والتصنيف"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "4. Work Types"
+msgstr "٤. أنواع الأعمال"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "5. Award Results"
+msgstr "٥. نتائج الترسية"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "6. Local Content & SME"
+msgstr "٦. المحتوى المحلي والمنشآت الصغيرة والمتوسطة"
+
+#. module: ics_etimad_tenders_crm
+#. odoo-python
+#: code:addons/ics_etimad_tenders_crm/models/etimad_tender.py:0
+msgid "<i class=\"fa fa-check\"/> Marked as participating in this tender"
+msgstr "<i class=\"fa fa-check\"/> تم التحديد كمشارك في هذه المنافسة"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "<span class=\"o_stat_text\" style=\"color: #ffc107;\">Favorited</span>"
+msgstr "<span class=\"o_stat_text\" style=\"color: #ffc107;\">في المفضلة</span>"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid ""
+"<span class=\"o_stat_text\">Add to</span>\n"
+"                                <span class=\"o_stat_text\">Favorites</span>"
+msgstr ""
+"<span class=\"o_stat_text\">إضافة إلى</span>\n"
+"                                <span class=\"o_stat_text\">المفضلة</span>"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid ""
+"<span class=\"o_stat_text\">Create</span>\n"
+"                                <span class=\"o_stat_text\">Opportunity</span>"
+msgstr ""
+"<span class=\"o_stat_text\">إنشاء</span>\n"
+"                                <span class=\"o_stat_text\">فرصة</span>"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid ""
+"<span class=\"o_stat_text\">View on</span>\n"
+"                                <span class=\"o_stat_text\">Etimad</span>"
+msgstr ""
+"<span class=\"o_stat_text\">عرض على</span>\n"
+"                                <span class=\"o_stat_text\">منصة اعتماد</span>"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_matching_rule_form
+msgid "<strong>In List:</strong> Put comma-separated values in Value (text)."
+msgstr "<strong>في القائمة:</strong> ضع القيم مفصولة بفواصل في حقل القيمة (نص)."
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_matching_rule_form
+msgid "<strong>Numbers:</strong> Use Value (number) for Greater/Less than."
+msgstr "<strong>أرقام:</strong> استخدم القيمة (رقم) لشروط أكبر من / أصغر من."
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_matching_rule_form
+msgid ""
+"<strong>Text:</strong> Contains, Equals, Starts With, Regex, In List (comma-"
+"separated)."
+msgstr ""
+"<strong>نص:</strong> يحتوي على، يساوي، يبدأ بـ، تعبير نمطي، في القائمة (مفصولة بفواصل)."
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_matching_rule__action_type
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_matching_rule_form
+msgid "Action"
+msgstr "الإجراء"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__message_needaction
+msgid "Action Needed"
+msgstr "إجراء مطلوب"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_config_wizard_form
+msgid "Actions"
+msgstr "الإجراءات"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_activity__active
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_matching_rule__active
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_activity_search
+msgid "Active"
+msgstr "نشط"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__activity_ids
+msgid "Activities"
+msgstr "الأنشطة"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_list
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_search
+msgid "Activity"
+msgstr "النشاط"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__activity_details
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_matching_rule__field_name__activity_details
+msgid "Activity Details"
+msgstr "تفاصيل النشاط"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__activity_exception_decoration
+msgid "Activity Exception Decoration"
+msgstr "تمييز استثناء النشاط"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_activity__activity_id
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__activity_id
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_activity_search
+msgid "Activity ID"
+msgstr "رقم النشاط"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.constraint,message:ics_etimad_tenders_crm.constraint_ics_etimad_activity_activity_id_unique
+msgid "Activity ID must be unique!"
+msgstr "يجب أن يكون رقم النشاط فريداً!"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_matching_rule__field_name__activity_name
+msgid "Activity Name"
+msgstr "اسم النشاط"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_activity__name
+msgid "Activity Name (Arabic)"
+msgstr "اسم النشاط (بالعربية)"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_activity__name_en
+msgid "Activity Name (English)"
+msgstr "اسم النشاط (بالإنجليزية)"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__activity_state
+msgid "Activity State"
+msgstr "حالة النشاط"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__activity_type_icon
+msgid "Activity Type Icon"
+msgstr "أيقونة نوع النشاط"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,help:ics_etimad_tenders_crm.field_ics_etimad_activity__name
+msgid "Activity name as displayed in Etimad portal"
+msgstr "اسم النشاط كما يظهر في منصة اعتماد"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.actions.server,name:ics_etimad_tenders_crm.action_server_bulk_add_favorites
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Add to Favorites"
+msgstr "إضافة إلى المفضلة"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Additional notes about local content requirements..."
+msgstr "ملاحظات إضافية حول متطلبات المحتوى المحلي..."
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Address"
+msgstr "العنوان"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__agency_name
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_list
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_search
+msgid "Agency"
+msgstr "الجهة الحكومية"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_matching_rule__field_name__agency_name
+msgid "Agency Name"
+msgstr "اسم الجهة"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Agency branch"
+msgstr "فرع الجهة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_config_wizard__etimad_publish_date_filter__0
+#: model:ir.ui.menu,name:ics_etimad_tenders_crm.menu_etimad_tenders
+msgid "All Tenders"
+msgstr "جميع المنافسات"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_matching_rule__action_type__add_note
+msgid "Append to Internal Notes"
+msgstr "إضافة إلى الملاحظات الداخلية"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_matching_rule__action_type__add_reason
+msgid "Append to Match Reasons"
+msgstr "إضافة إلى أسباب التطابق"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_list
+msgid "Apply Matching Rules"
+msgstr "تطبيق قواعد المطابقة"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_search
+msgid "Approved"
+msgstr "معتمدة"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_config_wizard_form
+msgid "Archive"
+msgstr "أرشفة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_config_wizard__etimad_archive_days
+msgid "Archive After Days"
+msgstr "الأرشفة بعد (أيام)"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_config_wizard__etimad_archive_lost_only
+msgid "Archive Lost/Cancelled Only"
+msgstr "أرشفة المنافسات الخاسرة/الملغاة فقط"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_activity_search
+msgid "Archived"
+msgstr "مؤرشف"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_matching_rule__user_id
+msgid "Assign to"
+msgstr "تعيين إلى"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_matching_rule__action_type__assign_user
+msgid "Assign to User"
+msgstr "تعيين إلى مستخدم"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__assigned_user_id
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_list
+msgid "Assigned To"
+msgstr "مسؤول المنافسة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__message_attachment_count
+msgid "Attachment Count"
+msgstr "عدد المرفقات"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_config_wizard_form
+msgid "Auto Archive"
+msgstr "الأرشفة التلقائية"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_config_wizard__etimad_auto_archive
+msgid "Auto Archive Old Tenders"
+msgstr "أرشفة المنافسات القديمة تلقائياً"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_config_wizard__etimad_auto_assign_salesperson
+msgid "Auto Assign Salesperson"
+msgstr "تعيين مندوب المبيعات تلقائياً"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_config_wizard__etimad_auto_create_opportunity
+msgid "Auto Create Opportunities"
+msgstr "إنشاء الفرص تلقائياً"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_config_wizard__etimad_auto_fetch_details
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_config_wizard_form
+msgid "Auto Fetch Details"
+msgstr "جلب التفاصيل تلقائياً"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_config_wizard_form
+msgid "Auto Opportunity"
+msgstr "الفرصة التلقائية"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_config_wizard_form
+msgid "Auto Synchronization"
+msgstr "المزامنة التلقائية"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Auto-filled from Etimad"
+msgstr "مُعبَّأ تلقائياً من منصة اعتماد"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Award & Work Dates"
+msgstr "تواريخ الترسية والعمل"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__award_announced
+msgid "Award Announced"
+msgstr "تم الإعلان عن الترسية"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__award_announcement_date
+msgid "Award Announcement Date"
+msgstr "تاريخ الإعلان عن الترسية"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Award Details"
+msgstr "تفاصيل الترسية"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Award Status"
+msgstr "حالة الترسية"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_list
+msgid "Awarded"
+msgstr "تمت الترسية"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__awarded_amount
+msgid "Awarded Amount"
+msgstr "قيمة الترسية"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__awarded_company_name
+msgid "Awarded Company Name"
+msgstr "اسم الشركة الفائزة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_tender__execution_location_type__both
+msgid "Both"
+msgstr "داخل وخارج المملكة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__branch_name
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Branch"
+msgstr "الفرع"
+
+#. module: ics_etimad_tenders_crm
+#. odoo-python
+#: code:addons/ics_etimad_tenders_crm/models/etimad_tender.py:0
+msgid "Bulk Operation Complete"
+msgstr "اكتملت العملية الجماعية"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "CRM Integration"
+msgstr "تكامل إدارة العملاء"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Calculation Mechanism"
+msgstr "آلية الحساب"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__change_notification_sent
+msgid "Change Notification Sent"
+msgstr "تم إرسال إشعار التغيير"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__classification_field
+msgid "Classification Field"
+msgstr "حقل التصنيف"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__classification_required
+msgid "Classification Required"
+msgstr "التصنيف مطلوب"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.actions.act_window,help:ics_etimad_tenders_crm.action_etimad_tenders
+msgid ""
+"Click the <b>Fetch Etimad Tenders</b> button in the action menu to sync "
+"tenders from the Etimad platform."
+msgstr ""
+"انقر على زر <b>جلب منافسات اعتماد</b> في قائمة الإجراءات لمزامنة المنافسات من منصة اعتماد."
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_activity__color
+msgid "Color Index"
+msgstr "مؤشر اللون"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,help:ics_etimad_tenders_crm.field_ics_etimad_activity__keywords
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_activity_form
+msgid "Comma-separated keywords for tender matching (Arabic and English)"
+msgstr "كلمات مفتاحية مفصولة بفواصل لمطابقة المنافسات (عربية وإنجليزية)"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model,name:ics_etimad_tenders_crm.model_res_company
+msgid "Companies"
+msgstr "الشركات"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,help:ics_etimad_tenders_crm.field_res_company__etimad_preferred_activities_ids
+msgid "Company's main business activities from Etimad classification."
+msgstr "الأنشطة التجارية الرئيسية للشركة وفق تصنيف منصة اعتماد."
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_matching_rule_form
+msgid "Condition"
+msgstr "الشرط"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.ui.menu,name:ics_etimad_tenders_crm.menu_etimad_config
+msgid "Configuration"
+msgstr "الإعدادات"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__construction_works
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Construction Works"
+msgstr "أعمال الإنشاء"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_matching_rule__operator__contains
+msgid "Contains"
+msgstr "يحتوي على"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Contract & Purpose"
+msgstr "العقد والغرض"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__contract_duration
+msgid "Contract Duration"
+msgstr "مدة العقد"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__contract_duration_days
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_matching_rule__field_name__contract_duration_days
+msgid "Contract Duration (Days)"
+msgstr "مدة العقد (بالأيام)"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Contractor Classification"
+msgstr "تصنيف المقاول"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Create CRM Opportunity"
+msgstr "إنشاء فرصة في إدارة العملاء"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.actions.server,name:ics_etimad_tenders_crm.action_server_bulk_create_opportunities
+msgid "Create Opportunities"
+msgstr "إنشاء فرص"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_kanban
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_list
+msgid "Create Opportunity"
+msgstr "إنشاء فرصة"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Create a CRM opportunity from this tender"
+msgstr "إنشاء فرصة في نظام إدارة العملاء من هذه المنافسة"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.actions.act_window,help:ics_etimad_tenders_crm.action_etimad_matching_rules
+msgid ""
+"Create rules to auto-assign users, mark favorites, or add notes when tenders"
+" match conditions."
+msgstr ""
+"أنشئ قواعد لتعيين المستخدمين تلقائياً أو تمييز المفضلة أو إضافة ملاحظات عند تطابق المنافسات مع الشروط."
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Created"
+msgstr "تاريخ الإنشاء"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_activity__create_uid
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_config_wizard__create_uid
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_matching_rule__create_uid
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__create_uid
+msgid "Created by"
+msgstr "أنشئ بواسطة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_activity__create_date
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_config_wizard__create_date
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_matching_rule__create_date
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__create_date
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__created_on
+msgid "Created on"
+msgstr "تاريخ الإنشاء"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__currency_id
+msgid "Currency"
+msgstr "العملة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.ui.menu,name:ics_etimad_tenders_crm.menu_etimad_dashboard
+msgid "Dashboard"
+msgstr "لوحة التحكم"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_list
+msgid "Data Status"
+msgstr "حالة البيانات"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_list
+msgid "Days Left"
+msgstr "الأيام المتبقية"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Days until deadline"
+msgstr "الأيام حتى الموعد النهائي"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_list
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_search
+msgid "Deadline"
+msgstr "الموعد النهائي"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__deadline_extended
+msgid "Deadline Extended"
+msgstr "تم تمديد الموعد النهائي"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Deadline Extensions"
+msgstr "تمديدات الموعد النهائي"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__description
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_matching_rule__field_name__description
+msgid "Description"
+msgstr "الوصف"
+
+#. module: ics_etimad_tenders_crm
+#. odoo-python
+#: code:addons/ics_etimad_tenders_crm/models/etimad_tender.py:0
+msgid "Detailed information fetched from {count} Etimad API endpoint(s)"
+msgstr "تم جلب المعلومات التفصيلية من {count} نقطة وصول في منصة اعتماد"
+
+#. module: ics_etimad_tenders_crm
+#. odoo-python
+#: code:addons/ics_etimad_tenders_crm/models/etimad_tender.py:0
+msgid "Details Updated"
+msgstr "تم تحديث التفاصيل"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_config_wizard_form
+msgid "Discard"
+msgstr "تجاهل"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_activity__display_name
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_config_wizard__display_name
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_matching_rule__display_name
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__display_name
+msgid "Display Name"
+msgstr "الاسم المعروض"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__document_cost_amount
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_matching_rule__field_name__document_cost_amount
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_list
+msgid "Document Cost"
+msgstr "قيمة وثائق المنافسة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_matching_rule__operator__not_contains
+msgid "Does Not Contain"
+msgstr "لا يحتوي على"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_search
+msgid "Due Next 2 Weeks"
+msgstr "خلال أسبوعين"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_search
+msgid "Due This Month"
+msgstr "هذا الشهر"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_search
+msgid "Due This Week"
+msgstr "هذا الأسبوع"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_search
+msgid "Due Today"
+msgstr "اليوم"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__dynamic_match_reasons
+msgid "Dynamic Match Reasons"
+msgstr "أسباب المطابقة الديناميكية"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.actions.act_window,name:ics_etimad_tenders_crm.action_etimad_matching_rules
+#: model:ir.ui.menu,name:ics_etimad_tenders_crm.menu_etimad_matching_rules
+msgid "Dynamic Matching Rules"
+msgstr "قواعد المطابقة الذكية"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_tender__submission_method__electronic
+msgid "Electronic"
+msgstr "إلكترونياً"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_config_wizard__etimad_auto_sync
+msgid "Enable Auto Sync"
+msgstr "تفعيل المزامنة التلقائية"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_config_wizard__etimad_enable_matching
+msgid "Enable Smart Matching"
+msgstr "تفعيل المطابقة الذكية"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_matching_rule__operator__endswith
+msgid "Ends With"
+msgstr "ينتهي بـ"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,help:ics_etimad_tenders_crm.field_ics_etimad_activity__name_en
+msgid "English translation of the activity name"
+msgstr "الترجمة الإنجليزية لاسم النشاط"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Enquiries (Hijri)"
+msgstr "الاستفسارات (هجري)"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__last_enquiry_date
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Enquiries Deadline"
+msgstr "آخر موعد للاستفسارات"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Enter tender name..."
+msgstr "أدخل اسم المنافسة..."
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_matching_rule__operator__equals
+msgid "Equals"
+msgstr "يساوي"
+
+#. module: ics_etimad_tenders_crm
+#. odoo-python
+#: code:addons/ics_etimad_tenders_crm/models/etimad_tender.py:0
+msgid "Error fetching detailed information: {}"
+msgstr "خطأ في جلب المعلومات التفصيلية: {}"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_list
+msgid "Est. Value"
+msgstr "القيمة التقديرية"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__estimated_amount
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_matching_rule__field_name__estimated_amount
+msgid "Estimated Amount"
+msgstr "المبلغ التقديري"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Estimated Value"
+msgstr "القيمة التقديرية"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.actions.act_window,name:ics_etimad_tenders_crm.action_etimad_activity
+#: model:ir.ui.menu,name:ics_etimad_tenders_crm.menu_etimad_activity
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_activity_list
+msgid "Etimad Activities"
+msgstr "أنشطة اعتماد"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_activity_form
+msgid "Etimad Activity"
+msgstr "نشاط اعتماد"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_list
+msgid "Etimad Status"
+msgstr "الحالة في اعتماد"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model,name:ics_etimad_tenders_crm.model_ics_etimad_tender
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Etimad Tender"
+msgstr "منافسة اعتماد"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model,name:ics_etimad_tenders_crm.model_ics_etimad_activity
+msgid "Etimad Tender Activities"
+msgstr "أنشطة منافسات اعتماد"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model,name:ics_etimad_tenders_crm.model_ics_etimad_matching_rule
+msgid "Etimad Tender Smart Matching Rule"
+msgstr "قاعدة المطابقة الذكية لمنافسات اعتماد"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__etimad_tender_type
+msgid "Etimad Tender Type"
+msgstr "نوع المنافسة في اعتماد"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.actions.act_window,name:ics_etimad_tenders_crm.action_etimad_tenders
+#: model:ir.ui.menu,name:ics_etimad_tenders_crm.menu_etimad_root
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_list
+msgid "Etimad Tenders"
+msgstr "منافسات اعتماد"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model,name:ics_etimad_tenders_crm.model_ics_etimad_config_wizard
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_config_wizard_form
+msgid "Etimad Tenders Configuration"
+msgstr "إعدادات منافسات اعتماد"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.actions.act_window,name:ics_etimad_tenders_crm.action_etimad_config_wizard
+msgid "Etimad Tenders Settings"
+msgstr "إعدادات منافسات اعتماد"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_search
+msgid "Etimad Type"
+msgstr "النوع في اعتماد"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__tender_url
+msgid "Etimad URL"
+msgstr "رابط المنافسة في اعتماد"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Etimad Updates"
+msgstr "تحديثات اعتماد"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,help:ics_etimad_tenders_crm.field_ics_etimad_activity__activity_id
+msgid "Etimad activity ID from the portal"
+msgstr "رقم النشاط في منصة اعتماد"
+
+#. module: ics_etimad_tenders_crm
+#. odoo-python
+#: code:addons/ics_etimad_tenders_crm/models/etimad_tender.py:0
+msgid "Etimad portal is blocking requests. Please try again later."
+msgstr "منصة اعتماد تحجب الطلبات. يرجى المحاولة لاحقاً."
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__execution_cities
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_matching_rule__field_name__execution_cities
+msgid "Execution Cities"
+msgstr "مدن التنفيذ"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Execution Location"
+msgstr "موقع التنفيذ"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__execution_location_type
+msgid "Execution Location Type"
+msgstr "نوع موقع التنفيذ"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__execution_regions
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_matching_rule__field_name__execution_regions
+msgid "Execution Regions"
+msgstr "مناطق التنفيذ"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__expected_award_date
+msgid "Expected Award Date"
+msgstr "تاريخ الترسية المتوقع"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_list
+msgid "Extended"
+msgstr "ممدد"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__deadline_extensions_count
+msgid "Extension Count"
+msgstr "عدد التمديدات"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Extensions"
+msgstr "التمديدات"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__external_source
+msgid "External Source"
+msgstr "المصدر الخارجي"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_tender__scraping_status__failed
+msgid "Failed"
+msgstr "فشل"
+
+#. module: ics_etimad_tenders_crm
+#. odoo-python
+#: code:addons/ics_etimad_tenders_crm/models/etimad_tender.py:0
+msgid "Failed to fetch any tenders. The site may have anti-bot protection."
+msgstr "فشل في جلب أي منافسات. قد تكون المنصة تستخدم حماية ضد الروبوتات."
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__is_favorite
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Favorite"
+msgstr "مفضلة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.actions.act_window,name:ics_etimad_tenders_crm.action_etimad_tenders_favorites
+msgid "Favorite Tenders"
+msgstr "المنافسات المفضلة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.ui.menu,name:ics_etimad_tenders_crm.menu_etimad_favorites
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_search
+msgid "Favorites"
+msgstr "المفضلة"
+
+#. module: ics_etimad_tenders_crm
+#. odoo-python
+#: code:addons/ics_etimad_tenders_crm/models/etimad_tender.py:0
+msgid "Favorites Updated"
+msgstr "تم تحديث المفضلة"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_list
+msgid "Fetch 150 tenders (3 pages) from Etimad portal"
+msgstr "جلب 150 منافسة (3 صفحات) من منصة اعتماد"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_kanban
+msgid "Fetch Batch"
+msgstr "جلب دفعة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.actions.server,name:ics_etimad_tenders_crm.action_server_fetch_batch_etimad_tenders
+msgid "Fetch Batch (150 Tenders)"
+msgstr "جلب دفعة (150 منافسة)"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.actions.server,name:ics_etimad_tenders_crm.action_fetch_batch_etimad_tenders_menu
+msgid "Fetch Batch (250 Tenders)"
+msgstr "جلب دفعة (250 منافسة)"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.ui.menu,name:ics_etimad_tenders_crm.menu_fetch_batch_tenders
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_list
+msgid "Fetch Batch (250)"
+msgstr "جلب دفعة (250)"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_list
+msgid "Fetch Details"
+msgstr "جلب التفاصيل"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.actions.server,name:ics_etimad_tenders_crm.action_server_fetch_etimad_tenders
+msgid "Fetch Etimad Tenders"
+msgstr "جلب منافسات اعتماد"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.actions.server,name:ics_etimad_tenders_crm.ir_cron_fetch_etimad_tenders_daily_ir_actions_server
+msgid "Fetch Etimad Tenders - Daily Sync"
+msgstr "جلب منافسات اعتماد - المزامنة اليومية"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_kanban
+msgid "Fetch Latest"
+msgstr "جلب الأحدث"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.actions.server,name:ics_etimad_tenders_crm.action_fetch_etimad_tenders_menu
+#: model:ir.ui.menu,name:ics_etimad_tenders_crm.menu_fetch_latest_tenders
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_list
+msgid "Fetch Latest Tenders"
+msgstr "جلب أحدث المنافسات"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_list
+msgid "Fetch detailed information from Etimad"
+msgstr "جلب المعلومات التفصيلية من اعتماد"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Fetch detailed information from Etimad API"
+msgstr "جلب المعلومات التفصيلية من واجهة برمجة اعتماد"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_config_wizard__etimad_fetch_details_threshold
+msgid "Fetch if Match Score ≥ (%)"
+msgstr "الجلب التلقائي عند نسبة تطابق ≥ (%)"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_list
+msgid "Fetch latest tenders from Etimad portal (up to 150)"
+msgstr "جلب أحدث المنافسات من منصة اعتماد (حتى 150 منافسة)"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_matching_rule__field_name
+msgid "Field"
+msgstr "الحقل"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,help:ics_etimad_tenders_crm.field_ics_etimad_config_wizard__etimad_publish_date_filter
+msgid ""
+"Filter tenders by publish date on Etimad portal. 'All Tenders' fetches "
+"everything available."
+msgstr ""
+"فلترة المنافسات حسب تاريخ النشر في منصة اعتماد. 'جميع المنافسات' يجلب كل المتاح."
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Final %"
+msgstr "نسبة الضمان النهائي %"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Final Guarantee"
+msgstr "ضمان حسن الأداء"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__final_guarantee_percentage
+msgid "Final Guarantee Pct"
+msgstr "نسبة ضمان حسن الأداء"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__final_guarantee_required
+msgid "Final Guarantee Required"
+msgstr "ضمان حسن الأداء مطلوب"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Financial Information"
+msgstr "المعلومات المالية"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__message_follower_ids
+msgid "Followers"
+msgstr "المتابعون"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "المتابعون (الشركاء)"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,help:ics_etimad_tenders_crm.field_ics_etimad_tender__activity_type_icon
+msgid "Font awesome icon e.g. fa-tasks"
+msgstr "أيقونة Font Awesome مثل fa-tasks"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Government agency"
+msgstr "جهة حكومية"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_matching_rule__operator__gt
+msgid "Greater Than"
+msgstr "أكبر من"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_matching_rule__operator__gte
+msgid "Greater or Equal"
+msgstr "أكبر من أو يساوي"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_activity_search
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_search
+msgid "Group By"
+msgstr "تجميع حسب"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__has_etimad_updates
+msgid "Has Etimad Updates"
+msgstr "لديه تحديثات من اعتماد"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__has_message
+msgid "Has Message"
+msgstr "لديه رسائل"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_matching_rule_form
+msgid "Help"
+msgstr "مساعدة"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_search
+msgid "High Match Score (>70%)"
+msgstr "نسبة تطابق عالية (>70%)"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Hijri date"
+msgstr "التاريخ الهجري"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__is_hot_tender
+msgid "Hot Tender"
+msgstr "منافسة مميزة"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_search
+msgid "Hot Tenders"
+msgstr "المنافسات المميزة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_activity__id
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_config_wizard__id
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_matching_rule__id
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__id
+msgid "ID"
+msgstr "المعرف"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__activity_exception_icon
+msgid "Icon"
+msgstr "الأيقونة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,help:ics_etimad_tenders_crm.field_ics_etimad_tender__activity_exception_icon
+msgid "Icon to indicate an exception activity."
+msgstr "أيقونة تشير إلى نشاط استثنائي."
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,help:ics_etimad_tenders_crm.field_ics_etimad_tender__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "إذا كان محدداً، توجد رسائل جديدة تتطلب انتباهك."
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,help:ics_etimad_tenders_crm.field_ics_etimad_tender__message_has_error
+#: model:ir.model.fields,help:ics_etimad_tenders_crm.field_ics_etimad_tender__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr "إذا كان محدداً، بعض الرسائل لم تُرسَل بنجاح."
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Important Dates"
+msgstr "التواريخ المهمة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_matching_rule__operator__in_list
+msgid "In List (comma-separated)"
+msgstr "في القائمة (مفصولة بفواصل)"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__includes_supply_items
+msgid "Includes Supply Items"
+msgstr "يتضمن مواد توريد"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Initial Guarantee"
+msgstr "الضمان الابتدائي"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__initial_guarantee_address
+msgid "Initial Guarantee Address"
+msgstr "عنوان تسليم الضمان الابتدائي"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__initial_guarantee_required
+msgid "Initial Guarantee Required"
+msgstr "الضمان الابتدائي مطلوب"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__initial_guarantee_type
+msgid "Initial Guarantee Type"
+msgstr "نوع الضمان الابتدائي"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Inquiry Dates"
+msgstr "تواريخ الاستفسار"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__inquiry_start_date
+msgid "Inquiry Start Date"
+msgstr "تاريخ بدء الاستفسار"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_tender__execution_location_type__inside_kingdom
+msgid "Inside Kingdom"
+msgstr "داخل المملكة"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Insurance & Guarantees"
+msgstr "التأمين والضمانات"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__insurance_required
+msgid "Insurance Required"
+msgstr "التأمين مطلوب"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__notes
+msgid "Internal Notes"
+msgstr "الملاحظات الداخلية"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_matching_rule__operator__is_empty
+msgid "Is Empty"
+msgstr "فارغ"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__message_is_follower
+msgid "Is Follower"
+msgstr "متابع"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_matching_rule__operator__is_not_empty
+msgid "Is Not Empty"
+msgstr "ليس فارغاً"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_tender__estimated_value_category__large
+msgid "Large"
+msgstr "كبير"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_search
+msgid "Large Value (1M-10M)"
+msgstr "قيمة كبيرة (1م - 10م)"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_config_wizard__etimad_publish_date_filter__5
+msgid "Last 3 Months"
+msgstr "آخر 3 أشهر"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Last Change"
+msgstr "آخر تغيير"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__last_enquiry_date_hijri
+msgid "Last Enquiry Date (Hijri)"
+msgstr "آخر موعد استفسار (هجري)"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__last_deadline_extension_date
+msgid "Last Extension Date"
+msgstr "تاريخ آخر تمديد"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_config_wizard__etimad_publish_date_filter__4
+msgid "Last Month"
+msgstr "الشهر الماضي"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__last_offer_date_hijri
+msgid "Last Offer Date (Hijri)"
+msgstr "تاريخ آخر عرض (هجري)"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__last_scraped_at
+msgid "Last Scraped At"
+msgstr "آخر جلب للبيانات"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__last_scraping_error
+msgid "Last Scraping Error"
+msgstr "آخر خطأ في جلب البيانات"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__last_significant_change
+msgid "Last Significant Change"
+msgstr "آخر تغيير جوهري"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_activity__write_uid
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_config_wizard__write_uid
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_matching_rule__write_uid
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__write_uid
+msgid "Last Updated by"
+msgstr "آخر تحديث بواسطة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_activity__write_date
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_config_wizard__write_date
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_matching_rule__write_date
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__write_date
+msgid "Last Updated on"
+msgstr "تاريخ آخر تحديث"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_config_wizard__etimad_publish_date_filter__3
+msgid "Last Week"
+msgstr "الأسبوع الماضي"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_matching_rule__operator__lt
+msgid "Less Than"
+msgstr "أصغر من"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_matching_rule__operator__lte
+msgid "Less or Equal"
+msgstr "أصغر من أو يساوي"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Linked Opportunity"
+msgstr "الفرصة المرتبطة"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Local Content Details"
+msgstr "تفاصيل المحتوى المحلي"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__local_content_mechanism
+msgid "Local Content Mechanism"
+msgstr "آلية المحتوى المحلي"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__local_content_notes
+msgid "Local Content Notes"
+msgstr "ملاحظات المحتوى المحلي"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__local_content_percentage
+msgid "Local Content Pct"
+msgstr "نسبة المحتوى المحلي"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__local_content_required
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_search
+msgid "Local Content Required"
+msgstr "المحتوى المحلي مطلوب"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Local Content Requirements"
+msgstr "متطلبات المحتوى المحلي"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__local_content_baseline_weight
+msgid "Local Content Weight Pct"
+msgstr "وزن المحتوى المحلي %"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Maintenance & Operation"
+msgstr "الصيانة والتشغيل"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__maintenance_works
+msgid "Maintenance and Operation Works"
+msgstr "أعمال الصيانة والتشغيل"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_config_wizard_form
+msgid "Manage Dynamic Rules"
+msgstr "إدارة القواعد الديناميكية"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_tender__submission_method__manual
+msgid "Manual"
+msgstr "يدوياً"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_config_wizard_form
+msgid "Manual Actions"
+msgstr "الإجراءات اليدوية"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_config_wizard_form
+msgid "Manual Sync Now"
+msgstr "مزامنة يدوية الآن"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_matching_rule__action_type__set_favorite
+msgid "Mark as Favorite"
+msgstr "تحديد كمفضلة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.actions.server,name:ics_etimad_tenders_crm.action_server_bulk_mark_progress
+msgid "Mark as In Progress"
+msgstr "تحديد كقيد التنفيذ"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.actions.server,name:ics_etimad_tenders_crm.action_server_bulk_mark_lost
+msgid "Mark as Lost"
+msgstr "تحديد كخسارة"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Mark as Participating"
+msgstr "تحديد كمشارك"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Mark that your company is preparing a quotation for this tender"
+msgstr "حدد أن شركتك تعمل على تحضير عرض لهذه المنافسة"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_list
+msgid "Match %"
+msgstr "% التطابق"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_activity__keywords
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_activity_form
+msgid "Matching Keywords"
+msgstr "كلمات مفتاحية للمطابقة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__matching_reasons
+msgid "Matching Reasons"
+msgstr "أسباب التطابق"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_matching_rule_form
+msgid "Matching Rule"
+msgstr "قاعدة المطابقة"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_matching_rule_tree
+msgid "Matching Rules"
+msgstr "قواعد المطابقة"
+
+#. module: ics_etimad_tenders_crm
+#. odoo-python
+#: code:addons/ics_etimad_tenders_crm/models/etimad_tender.py:0
+msgid "Matching Rules Applied"
+msgstr "تم تطبيق قواعد المطابقة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__matching_score
+msgid "Matching Score"
+msgstr "نسبة التطابق"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_config_wizard_form
+msgid "Matching Settings"
+msgstr "إعدادات المطابقة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__max_inquiry_response_days
+msgid "Max Inquiry Response Days"
+msgstr "أقصى مدة للرد على الاستفسارات (أيام)"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_config_wizard__etimad_max_retries
+msgid "Max Retries"
+msgstr "أقصى عدد للمحاولات"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_tender__estimated_value_category__medium
+msgid "Medium"
+msgstr "متوسط"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_search
+msgid "Medium Match Score (40-70%)"
+msgstr "نسبة تطابق متوسطة (40-70%)"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_search
+msgid "Medium Value (100K-1M)"
+msgstr "قيمة متوسطة (100 ألف - 1 مليون)"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_tender__estimated_value_category__mega
+msgid "Mega"
+msgstr "ضخم"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_search
+msgid "Mega Value (>10M)"
+msgstr "قيمة ضخمة (أكثر من 10 ملايين)"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__message_has_error
+msgid "Message Delivery error"
+msgstr "خطأ في تسليم الرسالة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__message_ids
+msgid "Messages"
+msgstr "الرسائل"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_config_wizard__etimad_min_match_score
+msgid "Min Match Score (%)"
+msgstr "أدنى نسبة تطابق (%)"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_config_wizard__etimad_min_preparation_days
+msgid "Min Preparation Days"
+msgstr "أدنى أيام التحضير"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_config_wizard__etimad_min_tender_value
+msgid "Min Tender Value (SAR)"
+msgstr "أدنى قيمة للمنافسة (ريال سعودي)"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Minimum Required %"
+msgstr "الحد الأدنى المطلوب %"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_config_wizard_form
+msgid "Ministry of Health, Saudi Aramco"
+msgstr "وزارة الصحة، أرامكو السعودية"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__my_activity_date_deadline
+msgid "My Activity Deadline"
+msgstr "موعد نشاطي النهائي"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.actions.act_window,name:ics_etimad_tenders_crm.action_etimad_my_opportunities
+msgid "My Tender Opportunities"
+msgstr "فرصي من المنافسات"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__activity_calendar_event_id
+msgid "Next Activity Calendar Event"
+msgstr "حدث التقويم للنشاط القادم"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__activity_date_deadline
+msgid "Next Activity Deadline"
+msgstr "الموعد النهائي للنشاط القادم"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__activity_summary
+msgid "Next Activity Summary"
+msgstr "ملخص النشاط القادم"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__activity_type_id
+msgid "Next Activity Type"
+msgstr "نوع النشاط القادم"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.actions.act_window,help:ics_etimad_tenders_crm.action_etimad_activity
+msgid "No Etimad activities found"
+msgstr "لا توجد أنشطة اعتماد"
+
+#. module: ics_etimad_tenders_crm
+#. odoo-python
+#: code:addons/ics_etimad_tenders_crm/models/etimad_tender.py:0
+msgid "No Updates"
+msgstr "لا توجد تحديثات"
+
+#. module: ics_etimad_tenders_crm
+#. odoo-python
+#: code:addons/ics_etimad_tenders_crm/models/etimad_tender.py:0
+msgid "No new data found or all fields already up to date"
+msgstr "لا توجد بيانات جديدة أو جميع الحقول محدثة بالفعل"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.actions.act_window,help:ics_etimad_tenders_crm.action_etimad_tenders
+msgid "No tenders found. Let's fetch some from Etimad!"
+msgstr "لا توجد منافسات. لنجلب بعضها من منصة اعتماد!"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_matching_rule__operator__not_equals
+msgid "Not Equals"
+msgstr "لا يساوي"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_matching_rule_form
+msgid "Note text or reason text"
+msgstr "نص الملاحظة أو نص السبب"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_config_wizard__etimad_notification_user_ids
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_res_company__etimad_notification_user_ids
+msgid "Notification Recipients"
+msgstr "مستلمو الإشعارات"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_config_wizard_form
+msgid "Notification Triggers"
+msgstr "محفزات الإشعارات"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_config_wizard_form
+msgid "Notifications"
+msgstr "الإشعارات"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_config_wizard__etimad_notify_high_match
+msgid "Notify High Match (≥70%)"
+msgstr "إشعار عند تطابق عالٍ (≥70%)"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_config_wizard__etimad_notify_hot_tenders
+msgid "Notify Hot Tenders"
+msgstr "إشعار بالمنافسات المميزة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_config_wizard__etimad_notify_urgent_deadlines
+msgid "Notify Urgent Deadlines (≤3 days)"
+msgstr "إشعار بالمواعيد العاجلة (≤3 أيام)"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_config_wizard__etimad_notify_new_tenders
+msgid "Notify on New Tenders"
+msgstr "إشعار عند وجود منافسات جديدة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__message_needaction_counter
+msgid "Number of Actions"
+msgstr "عدد الإجراءات"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__message_has_error_counter
+msgid "Number of errors"
+msgstr "عدد الأخطاء"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,help:ics_etimad_tenders_crm.field_ics_etimad_tender__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "عدد الرسائل التي تتطلب إجراءً"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,help:ics_etimad_tenders_crm.field_ics_etimad_tender__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "عدد الرسائل التي لم تُرسَل"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Offer Dates"
+msgstr "تواريخ العروض"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__offer_examination_date
+msgid "Offer Examination Date"
+msgstr "تاريخ فحص العروض"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__offer_opening_date
+msgid "Offer Opening Date"
+msgstr "تاريخ فتح العروض"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Offers (Hijri)"
+msgstr "العروض (هجري)"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__offers_deadline
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Offers Deadline"
+msgstr "آخر موعد لتقديم العروض"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Open detailed tender information page"
+msgstr "فتح صفحة تفاصيل المنافسة"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Open detailed tender report"
+msgstr "فتح تقرير المنافسة التفصيلي"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Open on Etimad Portal"
+msgstr "فتح في منصة اعتماد"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__opening_location
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Opening Location"
+msgstr "مكان فتح العروض"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_matching_rule__operator
+msgid "Operator"
+msgstr "المشغّل"
+
+#. module: ics_etimad_tenders_crm
+#. odoo-python
+#: code:addons/ics_etimad_tenders_crm/models/etimad_matching_rule.py:0
+msgid ""
+"Operator \"%s\" can only be used with numeric fields (Estimated Amount, "
+"Remaining Days, etc.)."
+msgstr ""
+"المشغّل \"%s\" يُستخدم فقط مع الحقول الرقمية (المبلغ التقديري، الأيام المتبقية، إلخ)."
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__opportunity_count
+msgid "Opportunities"
+msgstr "الفرص"
+
+#. module: ics_etimad_tenders_crm
+#. odoo-python
+#: code:addons/ics_etimad_tenders_crm/models/etimad_tender.py:0
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__opportunity_id
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_list
+msgid "Opportunity"
+msgstr "الفرصة"
+
+#. module: ics_etimad_tenders_crm
+#. odoo-python
+#: code:addons/ics_etimad_tenders_crm/models/etimad_tender.py:0
+msgid "Opportunity Created"
+msgstr "تم إنشاء الفرصة"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_config_wizard_form
+msgid "Opportunity Creation"
+msgstr "إنشاء الفرص"
+
+#. module: ics_etimad_tenders_crm
+#. odoo-python
+#: code:addons/ics_etimad_tenders_crm/models/etimad_tender.py:0
+msgid "Opportunity created: <a href=\"/web#id=%s&model=crm.lead\">%s</a>"
+msgstr "تم إنشاء الفرصة: <a href=\"/web#id=%s&model=crm.lead\">%s</a>"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_tender__execution_location_type__outside_kingdom
+msgid "Outside Kingdom"
+msgstr "خارج المملكة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_config_wizard__etimad_fetch_pages
+msgid "Pages per Sync"
+msgstr "الصفحات لكل مزامنة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_tender__scraping_status__partial
+msgid "Partial"
+msgstr "جزئي"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__is_participating
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_list
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_search
+msgid "Participating"
+msgstr "مشارك"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_tender__scraping_status__pending
+msgid "Pending"
+msgstr "في الانتظار"
+
+#. module: ics_etimad_tenders_crm
+#. odoo-python
+#: code:addons/ics_etimad_tenders_crm/models/etimad_matching_rule.py:0
+msgid "Please set Value (text) for this condition."
+msgstr "يرجى تحديد القيمة (نص) لهذا الشرط."
+
+#. module: ics_etimad_tenders_crm
+#. odoo-python
+#: code:addons/ics_etimad_tenders_crm/models/etimad_matching_rule.py:0
+msgid "Please set Value (text) or Value (number) for this condition."
+msgstr "يرجى تحديد القيمة (نص) أو القيمة (رقم) لهذا الشرط."
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_config_wizard__etimad_preferred_activities_ids
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_res_company__etimad_preferred_activities_ids
+msgid "Preferred Activities"
+msgstr "الأنشطة المفضلة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_config_wizard__etimad_preferred_agencies
+msgid "Preferred Agencies"
+msgstr "الجهات الحكومية المفضلة"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Previous Deadline"
+msgstr "الموعد النهائي السابق"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__previous_last_enquiry_date
+msgid "Previous Enquiry Deadline"
+msgstr "آخر موعد استفسار السابق"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__previous_estimated_amount
+msgid "Previous Estimated Amount"
+msgstr "المبلغ التقديري السابق"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__previous_offers_deadline
+msgid "Previous Offers Deadline"
+msgstr "آخر موعد تقديم العروض السابق"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_config_wizard__etimad_preferred_categories
+msgid "Primary Business Categories"
+msgstr "فئات الأعمال الرئيسية"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_config_wizard__etimad_publish_date_filter
+msgid "Publish Date Filter"
+msgstr "فلتر تاريخ النشر"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Published"
+msgstr "تاريخ النشر"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__published_at
+msgid "Published At"
+msgstr "تاريخ النشر"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_search
+msgid "Published Date"
+msgstr "تاريخ النشر"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_search
+msgid "Published This Week"
+msgstr "المنشورة هذا الأسبوع"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_search
+msgid "Published Today"
+msgstr "المنشورة اليوم"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__rating_ids
+msgid "Ratings"
+msgstr "التقييمات"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_list
+msgid "Re-run dynamic matching rules on selected tenders"
+msgstr "إعادة تطبيق قواعد المطابقة الديناميكية على المنافسات المحددة"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Re-run dynamic matching rules on this tender"
+msgstr "إعادة تطبيق قواعد المطابقة الديناميكية على هذه المنافسة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,help:ics_etimad_tenders_crm.field_ics_etimad_tender__dynamic_match_reasons
+msgid ""
+"Reasons added by matching rules (in addition to computed match score "
+"reasons)."
+msgstr ""
+"أسباب أضافتها قواعد المطابقة (بالإضافة إلى أسباب نسبة التطابق المحسوبة)."
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_config_wizard_form
+msgid "Recalculate All Match Scores"
+msgstr "إعادة حساب جميع نسب التطابق"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_config_wizard_form
+msgid "Recipients"
+msgstr "المستلمون"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_list
+msgid "Reference"
+msgstr "المرجع"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__reference_number
+msgid "Reference Number"
+msgstr "الرقم المرجعي"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.constraint,message:ics_etimad_tenders_crm.constraint_ics_etimad_tender_reference_number_unique
+msgid ""
+"Reference number must be unique! A tender with this reference already "
+"exists."
+msgstr ""
+"يجب أن يكون الرقم المرجعي فريداً! توجد منافسة بهذا المرجع مسبقاً."
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Reference will be set automatically"
+msgstr "سيُعيَّن المرجع تلقائياً"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_matching_rule__operator__regex
+msgid "Regex Match"
+msgstr "تعبير نمطي"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__remaining_days
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_matching_rule__field_name__remaining_days
+msgid "Remaining Days"
+msgstr "الأيام المتبقية"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Remove from Favorites"
+msgstr "حذف من المفضلة"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Remove participation flag"
+msgstr "إلغاء تحديد المشاركة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__activity_user_id
+msgid "Responsible User"
+msgstr "المستخدم المسؤول"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_matching_rule_form
+msgid "Rule"
+msgstr "القاعدة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_matching_rule__name
+msgid "Rule Name"
+msgstr "اسم القاعدة"
+
+#. module: ics_etimad_tenders_crm
+#. odoo-python
+#: code:addons/ics_etimad_tenders_crm/models/etimad_tender.py:0
+msgid "Rules applied to %s tender(s)."
+msgstr "تم تطبيق القواعد على %s منافسة."
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.actions.act_window,help:ics_etimad_tenders_crm.action_etimad_matching_rules
+msgid ""
+"Rules run on tender create/update when Smart Matching is enabled in Settings.\n"
+"                Use <strong>Sequence</strong> to control order; first matching rule wins per action type."
+msgstr ""
+"تُطبَّق القواعد عند إنشاء أو تحديث المنافسة عند تفعيل المطابقة الذكية في الإعدادات.\n"
+"                استخدم <strong>الترتيب</strong> للتحكم في الأولوية؛ أول قاعدة تتطابق لكل نوع إجراء هي الفائزة."
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_search
+msgid "SME Allowed"
+msgstr "مسموح للمنشآت الصغيرة والمتوسطة"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "SME Benefits"
+msgstr "مزايا المنشآت الصغيرة والمتوسطة"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "SME Certificate Mandatory"
+msgstr "شهادة المنشآت الصغيرة والمتوسطة إلزامية"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__sme_participation_allowed
+msgid "SME Participation Allowed"
+msgstr "مشاركة المنشآت الصغيرة والمتوسطة مسموحة"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "SME Price Preference %"
+msgstr "نسبة تفضيل سعر المنشآت الصغيرة والمتوسطة %"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__sme_price_preference
+msgid "SME Price Preference Pct"
+msgstr "نسبة تفضيل السعر للمنشآت الصغيرة والمتوسطة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__sme_qualification_mandatory
+msgid "SME Qualification Mandatory"
+msgstr "تأهيل المنشآت الصغيرة والمتوسطة إلزامي"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr "خطأ في تسليم الرسالة النصية"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_config_wizard_form
+msgid "Save"
+msgstr "حفظ"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_config_wizard_form
+msgid "Scraping & Sync"
+msgstr "الجلب والمزامنة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__scraping_error_count
+msgid "Scraping Errors"
+msgstr "أخطاء الجلب"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_search
+msgid "Scraping Issues"
+msgstr "مشاكل الجلب"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__scraping_status
+msgid "Scraping Status"
+msgstr "حالة الجلب"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_activity_search
+msgid "Search Activities"
+msgstr "بحث في الأنشطة"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_search
+msgid "Search Tenders"
+msgstr "بحث في المنافسات"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_tender__submission_method__separate_files
+msgid "Separate Files"
+msgstr "ملفات منفصلة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_matching_rule__sequence
+msgid "Sequence"
+msgstr "الترتيب"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Set by matching rules"
+msgstr "مُعيَّن بواسطة قواعد المطابقة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,help:ics_etimad_tenders_crm.field_ics_etimad_activity__active
+msgid "Set to False to hide this activity from selection"
+msgstr "اضبط على خطأ لإخفاء هذا النشاط من القائمة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.ui.menu,name:ics_etimad_tenders_crm.menu_etimad_config_smart_matching
+msgid "Settings"
+msgstr "الإعدادات"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_tender__submission_method__single_file
+msgid "Single File"
+msgstr "ملف واحد"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_tender__estimated_value_category__small
+msgid "Small"
+msgstr "صغير"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_search
+msgid "Small Value (<100K)"
+msgstr "قيمة صغيرة (أقل من 100 ألف)"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_config_wizard_form
+msgid "Smart Matching"
+msgstr "المطابقة الذكية"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Source"
+msgstr "المصدر"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_matching_rule__operator__startswith
+msgid "Starts With"
+msgstr "يبدأ بـ"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Status & Approval"
+msgstr "الحالة والاعتماد"
+
+#. module: ics_etimad_tenders_crm
+#. odoo-python
+#: code:addons/ics_etimad_tenders_crm/models/etimad_tender.py:0
+msgid "Status Updated"
+msgstr "تم تحديث الحالة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,help:ics_etimad_tenders_crm.field_ics_etimad_tender__activity_state
+msgid ""
+"Status based on activities\n"
+"Overdue: Due date is already passed\n"
+"Today: Activity date is today\n"
+"Planned: Future activities."
+msgstr ""
+"الحالة بناءً على الأنشطة\n"
+"متأخر: مر موعد الاستحقاق\n"
+"اليوم: موعد النشاط اليوم\n"
+"مجدول: أنشطة مستقبلية."
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__submission_date
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Submission Date"
+msgstr "تاريخ التقديم"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__submission_method
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Submission Method"
+msgstr "طريقة التقديم"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_tender__scraping_status__success
+msgid "Success"
+msgstr "ناجح"
+
+#. module: ics_etimad_tenders_crm
+#. odoo-python
+#: code:addons/ics_etimad_tenders_crm/models/etimad_tender.py:0
+msgid ""
+"Successfully fetched and updated {count} detail fields from {endpoints} "
+"endpoint(s)"
+msgstr ""
+"تم جلب وتحديث {count} حقلاً تفصيلياً من {endpoints} نقطة وصول بنجاح"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Supply Items"
+msgstr "مواد التوريد"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__suspension_period_days
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Suspension Period (Days)"
+msgstr "فترة التعليق (أيام)"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_config_wizard__etimad_sync_interval
+msgid "Sync Interval (hours)"
+msgstr "فترة المزامنة (ساعات)"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__local_content_target_percentage
+msgid "Target Local Content Pct"
+msgstr "نسبة المحتوى المحلي المستهدفة"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Target for Evaluation %"
+msgstr "النسبة المستهدفة للتقييم %"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__activity_name
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Tender Activity"
+msgstr "نشاط المنافسة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__tender_status_approved
+msgid "Tender Approved"
+msgstr "المنافسة معتمدة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__tender_id
+msgid "Tender ID"
+msgstr "رقم المنافسة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__tender_id_string
+msgid "Tender ID String"
+msgstr "رقم المنافسة (نصي)"
+
+#. module: ics_etimad_tenders_crm
+#. odoo-python
+#: code:addons/ics_etimad_tenders_crm/models/etimad_tender.py:0
+msgid "Tender ID String is required to fetch detailed information."
+msgstr "رقم المنافسة النصي مطلوب لجلب المعلومات التفصيلية."
+
+#. module: ics_etimad_tenders_crm
+#. odoo-python
+#: code:addons/ics_etimad_tenders_crm/models/etimad_tender.py:0
+msgid "Tender ID String is required."
+msgstr "رقم المنافسة النصي مطلوب."
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Tender Information"
+msgstr "معلومات المنافسة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__name
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_matching_rule__field_name__name
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_list
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_search
+msgid "Tender Name"
+msgstr "اسم المنافسة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__tender_number
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Tender Number"
+msgstr "رقم المنافسة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__tender_purpose
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_matching_rule__field_name__tender_purpose
+msgid "Tender Purpose"
+msgstr "الغرض من المنافسة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__tender_status_id
+msgid "Tender Status ID"
+msgstr "رقم حالة المنافسة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__tender_status_text
+msgid "Tender Status Text"
+msgstr "نص حالة المنافسة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_matching_rule__field_name__etimad_tender_type
+msgid "Tender Type"
+msgstr "نوع المنافسة"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Tender activity"
+msgstr "نشاط المنافسة"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Tender type from Etimad"
+msgstr "نوع المنافسة من منصة اعتماد"
+
+#. module: ics_etimad_tenders_crm
+#. odoo-python
+#: code:addons/ics_etimad_tenders_crm/models/etimad_tender.py:0
+msgid "Tenders Synchronized"
+msgstr "تمت مزامنة المنافسات"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_config_wizard__etimad_fetch_page_size
+msgid "Tenders per Page"
+msgstr "المنافسات لكل صفحة"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_config_wizard_form
+msgid "Test Connection"
+msgstr "اختبار الاتصال"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_matching_rule_form
+msgid "Then"
+msgstr "ثم"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.actions.act_window,help:ics_etimad_tenders_crm.action_etimad_activity
+msgid ""
+"These are the main business activities from Etimad portal (النشاط الأساسي).\n"
+"                They are used for smart matching of tenders to your company profile."
+msgstr ""
+"هذه هي الأنشطة التجارية الرئيسية من منصة اعتماد (النشاط الأساسي).\n"
+"                تُستخدم لمطابقة المنافسات ذكياً مع ملف شركتك."
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Times Extended"
+msgstr "عدد مرات التمديد"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_config_wizard__etimad_publish_date_filter__1
+msgid "Today"
+msgstr "اليوم"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_list
+msgid "Type"
+msgstr "النوع"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,help:ics_etimad_tenders_crm.field_ics_etimad_tender__activity_exception_decoration
+msgid "Type of the exception activity on record."
+msgstr "نوع النشاط الاستثنائي في السجل."
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Unmark Participating"
+msgstr "إلغاء تحديد المشاركة"
+
+#. module: ics_etimad_tenders_crm
+#. odoo-python
+#: code:addons/ics_etimad_tenders_crm/models/etimad_tender.py:0
+msgid "Unmarked as participating"
+msgstr "تم إلغاء تحديد المشاركة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__is_urgent
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_search
+msgid "Urgent"
+msgstr "عاجل"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.ui.menu,name:ics_etimad_tenders_crm.menu_etimad_urgent
+msgid "Urgent (≤7 days)"
+msgstr "عاجل (≤7 أيام)"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.actions.act_window,name:ics_etimad_tenders_crm.action_etimad_urgent_tenders
+msgid "Urgent Tenders (≤7 days)"
+msgstr "المنافسات العاجلة (≤7 أيام)"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,help:ics_etimad_tenders_crm.field_ics_etimad_matching_rule__action_value_char
+msgid "Used for note text or match reason text."
+msgstr "يُستخدم لنص الملاحظة أو نص سبب التطابق."
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,help:ics_etimad_tenders_crm.field_ics_etimad_matching_rule__user_id
+msgid "Used when Action is \"Assign to User\"."
+msgstr "يُستخدم عندما يكون الإجراء \"تعيين إلى مستخدم\"."
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,help:ics_etimad_tenders_crm.field_ics_etimad_tender__assigned_user_id
+msgid "User assigned by smart matching rules or manually."
+msgstr "المستخدم المعيَّن بواسطة قواعد المطابقة الذكية أو يدوياً."
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,help:ics_etimad_tenders_crm.field_res_company__etimad_notification_user_ids
+msgid "Users who will receive tender notifications."
+msgstr "المستخدمون الذين سيستلمون إشعارات المنافسات."
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_matching_rule__action_value_char
+msgid "Value"
+msgstr "القيمة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_matching_rule__value_float
+msgid "Value (number)"
+msgstr "القيمة (رقم)"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_matching_rule__value_char
+msgid "Value (text)"
+msgstr "القيمة (نص)"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__estimated_value_category
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_list
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_search
+msgid "Value Category"
+msgstr "فئة القيمة"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "View Details Page"
+msgstr "عرض صفحة التفاصيل"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "View Opportunity"
+msgstr "عرض الفرصة"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "View Report"
+msgstr "عرض التقرير"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_list
+msgid "Visit Etimad"
+msgstr "زيارة منصة اعتماد"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Visit this tender on the Etimad website"
+msgstr "زيارة هذه المنافسة على موقع اعتماد"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__website_message_ids
+msgid "Website Messages"
+msgstr "رسائل الموقع الإلكتروني"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,help:ics_etimad_tenders_crm.field_ics_etimad_tender__website_message_ids
+msgid "Website communication history"
+msgstr "سجل التواصل عبر الموقع الإلكتروني"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "Weight in Evaluation %"
+msgstr "الوزن في التقييم %"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_matching_rule_form
+msgid "When"
+msgstr "عندما"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_search
+msgid "With Award Results"
+msgstr "مع نتائج الترسية"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.ui.menu,name:ics_etimad_tenders_crm.menu_etimad_opportunities
+msgid "With Opportunities"
+msgstr "مع الفرص"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_search
+msgid "With Opportunity"
+msgstr "مع فرصة"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_search
+msgid "Without Opportunity"
+msgstr "بدون فرصة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,field_description:ics_etimad_tenders_crm.field_ics_etimad_tender__work_start_date
+msgid "Work Start Date"
+msgstr "تاريخ بدء العمل"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields.selection,name:ics_etimad_tenders_crm.selection__ics_etimad_config_wizard__etimad_publish_date_filter__2
+msgid "Yesterday"
+msgstr "أمس"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_kanban
+msgid "days"
+msgstr "أيام"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_matching_rule_form
+msgid "e.g. High value IT tenders"
+msgstr "مثال: منافسات تقنية المعلومات ذات القيمة العالية"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "required after winning"
+msgstr "مطلوب بعد الفوز"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_config_wizard_form
+msgid "supply, maintenance, services"
+msgstr "توريد، صيانة، خدمات"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "أعمال الإنشاء (Construction Works)"
+msgstr "أعمال الإنشاء (Construction Works)"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "أعمال الصيانة والتشغيل (Maintenance & Operation Works)"
+msgstr "أعمال الصيانة والتشغيل (Maintenance & Operation Works)"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "الغرض من المنافسة"
+msgstr "الغرض من المنافسة"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "القيمة التقديرية - Not always published"
+msgstr "القيمة التقديرية - لا تُنشر دائماً"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "قيمة وثائق المنافسة"
+msgstr "قيمة وثائق المنافسة"
+
+#. module: ics_etimad_tenders_crm
+#: model:ir.model.fields,help:ics_etimad_tenders_crm.field_ics_etimad_tender__document_cost_amount
+msgid "قيمة وثائق المنافسة - Scraped from Etimad detail page"
+msgstr "قيمة وثائق المنافسة - مجلوبة من صفحة تفاصيل اعتماد"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "مدن التنفيذ (Cities)"
+msgstr "مدن التنفيذ (Cities)"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "مناطق التنفيذ (Regions)"
+msgstr "مناطق التنفيذ (Regions)"
+
+#. module: ics_etimad_tenders_crm
+#: model_terms:ir.ui.view,arch_db:ics_etimad_tenders_crm.view_etimad_tender_form
+msgid "نشاط المنافسة (Tender Activity Details)"
+msgstr "نشاط المنافسة (Tender Activity Details)"
